@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Frequência Sacramental | Sistema de Apoio ao Conselho de Ala</title>
+    <title>Frequência Sacramental</title>
     
     <!-- Frameworks -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -29,278 +29,258 @@
         .hidden { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
 
-        /* Glassmorphism & Soft UI */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 24px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        /* Estilo Desktop Sidebar */
+        @media (min-width: 768px) {
+            .sidebar-fixed { width: 280px; position: fixed; height: 100vh; left: 0; top: 0; }
+            .main-content { margin-left: 280px; width: calc(100% - 280px); }
         }
 
-        /* Nav Transitions */
-        .nav-link { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .nav-link.active { color: var(--sacramental-blue); transform: translateY(-4px); }
-        .nav-link.active i { background: #e0f2fe; padding: 10px; border-radius: 16px; color: var(--sacramental-blue); }
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-radius: 24px;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Navegação */
+        .nav-active { background: #eef2ff; color: var(--sacramental-blue); font-weight: 800; }
+        .nav-active i { color: var(--sacramental-blue); }
 
         /* Custom Checkbox */
-        .cb-custom {
-            width: 28px;
-            height: 28px;
-            border-radius: 10px;
-            border: 2px solid #cbd5e1;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+        .check-box {
+            width: 26px; height: 26px; border-radius: 8px; border: 2px solid #e2e8f0;
+            display: flex; align-items: center; justify-content: center; transition: 0.2s;
         }
-        .cb-active { background: var(--healing-teal); border-color: var(--healing-teal); color: white; }
-
-        /* Sidebar Desktop */
-        @media (min-width: 768px) {
-            .sidebar { width: 280px; position: fixed; height: 100vh; }
-            .content-area { margin-left: 280px; }
-        }
-
-        /* Floating Button Mobile */
-        .floating-add {
-            position: fixed;
-            bottom: 100px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            background: var(--sacramental-blue);
-            color: white;
-            border-radius: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 20px rgba(0, 46, 93, 0.3);
-            z-index: 40;
-        }
+        .check-active { background: var(--healing-teal); border-color: var(--healing-teal); color: white; }
     </style>
 </head>
 <body class="antialiased">
 
-    <!-- OVERLAY LOADING -->
-    <div id="loading-screen" class="fixed inset-0 bg-white z-[200] flex flex-col items-center justify-center space-y-4">
-        <div class="w-12 h-12 border-4 border-slate-200 border-t-[#002e5d] rounded-full animate-spin"></div>
-        <p class="text-xs font-bold text-slate-400 tracking-widest uppercase">Frequência Sacramental</p>
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen" class="fixed inset-0 bg-white z-[200] flex items-center justify-center">
+        <div class="flex flex-col items-center gap-4">
+            <div class="w-10 h-10 border-4 border-slate-100 border-t-[#002e5d] rounded-full animate-spin"></div>
+            <p class="text-[10px] font-bold text-slate-400 tracking-widest uppercase">Carregando Sistema...</p>
+        </div>
     </div>
 
-    <!-- APP WRAPPER -->
-    <div class="min-h-screen flex flex-col md:flex-row">
-        
-        <!-- SIDEBAR / NAV -->
-        <aside id="main-nav" class="hidden glass-card m-4 p-6 flex-col justify-between sidebar z-[100] md:flex">
-            <div>
-                <div class="flex items-center space-x-3 mb-10 px-2">
-                    <div class="w-10 h-10 bg-[#002e5d] rounded-xl flex items-center justify-center text-white">
-                        <i class="fas fa-church"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-extrabold text-sm leading-tight text-[#002e5d]">Ala Unificada</h1>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Gestão de Frequência</p>
-                    </div>
-                </div>
+    <div class="min-h-screen flex">
 
-                <nav class="space-y-1">
-                    <button onclick="switchTab('dashboard')" id="side-dashboard" class="w-full flex items-center space-x-3 p-4 rounded-2xl font-semibold text-slate-500 hover:bg-slate-50 transition-all active-tab">
-                        <i class="fas fa-grid-2"></i> <span>Dashboard</span>
-                    </button>
-                    <button onclick="switchTab('attendance')" id="side-attendance" class="w-full flex items-center space-x-3 p-4 rounded-2xl font-semibold text-slate-500 hover:bg-slate-50 transition-all">
-                        <i class="fas fa-calendar-check"></i> <span>Registrar</span>
-                    </button>
-                    <button onclick="switchTab('analysis')" id="side-analysis" class="w-full flex items-center space-x-3 p-4 rounded-2xl font-semibold text-slate-500 hover:bg-slate-50 transition-all">
-                        <i class="fas fa-heart-pulse"></i> <span>Resgate</span>
-                    </button>
-                    <button onclick="switchTab('reports')" id="side-reports" class="w-full flex items-center space-x-3 p-4 rounded-2xl font-semibold text-slate-500 hover:bg-slate-50 transition-all">
-                        <i class="fas fa-chart-pie"></i> <span>Relatórios</span>
-                    </button>
-                </nav>
+        <!-- SIDEBAR (DESKTOP) -->
+        <aside id="desktop-sidebar" class="hidden md:flex sidebar-fixed bg-white border-r border-slate-100 flex-col p-6 z-[100]">
+            <div class="flex items-center gap-3 mb-10 px-2">
+                <div class="w-10 h-10 bg-[#002e5d] rounded-xl flex items-center justify-center text-white">
+                    <i class="fas fa-church"></i>
+                </div>
+                <h1 class="font-black text-[#002e5d] leading-none uppercase text-xs tracking-tighter">Frequência<br>Sacramental</h1>
             </div>
 
-            <div class="bg-slate-50 p-4 rounded-3xl space-y-3">
-                <div class="flex items-center space-x-3">
-                    <div id="user-avatar" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm font-bold text-[#002e5d]"></div>
-                    <div class="overflow-hidden">
-                        <p id="user-display-name" class="text-xs font-bold truncate">Usuário</p>
-                        <p id="user-display-role" class="text-[9px] text-slate-400 uppercase font-bold">Acesso</p>
-                    </div>
-                </div>
-                <button onclick="logout()" class="w-full text-xs font-bold text-red-500 p-2 hover:bg-red-50 rounded-xl transition-all">Sair do Sistema</button>
+            <nav class="flex-1 space-y-1">
+                <button onclick="switchTab('dashboard')" id="btn-side-dashboard" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-all">
+                    <i class="fas fa-chart-line w-5 text-center"></i> Painel Inicial
+                </button>
+                <button onclick="switchTab('attendance')" id="btn-side-attendance" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-all">
+                    <i class="fas fa-list-check w-5 text-center"></i> Registrar Frequência
+                </button>
+                <button onclick="switchTab('analysis')" id="btn-side-analysis" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-all">
+                    <i class="fas fa-heart-pulse w-5 text-center"></i> Resgate (+21 dias)
+                </button>
+                <button onclick="switchTab('reports')" id="btn-side-reports" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-all">
+                    <i class="fas fa-file-invoice w-5 text-center"></i> Relatórios Estratégicos
+                </button>
+                <button onclick="switchTab('add')" id="btn-side-add" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-all">
+                    <i class="fas fa-user-plus w-5 text-center"></i> Novo Membro
+                </button>
+                <hr class="my-4 border-slate-50">
+                <button id="admin-menu-btn" onclick="switchTab('admin-users')" class="hidden w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-all">
+                    <i class="fas fa-users-cog w-5 text-center"></i> Gerenciar Logins
+                </button>
+            </nav>
+
+            <div class="p-4 bg-slate-50 rounded-3xl">
+                <p id="user-side-name" class="font-bold text-xs truncate uppercase">Usuário</p>
+                <button onclick="logout()" class="text-[10px] font-bold text-red-400 mt-2 block uppercase underline">Sair</button>
             </div>
         </aside>
 
-        <!-- MAIN CONTENT AREA -->
-        <div class="flex-1 content-area pb-32 md:pb-10">
+        <!-- CONTEÚDO PRINCIPAL -->
+        <main class="flex-1 main-content flex flex-col min-w-0">
             
             <!-- HEADER MOBILE -->
-            <header class="p-6 flex justify-between items-center md:hidden">
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Frequência</p>
-                    <h2 class="text-xl font-extrabold text-[#002e5d]" id="mobile-page-title">Dashboard</h2>
-                </div>
-                <button onclick="logout()" class="w-10 h-10 bg-white rounded-full shadow-sm flex items-center justify-center text-red-400">
+            <header class="md:hidden p-6 flex justify-between items-center bg-white border-b border-slate-50 sticky top-0 z-50">
+                <h2 class="font-extrabold text-[#002e5d] text-lg italic" id="page-title-mobile">Dashboard</h2>
+                <button onclick="logout()" class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </header>
 
-            <!-- VIEWS -->
-            <div class="px-6 space-y-6 max-w-5xl mx-auto">
-                
-                <!-- LOGIN VIEW -->
-                <section id="view-login" class="min-h-[80vh] flex items-center justify-center hidden">
-                    <div class="glass-card p-8 w-full max-w-sm text-center space-y-6">
-                        <i class="fas fa-shield-halved text-5xl text-[#002e5d]"></i>
-                        <h2 class="text-2xl font-black">Bem-vindo</h2>
-                        <div class="space-y-3 text-left">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase px-2">Usuário</label>
-                            <input type="text" id="login-user" class="w-full p-4 rounded-2xl border-none bg-slate-100 focus:ring-2 focus:ring-[#002e5d] transition-all">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase px-2">Senha</label>
-                            <input type="password" id="login-pass" class="w-full p-4 rounded-2xl border-none bg-slate-100 focus:ring-2 focus:ring-[#002e5d] transition-all">
+            <div class="p-6 md:p-10 space-y-8 max-w-6xl mx-auto w-full">
+
+                <!-- VIEW LOGIN -->
+                <section id="view-login" class="min-h-[70vh] flex items-center justify-center hidden">
+                    <div class="glass-card p-10 w-full max-w-sm text-center space-y-6 shadow-2xl">
+                        <i class="fas fa-user-lock text-5xl text-[#002e5d]"></i>
+                        <h2 class="text-2xl font-black text-slate-800">Acesso Restrito</h2>
+                        <div class="space-y-3">
+                            <input type="text" id="login-user" placeholder="Usuário" class="w-full p-4 rounded-2xl bg-slate-100 outline-none border-none text-sm">
+                            <input type="password" id="login-pass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-100 outline-none border-none text-sm">
                         </div>
-                        <button onclick="checkLogin()" class="w-full py-4 bg-[#002e5d] text-white rounded-2xl font-bold shadow-xl active:scale-95 transition-all">Entrar no Sistema</button>
-                        <button onclick="switchTab('first-login')" class="text-xs font-bold text-slate-400 underline">É meu primeiro acesso</button>
+                        <button onclick="checkLogin()" class="w-full bg-[#002e5d] text-white py-4 rounded-2xl font-bold shadow-xl active:scale-95 transition-all">Entrar</button>
+                        <button onclick="switchTab('first-login')" class="text-xs font-bold text-slate-400 underline">Primeiro Acesso?</button>
                     </div>
                 </section>
 
-                <!-- DASHBOARD VIEW -->
+                <section id="view-first-login" class="hidden py-10 flex justify-center">
+                    <div class="glass-card p-10 w-full max-w-sm text-center space-y-4">
+                        <h2 class="font-black text-xl">Ativar Conta</h2>
+                        <p class="text-[10px] text-slate-400 uppercase">Defina sua senha pessoal</p>
+                        <input type="text" id="first-user" placeholder="Usuário Pré-autorizado" class="w-full p-4 rounded-2xl bg-slate-50 text-sm border">
+                        <input type="password" id="first-pass" placeholder="Crie uma Senha" class="w-full p-4 rounded-2xl bg-slate-50 text-sm border">
+                        <input type="password" id="first-pass-confirm" placeholder="Confirme a Senha" class="w-full p-4 rounded-2xl bg-slate-50 text-sm border">
+                        <button onclick="processFirstLogin()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-bold">ATIVAR ACESSO</button>
+                    </div>
+                </section>
+
+                <!-- DASHBOARD -->
                 <section id="view-dashboard" class="hidden space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="glass-card p-6 flex items-center space-x-4 border-l-8 border-green-500">
-                            <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-600"><i class="fas fa-users text-xl"></i></div>
-                            <div>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase">Presentes Hoje</p>
-                                <p id="stats-present" class="text-2xl font-black text-slate-800">0</p>
-                            </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="glass-card p-6 border-l-8 border-green-500">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Presentes Hoje</p>
+                            <p id="stats-present" class="text-4xl font-black text-slate-800">0</p>
                         </div>
-                        <div class="glass-card p-6 flex items-center space-x-4 border-l-8 border-[#002e5d]">
-                            <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-[#002e5d]"><i class="fas fa-database text-xl"></i></div>
-                            <div>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase">Membros na Lista</p>
-                                <p id="stats-total" class="text-2xl font-black text-slate-800">0</p>
-                            </div>
+                        <div class="glass-card p-6 border-l-8 border-[#002e5d]">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Membros na Ala</p>
+                            <p id="stats-total" class="text-4xl font-black text-slate-800">0</p>
                         </div>
-                        <div class="glass-card p-6 flex items-center space-x-4 border-l-8 border-orange-500">
-                            <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600"><i class="fas fa-heart-pulse text-xl"></i></div>
-                            <div>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase">Urgência Resgate</p>
-                                <p id="stats-rescue" class="text-2xl font-black text-slate-800">0</p>
-                            </div>
+                        <div class="glass-card p-6 border-l-8 border-orange-500">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Resgate Prioritário</p>
+                            <p id="stats-rescue" class="text-4xl font-black text-slate-800">0</p>
                         </div>
                     </div>
-
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="glass-card p-6">
-                            <h3 class="font-bold text-sm mb-6 flex justify-between">Saúde por Organização <span>%</span></h3>
-                            <canvas id="heatmapChart" height="200"></canvas>
-                        </div>
-                        <div class="glass-card p-6">
-                            <h3 class="font-bold text-sm mb-6">Tendência de Frequência</h3>
-                            <canvas id="attendanceChart" height="200"></canvas>
-                        </div>
+                        <div class="glass-card p-8"><canvas id="heatmapChart" height="200"></canvas></div>
+                        <div class="glass-card p-8"><canvas id="attendanceChart" height="200"></canvas></div>
                     </div>
                 </section>
 
-                <!-- ATTENDANCE VIEW -->
+                <!-- REGISTRAR FREQUÊNCIA -->
                 <section id="view-attendance" class="hidden space-y-6">
-                    <div class="flex flex-col md:flex-row gap-4 md:items-center justify-between">
-                        <div class="relative flex-1">
-                            <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            <input type="text" id="searchMember" placeholder="Buscar por nome ou família..." class="w-full pl-14 p-4 glass-card border-none focus:ring-2 focus:ring-[#002e5d]">
+                    <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
+                        <div class="relative w-full md:max-w-md">
+                            <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                            <input type="text" id="searchMember" placeholder="Buscar por nome ou família..." class="w-full pl-14 p-4 glass-card border-none outline-none focus:ring-2 focus:ring-[#002e5d]">
                         </div>
-                        <div class="glass-card px-4 py-2 flex items-center space-x-3">
-                            <i class="fas fa-calendar-alt text-[#002e5d]"></i>
-                            <select id="dateSelect" class="bg-transparent font-bold text-sm border-none outline-none"></select>
+                        <div class="glass-card flex items-center px-4 py-2 gap-3 w-full md:w-auto">
+                            <i class="fas fa-calendar-check text-[#002e5d]"></i>
+                            <select id="dateSelect" class="bg-transparent font-bold text-sm border-none outline-none w-full"></select>
                         </div>
                     </div>
+                    <div id="orgFilters" class="flex overflow-x-auto gap-2 no-scrollbar py-2"></div>
+                    <div id="memberList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+                </section>
 
-                    <div class="flex space-x-2 overflow-x-auto no-scrollbar pb-2" id="orgFilters"></div>
-
-                    <div id="memberList" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <!-- Members Injected -->
+                <!-- RELATÓRIOS ESTRATÉGICOS -->
+                <section id="view-reports" class="hidden space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="glass-card p-8">
+                            <h3 class="font-black text-yellow-600 uppercase text-[10px] tracking-widest mb-4"><i class="fas fa-triangle-exclamation mr-2"></i>Sinal Amarelo (Frequência em Queda)</h3>
+                            <div id="report-yellow" class="space-y-3"></div>
+                        </div>
+                        <div class="glass-card p-8">
+                            <h3 class="font-black text-blue-600 uppercase text-[10px] tracking-widest mb-4"><i class="fas fa-users-viewfinder mr-2"></i>Ausências por Família (Hoje)</h3>
+                            <div id="report-family" class="space-y-3"></div>
+                        </div>
+                        <div class="glass-card p-8 lg:col-span-2">
+                            <h3 class="font-black text-green-600 uppercase text-[10px] tracking-widest mb-4"><i class="fas fa-seedling mr-2"></i>Novos Moradores e Conversos</h3>
+                            <div id="report-retention" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                        </div>
                     </div>
                 </section>
 
-                <!-- RESCUE / ANALYSIS VIEW -->
-                <section id="view-analysis" class="hidden space-y-6 text-center">
-                    <div class="max-w-xl mx-auto space-y-3">
-                        <div class="inline-flex p-3 bg-orange-100 text-orange-600 rounded-full font-bold text-[10px] uppercase tracking-widest">Atenção Prioritária</div>
-                        <h2 class="text-2xl font-black text-slate-800">Resgate e Ministração</h2>
-                        <p class="text-sm text-slate-400">Membros ausentes há mais de 3 semanas (21 dias). O foco deve ser o contato amoroso.</p>
-                    </div>
-                    <div id="missingList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-left"></div>
+                <!-- RESGATE (+21 DIAS) -->
+                <section id="view-analysis" class="hidden space-y-6">
+                    <div id="missingList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </section>
 
-                <!-- ADD MEMBER VIEW -->
+                <!-- NOVO MEMBRO -->
                 <section id="view-add" class="hidden flex justify-center">
-                    <div class="glass-card p-8 w-full max-w-xl space-y-6">
-                        <h3 class="text-xl font-bold flex items-center"><i class="fas fa-user-plus mr-3 text-[#002e5d]"></i>Cadastrar Novo</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-bold text-slate-400 uppercase">Nome Completo</label>
-                                <input type="text" id="newName" class="w-full p-4 bg-slate-50 border-none rounded-2xl uppercase text-sm">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-bold text-slate-400 uppercase">Família (Sobrenome)</label>
-                                <input type="text" id="newFamily" class="w-full p-4 bg-slate-50 border-none rounded-2xl uppercase text-sm">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-bold text-slate-400 uppercase">Organização</label>
-                                <select id="newOrg" class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm">
-                                    <option value="Quórum de Élderes">Quórum de Élderes</option>
-                                    <option value="Sociedade de Socorro">Sociedade de Socorro</option>
-                                    <option value="Moças">Moças</option>
-                                    <option value="Rapazes">Rapazes</option>
-                                    <option value="Primária">Primária</option>
-                                    <option value="Visitante">Visitante</option>
+                    <div class="glass-card p-10 w-full max-w-xl space-y-6">
+                        <h3 class="text-xl font-black text-[#002e5d] uppercase tracking-tighter">Novo Cadastro</h3>
+                        <div class="grid grid-cols-1 gap-4">
+                            <input type="text" id="newName" placeholder="NOME COMPLETO" class="w-full p-4 bg-slate-50 border-none rounded-2xl uppercase text-sm">
+                            <input type="text" id="newFamily" placeholder="SOBRENOME DA FAMÍLIA" class="w-full p-4 bg-slate-50 border-none rounded-2xl uppercase text-sm">
+                            <div class="grid grid-cols-2 gap-2">
+                                <select id="newOrg" class="p-4 bg-slate-50 border-none rounded-2xl text-[10px] font-bold">
+                                    <option value="Quórum de Élderes">QUÓRUM DE ÉLDERES</option>
+                                    <option value="Sociedade de Socorro">SOCIEDADE DE SOCORRO</option>
+                                    <option value="Moças">MOÇAS</option>
+                                    <option value="Rapazes">RAPAZES</option>
+                                    <option value="Primária">PRIMÁRIA</option>
+                                    <option value="Visitante">VISITANTE</option>
+                                </select>
+                                <select id="newCat" class="p-4 bg-slate-50 border-none rounded-2xl text-[10px] font-bold">
+                                    <option value="Membro">MEMBRO ATIVO</option>
+                                    <option value="Recém-Converso">RECÉM-CONVERSO</option>
+                                    <option value="Novo Morador">NOVO MORADOR</option>
                                 </select>
                             </div>
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-bold text-slate-400 uppercase">Status</label>
-                                <select id="newCat" class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm">
-                                    <option value="Membro">Membro da Ala</option>
-                                    <option value="Recém-Converso">Recém-Converso</option>
-                                    <option value="Novo Morador">Novo Morador</option>
-                                </select>
-                            </div>
+                            <button onclick="addMember()" class="w-full bg-[#002e5d] text-white p-5 rounded-2xl font-bold uppercase tracking-widest shadow-xl">Cadastrar Membro</button>
                         </div>
-                        <button onclick="addMember()" class="w-full py-4 bg-[#002e5d] text-white rounded-2xl font-bold shadow-lg">Salvar Cadastro</button>
                     </div>
+                </section>
+
+                <!-- GERENCIAR LOGINS -->
+                <section id="view-admin-users" class="hidden space-y-6">
+                    <div class="glass-card p-8 max-w-lg mx-auto mb-10">
+                        <h4 class="font-bold text-[10px] uppercase text-slate-400 mb-4">Pré-autorizar acesso</h4>
+                        <div class="space-y-3">
+                            <input type="text" id="admin-new-name" placeholder="Nome Completo" class="w-full p-4 bg-slate-50 border-none rounded-xl text-sm">
+                            <input type="text" id="admin-new-user" placeholder="Login (Usuário)" class="w-full p-4 bg-slate-50 border-none rounded-xl text-sm">
+                            <select id="admin-new-role" class="w-full p-4 bg-slate-50 border-none rounded-xl text-sm">
+                                <option value="user">Secretário (Usuário)</option>
+                                <option value="admin">Administrador</option>
+                            </select>
+                            <button onclick="adminCreateUser()" class="w-full bg-[#002e5d] text-white p-4 rounded-xl font-bold uppercase text-[10px]">Autorizar Login</button>
+                        </div>
+                    </div>
+                    <div id="users-list" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-4xl mx-auto"></div>
                 </section>
 
             </div>
-        </div>
+        </main>
 
-        <!-- MOBILE FLOATING NAVIGATION -->
-        <nav class="md:hidden fixed bottom-6 left-6 right-6 h-20 glass-card flex justify-around items-center px-4 z-[100] border border-slate-200">
-            <button onclick="switchTab('dashboard')" class="nav-link flex flex-col items-center" id="nav-dashboard">
-                <i class="fas fa-house text-xl"></i>
+        <!-- FLOATING BAR (MOBILE) -->
+        <nav class="md:hidden fixed bottom-6 left-6 right-6 h-20 glass-card flex justify-around items-center px-4 z-[100] border-2 border-white shadow-2xl">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-slate-400 transition-all">
+                <i class="fas fa-home text-lg"></i>
             </button>
-            <button onclick="switchTab('attendance')" class="nav-link flex flex-col items-center" id="nav-attendance">
-                <i class="fas fa-list-check text-xl"></i>
+            <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center gap-1 text-slate-400 transition-all">
+                <i class="fas fa-clipboard-check text-lg"></i>
             </button>
-            <button onclick="switchTab('analysis')" class="nav-link flex flex-col items-center" id="nav-analysis">
-                <i class="fas fa-heart text-xl"></i>
+            <button onclick="switchTab('analysis')" id="nav-analysis" class="flex flex-col items-center gap-1 text-slate-400 transition-all">
+                <i class="fas fa-hand-holding-heart text-lg"></i>
             </button>
-            <button onclick="switchTab('add')" class="nav-link flex flex-col items-center" id="nav-add">
-                <i class="fas fa-plus text-xl"></i>
+            <button onclick="switchTab('reports')" id="nav-reports" class="flex flex-col items-center gap-1 text-slate-400 transition-all">
+                <i class="fas fa-file-invoice text-lg"></i>
+            </button>
+            <button onclick="switchTab('add')" id="nav-add" class="flex flex-col items-center gap-1 text-slate-400 transition-all">
+                <i class="fas fa-plus text-lg"></i>
             </button>
         </nav>
 
-        <!-- MEMBER EDIT MODAL -->
-        <div id="memberEditModal" class="hidden fixed inset-0 bg-[#002e5d]/40 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
+        <!-- MODAL EDITAR MEMBRO -->
+        <div id="memberEditModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
             <div class="glass-card w-full max-w-sm p-8 space-y-6">
                 <div class="flex justify-between items-center">
-                    <h3 class="font-bold uppercase text-xs text-slate-400">Editar Perfil</h3>
-                    <button onclick="closeMemberEdit()" class="text-slate-300 hover:text-red-500"><i class="fas fa-times"></i></button>
+                    <h3 class="font-bold uppercase text-[10px] text-slate-400 tracking-widest">Editar Cadastro</h3>
+                    <button onclick="closeMemberEdit()" class="text-slate-300"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="space-y-4">
-                    <input type="text" id="edit-member-name" class="w-full p-4 bg-slate-50 border-none rounded-2xl uppercase text-sm">
-                    <input type="text" id="edit-member-family" class="w-full p-4 bg-slate-50 border-none rounded-2xl uppercase text-sm">
-                    <select id="edit-member-org" class="w-full p-4 bg-slate-50 border-none rounded-2xl text-sm">
+                    <input type="text" id="edit-member-name" class="w-full p-4 bg-slate-50 rounded-2xl uppercase text-sm border-none">
+                    <input type="text" id="edit-member-family" class="w-full p-4 bg-slate-50 rounded-2xl uppercase text-sm border-none">
+                    <select id="edit-member-org" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none">
                         <option value="Quórum de Élderes">Quórum de Élderes</option>
                         <option value="Sociedade de Socorro">Sociedade de Socorro</option>
                         <option value="Moças">Moças</option>
@@ -309,21 +289,19 @@
                         <option value="Visitante">Visitante</option>
                     </select>
                 </div>
-                <div class="flex space-x-3">
-                    <button onclick="deleteMemberAction()" class="flex-1 py-3 border-2 border-red-50 rounded-2xl font-bold text-red-400 text-xs">Excluir</button>
-                    <button onclick="saveMemberAction()" class="flex-[2] py-3 bg-[#002e5d] text-white rounded-2xl font-bold text-xs">Salvar Alterações</button>
+                <div class="flex gap-2">
+                    <button onclick="deleteMemberAction()" class="flex-1 py-4 text-red-400 font-bold text-xs uppercase underline">Excluir</button>
+                    <button onclick="saveMemberAction()" class="flex-[2] py-4 bg-[#002e5d] text-white rounded-2xl font-bold text-xs">Salvar</button>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <!-- FIREBASE & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy, setDoc, deleteDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // CONFIGURAÇÃO DO SEU FIREBASE
         const firebaseConfig = {
           apiKey: "AIzaSyAaEKx9n4N847WW97FhfZxLZYtsa5cTsE0",
           authDomain: "frequencia-da-ala.firebaseapp.com",
@@ -336,64 +314,80 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Global State
-        let members = [];
-        let attendanceHistory = {};
+        // State
+        let members = []; let attendanceHistory = {}; let allUsers = [];
         let currentUser = JSON.parse(localStorage.getItem('user_data')) || null;
         let selectedDate = new Date().toISOString().split('T')[0];
         let currentFilter = 'TODOS';
-        let heatmapInstance = null;
-        let chartInstance = null;
+        let hChart = null; let aChart = null;
         let memberIdEditing = null;
+
+        // Init Dates
+        const dateSelect = document.getElementById('dateSelect');
+        const domingosISO = [];
+        for(let i=0; i<12; i++) {
+            let d = new Date(); d.setDate(d.getDate() - (d.getDay() + (7 * i)) % 84);
+            let iso = d.toISOString().split('T')[0];
+            domingosISO.push(iso);
+            dateSelect.innerHTML += `<option value="${iso}">${i==0 ? 'DOMINGO HOJE' : 'DOMINGO '+iso.split('-')[2]+'/'+iso.split('-')[1]}</option>`;
+        }
+        selectedDate = dateSelect.value;
 
         // --- AUTH ---
         window.checkLogin = async () => {
             const u = document.getElementById('login-user').value.toLowerCase().trim();
             const p = document.getElementById('login-pass').value.trim();
-            if(!u || !p) return;
-
             const q = query(collection(db, "usuarios"), where("username", "==", u), where("password", "==", p));
             const snap = await getDocs(q);
             if (!snap.empty) {
                 const d = snap.docs[0].data(); d.id = snap.docs[0].id;
                 localStorage.setItem('user_data', JSON.stringify(d));
-                currentUser = d;
                 location.reload();
             } else alert("Usuário ou senha incorretos.");
         };
 
+        window.processFirstLogin = async () => {
+            const u = document.getElementById('first-user').value.toLowerCase().trim();
+            const p1 = document.getElementById('first-pass').value.trim();
+            const p2 = document.getElementById('first-pass-confirm').value.trim();
+            if(!u || p1 !== p2) return alert("Senhas não coincidem!");
+            const q = query(collection(db, "usuarios"), where("username", "==", u));
+            const snap = await getDocs(q);
+            if(snap.empty) return alert("Usuário não encontrado!");
+            await updateDoc(doc(db, "usuarios", snap.docs[0].id), { password: p1 });
+            alert("Acesso ativado!"); switchTab('login');
+        };
+
         window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
 
-        // --- UI FLOW ---
+        // --- TABS ---
         window.switchTab = (tab) => {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             document.getElementById(`view-${tab}`).classList.remove('hidden');
             
-            // Mobile Nav UI
-            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-            if(document.getElementById(`nav-${tab}`)) document.getElementById(`nav-${tab}`).classList.add('active');
-            
-            // Desktop Nav UI
-            document.querySelectorAll('aside nav button').forEach(b => b.classList.remove('bg-blue-50', 'text-[#002e5d]'));
-            if(document.getElementById(`side-${tab}`)) document.getElementById(`side-${tab}`).classList.add('bg-blue-50', 'text-[#002e5d]');
+            // UI Nav
+            document.querySelectorAll('aside button, nav button').forEach(b => b.classList.remove('nav-active', 'text-slate-800'));
+            if(document.getElementById(`btn-side-${tab}`)) document.getElementById(`btn-side-${tab}`).classList.add('nav-active', 'text-slate-800');
+            if(document.getElementById(`nav-${tab}`)) document.getElementById(`nav-${tab}`).classList.add('text-[#002e5d]');
 
-            document.getElementById('mobile-page-title').innerText = tab.charAt(0).toUpperCase() + tab.slice(1);
+            const titles = { 'dashboard': 'Painel Geral', 'attendance': 'Registrar Frequência', 'analysis': 'Resgate e Apoio', 'reports': 'Relatórios Estratégicos', 'add': 'Novo Cadastro', 'admin-users': 'Gerenciar Logins' };
+            document.getElementById('page-title-mobile').innerText = titles[tab] || 'Frequência';
             window.scrollTo(0,0);
         };
 
-        // --- DATA LOGIC ---
+        // --- CORE LOGIC ---
         function listenData() {
             onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => {
                 members = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderAttendance();
-                renderRescue();
-                updateCharts();
+                renderAll();
             });
             onSnapshot(collection(db, "historico"), (snap) => {
-                attendanceHistory = {};
-                snap.docs.forEach(d => attendanceHistory[d.id] = d.data().presents || []);
-                renderAttendance();
-                updateCharts();
+                attendanceHistory = {}; snap.docs.forEach(d => attendanceHistory[d.id] = d.data().presents || []);
+                renderAll();
+            });
+            onSnapshot(collection(db, "usuarios"), (snap) => {
+                allUsers = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                if(currentUser.role === 'admin') renderUsersList();
             });
             document.getElementById('loading-screen').classList.add('hidden');
         }
@@ -401,9 +395,7 @@
         window.togglePresence = async (memberId, memberName) => {
             const hRef = doc(db, "historico", selectedDate);
             let cur = attendanceHistory[selectedDate] || [];
-            const isPresent = cur.includes(memberId);
-
-            if(isPresent) {
+            if(cur.includes(memberId)) {
                 if(!confirm(`Remover presença de ${memberName}?`)) return;
                 cur = cur.filter(i => i !== memberId);
             } else {
@@ -413,66 +405,98 @@
             await setDoc(hRef, { presents: cur });
         };
 
-        function renderAttendance() {
-            const container = document.getElementById('memberList');
-            const search = document.getElementById('searchMember').value.toLowerCase();
-            const presentsToday = attendanceHistory[selectedDate] || [];
-            container.innerHTML = '';
+        function renderAll() {
+            renderAttendance();
+            renderRescue();
+            renderReports();
+            updateCharts();
+        }
 
-            let pCount = 0; let tCount = 0;
+        function renderAttendance() {
+            const list = document.getElementById('memberList');
+            const search = document.getElementById('searchMember').value.toLowerCase();
+            const curP = attendanceHistory[selectedDate] || [];
+            list.innerHTML = '';
+            let pC = 0; let tC = 0;
 
             members.forEach(m => {
-                const isP = presentsToday.includes(m.id);
-                if(m.org !== 'Visitante') { tCount++; if(isP) pCount++; }
+                const isP = curP.includes(m.id);
+                if(m.org !== 'Visitante') { tC++; if(isP) pC++; }
 
                 const matchesSearch = m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search));
                 const matchesFilter = currentFilter === 'TODOS' || m.org === currentFilter;
 
                 if(matchesSearch && matchesFilter) {
-                    container.innerHTML += `
-                        <div class="glass-card p-5 flex items-center space-x-4 border-l-4 ${isP ? 'border-teal-500 bg-teal-50/20' : 'border-slate-100'} transition-all">
-                            <div onclick="togglePresence('${m.id}', '${m.name}')" class="cb-custom ${isP ? 'cb-active' : ''}">
-                                ${isP ? '<i class="fas fa-check"></i>' : ''}
+                    list.innerHTML += `
+                        <div class="glass-card p-5 flex items-center gap-4 border-l-4 ${isP ? 'border-teal-500' : 'border-slate-100'}">
+                            <div onclick="togglePresence('${m.id}', '${m.name}')" class="check-box ${isP ? 'check-active' : ''}">
+                                ${isP ? '<i class="fas fa-check text-xs"></i>' : ''}
                             </div>
                             <div onclick="togglePresence('${m.id}', '${m.name}')" class="flex-1 min-w-0">
-                                <h4 class="font-bold text-sm text-slate-700 truncate">${m.name}</h4>
+                                <h4 class="font-bold text-sm text-slate-800 truncate">${m.name}</h4>
                                 <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">${m.familia || 'S/ FAM'} • ${m.org}</p>
                             </div>
-                            <button onclick="openMemberEdit('${m.id}')" class="text-slate-300 hover:text-[#002e5d] px-2"><i class="fas fa-pen-to-square"></i></button>
+                            <button onclick="openMemberEdit('${m.id}')" class="text-slate-200 hover:text-[#002e5d]"><i class="fas fa-pen-to-square"></i></button>
                         </div>
                     `;
                 }
             });
-            document.getElementById('stats-present').innerText = pCount;
-            document.getElementById('stats-total').innerText = tCount;
+            document.getElementById('stats-present').innerText = pC;
+            document.getElementById('stats-total').innerText = tC;
         }
 
         function renderRescue() {
             const list = document.getElementById('missingList');
-            list.innerHTML = '';
-            let rescueCount = 0;
-
+            list.innerHTML = ''; let resC = 0;
             members.forEach(m => {
                 if(m.org === 'Visitante') return;
                 const diff = Math.floor((new Date() - new Date(m.lastAttended)) / (1000*60*60*24));
                 if(diff >= 21) {
-                    rescueCount++;
+                    resC++;
                     list.innerHTML += `
-                        <div class="glass-card p-5 space-y-4 border-t-4 border-orange-400">
+                        <div class="glass-card p-6 border-t-4 border-orange-500 space-y-3">
                             <div>
-                                <p class="text-[10px] font-bold text-orange-500 uppercase tracking-widest">${Math.floor(diff/7)} semanas ausente</p>
-                                <h4 class="font-black text-lg text-slate-800">${m.name}</h4>
+                                <p class="text-[9px] font-black text-orange-500 uppercase">${Math.floor(diff/7)} SEMANAS AUSENTE</p>
+                                <h4 class="font-bold text-slate-800">${m.name}</h4>
                                 <p class="text-xs text-slate-400">Família ${m.familia || 'Não informada'}</p>
                             </div>
-                            <div class="flex space-x-2">
-                                <a href="https://wa.me/?text=Olá ${m.name.split(' ')[0]}, sentimos sua falta na Sacramental!" class="flex-1 bg-teal-500 text-white p-3 rounded-xl text-center text-xs font-bold"><i class="fab fa-whatsapp mr-2"></i>Mensagem</a>
-                                <button onclick="openMemberEdit('${m.id}')" class="p-3 bg-slate-50 text-slate-400 rounded-xl"><i class="fas fa-edit"></i></button>
-                            </div>
+                            <a href="https://wa.me/?text=Olá ${m.name.split(' ')[0]}, sentimos sua falta!" class="block w-full bg-teal-500 text-white p-3 rounded-xl text-center font-bold text-xs uppercase"><i class="fab fa-whatsapp mr-2"></i>Contatar</a>
                         </div>
                     `;
                 }
             });
-            document.getElementById('stats-rescue').innerText = rescueCount;
+            document.getElementById('stats-rescue').innerText = resC;
+        }
+
+        function renderReports() {
+            const yellowArea = document.getElementById('report-yellow');
+            const familyArea = document.getElementById('report-family');
+            const retentionArea = document.getElementById('report-retention');
+            yellowArea.innerHTML = ''; familyArea.innerHTML = ''; retentionArea.innerHTML = '';
+            
+            const families = {};
+            members.forEach(m => {
+                if(m.org === 'Visitante') return;
+
+                // Sinal Amarelo
+                let freq = domingosISO.slice(0, 4).filter(d => (attendanceHistory[d] || []).includes(m.id)).length;
+                if(freq === 1) yellowArea.innerHTML += `<div class="p-3 bg-white border rounded-xl text-xs"><b>${m.name}</b> faltou 3 dos últimos 4 domingos.</div>`;
+                
+                // Famílias
+                const fam = m.familia || 'SEM FAMÍLIA';
+                if(!families[fam]) families[fam] = { t: 0, p: 0 };
+                families[fam].t++; if((attendanceHistory[selectedDate] || []).includes(m.id)) families[fam].p++;
+
+                // Retenção
+                if(m.categoria && m.categoria !== 'Membro') {
+                    const isP = (attendanceHistory[selectedDate] || []).includes(m.id);
+                    retentionArea.innerHTML += `<div class="p-4 rounded-2xl border flex justify-between items-center ${isP?'bg-green-50 border-green-100':'bg-red-50 border-red-100'}"><span class="text-xs font-bold">${m.name}</span> <i class="fas ${isP?'fa-check text-green-600':'fa-times text-red-400'}"></i></div>`;
+                }
+            });
+
+            Object.keys(families).forEach(f => {
+                if(families[f].p === 0) familyArea.innerHTML += `<div class="p-3 bg-red-50 text-red-700 rounded-xl text-xs">Família <b>${f}</b>: 0 de ${families[f].t} presentes.</div>`;
+            });
         }
 
         // --- CHARTS ---
@@ -484,35 +508,28 @@
                 const pres = members.filter(m => m.org === o && (attendanceHistory[selectedDate] || []).includes(m.id)).length;
                 return total > 0 ? Math.round((pres/total)*100) : 0;
             });
-
-            if(heatmapInstance) heatmapInstance.destroy();
-            heatmapInstance = new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: ['ÉLD', 'SOC', 'MOÇ', 'RAP', 'PRI'],
-                    datasets: [{ data: stats, backgroundColor: ['#002e5d','#be185d','#0d9488','#ea580c','#7c3aed'], borderRadius: 10 }]
-                },
-                options: { indexAxis: 'y', plugins: { legend: false }, scales: { x: { max: 100 } } }
-            });
+            if(hChart) hChart.destroy();
+            hChart = new Chart(ctx1, { type: 'bar', data: { labels: ['ÉLD', 'SOC', 'MOÇ', 'RAP', 'PRI'], datasets: [{ data: stats, backgroundColor: '#002e5d', borderRadius: 8 }] }, options: { indexAxis: 'y', plugins: { legend: false }, scales: { x: { max: 100 } } } });
 
             const ctx2 = document.getElementById('attendanceChart').getContext('2d');
-            const dates = Object.keys(attendanceHistory).sort().slice(-5);
-            const counts = dates.map(d => attendanceHistory[d].length);
-            if(chartInstance) chartInstance.destroy();
-            chartInstance = new Chart(ctx2, {
-                type: 'line',
-                data: {
-                    labels: dates.map(d => d.split('-')[2]+'/'+d.split('-')[1]),
-                    datasets: [{ data: counts, borderColor: '#002e5d', backgroundColor: 'rgba(0,46,93,0.05)', fill: true, tension: 0.4 }]
-                },
-                options: { plugins: { legend: false }, scales: { y: { beginAtZero: true } } }
-            });
+            const dates = domingosISO.slice(0, 5).reverse();
+            const counts = dates.map(d => (attendanceHistory[d] || []).length);
+            if(aChart) aChart.destroy();
+            aChart = new Chart(ctx2, { type: 'line', data: { labels: dates.map(d=>d.split('-')[2]+'/'+d.split('-')[1]), datasets: [{ data: counts, borderColor: '#002e5d', backgroundColor: 'rgba(0,46,93,0.05)', fill: true, tension: 0.4 }] }, options: { plugins: { legend: false }, scales: { y: { beginAtZero: true } } } });
         }
 
-        // --- EDIT LOGIC ---
+        // --- AUX ---
+        window.addMember = async () => {
+            const n = document.getElementById('newName').value.toUpperCase().trim();
+            const f = document.getElementById('newFamily').value.toUpperCase().trim();
+            if(!n) return;
+            await addDoc(collection(db, "membros"), { name: n, familia: f, org: document.getElementById('newOrg').value, categoria: document.getElementById('newCat').value, lastAttended: "2024-01-01" });
+            document.getElementById('newName').value = ''; document.getElementById('newFamily').value = '';
+            switchTab('attendance');
+        };
+
         window.openMemberEdit = (id) => {
-            const m = members.find(x => x.id === id);
-            memberIdEditing = id;
+            const m = members.find(x => x.id === id); memberIdEditing = id;
             document.getElementById('edit-member-name').value = m.name;
             document.getElementById('edit-member-family').value = m.familia || '';
             document.getElementById('edit-member-org').value = m.org;
@@ -520,70 +537,52 @@
         };
         window.closeMemberEdit = () => { document.getElementById('memberEditModal').classList.add('hidden'); memberIdEditing = null; };
         window.saveMemberAction = async () => {
-            if(!memberIdEditing) return;
-            await updateDoc(doc(db, "membros", memberIdEditing), {
-                name: document.getElementById('edit-member-name').value.toUpperCase(),
-                familia: document.getElementById('edit-member-family').value.toUpperCase(),
-                org: document.getElementById('edit-member-org').value
-            });
+            await updateDoc(doc(db, "membros", memberIdEditing), { name: document.getElementById('edit-member-name').value.toUpperCase(), familia: document.getElementById('edit-member-family').value.toUpperCase(), org: document.getElementById('edit-member-org').value });
             closeMemberEdit();
         };
-        window.deleteMemberAction = async () => {
-            if(confirm("Excluir este membro?") && memberIdEditing) {
-                await deleteDoc(doc(db, "membros", memberIdEditing));
-                closeMemberEdit();
-            }
+        window.deleteMemberAction = async () => { if(confirm("Excluir?")) { await deleteDoc(doc(db, "membros", memberIdEditing)); closeMemberEdit(); } };
+
+        window.adminCreateUser = async () => {
+            const n = document.getElementById('admin-new-name').value;
+            const u = document.getElementById('admin-new-user').value.toLowerCase().trim();
+            const r = document.getElementById('admin-new-role').value;
+            if(!n || !u) return;
+            await addDoc(collection(db, "usuarios"), { name: n, username: u, password: "", role: r });
+            alert("Login autorizado!");
         };
 
-        window.addMember = async () => {
-            const n = document.getElementById('newName').value.trim().toUpperCase();
-            const f = document.getElementById('newFamily').value.trim().toUpperCase();
-            if(!n) return;
-            await addDoc(collection(db, "membros"), {
-                name: n,
-                familia: f,
-                org: document.getElementById('newOrg').value,
-                categoria: document.getElementById('newCat').value,
-                lastAttended: "2024-01-01"
+        function renderUsersList() {
+            const l = document.getElementById('users-list'); l.innerHTML = '';
+            allUsers.forEach(u => {
+                l.innerHTML += `<div class="bg-white p-4 rounded-2xl flex justify-between items-center text-xs border"><div><p class="font-bold">${u.name}</p><p class="opacity-40 uppercase text-[9px]">${u.username} • ${u.role}</p></div><i class="fas fa-circle ${u.password?'text-green-500':'text-yellow-500'} text-[6px]"></i></div>`;
             });
-            document.getElementById('newName').value = ''; document.getElementById('newFamily').value = '';
-            switchTab('attendance');
-        };
+        }
 
-        // --- INIT ---
+        // Init
         if(currentUser) {
-            document.getElementById('user-display-name').innerText = currentUser.name;
-            document.getElementById('user-avatar').innerText = currentUser.name.charAt(0);
-            document.getElementById('user-display-role').innerText = currentUser.role;
+            document.getElementById('user-side-name').innerText = currentUser.name;
+            if(currentUser.role === 'admin') document.getElementById('admin-menu-btn').classList.remove('hidden');
             
-            // Build Sunday Select
-            const dSel = document.getElementById('dateSelect');
-            for(let i=0; i<8; i++) {
-                let d = new Date(); d.setDate(d.getDate() - (d.getDay() + (7 * i)) % 56);
-                let iso = d.toISOString().split('T')[0];
-                dSel.innerHTML += `<option value="${iso}">${i==0 ? 'Hoje' : iso.split('-')[2]+'/'+iso.split('-')[1]}</option>`;
-            }
-            dSel.addEventListener('change', (e) => { selectedDate = e.target.value; renderAttendance(); updateCharts(); });
-
-            // Build Org Filters
+            // Build Filters
             const fArea = document.getElementById('orgFilters');
             ['TODOS', 'Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária', 'Visitante'].forEach(o => {
-                fArea.innerHTML += `<button onclick="setFilter('${o}')" class="filter-pill ${o=='TODOS' ? 'active' : ''} glass-card px-5 py-2 whitespace-nowrap text-xs font-bold" id="pill-${o.replace(/\s+/g, '')}">${o}</button>`;
+                fArea.innerHTML += `<button onclick="setFilter('${o}')" class="filter-pill ${o=='TODOS' ? 'active' : ''} glass-card px-5 py-2 whitespace-nowrap text-[10px] font-black uppercase tracking-widest" id="pill-${o.replace(/\s+/g, '')}">${o}</button>`;
             });
-
             window.setFilter = (f) => {
                 currentFilter = f;
-                document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active', 'bg-[#002e5d]', 'text-white'));
+                document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
                 document.getElementById('pill-'+f.replace(/\s+/g, '')).classList.add('active');
                 renderAttendance();
             };
 
+            dateSelect.addEventListener('change', (e) => { selectedDate = e.target.value; renderAll(); });
             document.getElementById('searchMember').addEventListener('input', renderAttendance);
+            
             switchTab('dashboard');
             listenData();
         } else {
             document.getElementById('view-login').classList.remove('hidden');
-            document.getElementById('main-nav').classList.add('hidden');
+            document.getElementById('desktop-sidebar').classList.add('hidden');
             document.getElementById('loading-screen').classList.add('hidden');
         }
 
