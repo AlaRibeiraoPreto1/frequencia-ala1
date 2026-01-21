@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Frequência Pro - LDS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { -webkit-tap-highlight-color: transparent; background-color: #f1f5f9; }
@@ -49,32 +49,32 @@
         
         <!-- Tela de Login -->
         <div id="view-login" class="py-10">
-            <div class="bg-white p-8 rounded-3xl shadow-sm border text-center">
-                <i class="fas fa-user-circle text-5xl text-[#002e5d] mb-4"></i>
-                <h2 class="text-xl font-bold mb-6">Acesso ao Sistema</h2>
+            <div class="bg-white p-8 rounded-3xl shadow-sm border text-center border-gray-100">
+                <i class="fas fa-user-shield text-5xl text-[#002e5d] mb-4"></i>
+                <h2 class="text-xl font-bold mb-6">Acesso Protegido</h2>
                 <div class="space-y-4">
                     <input type="text" id="login-user" placeholder="Usuário" class="w-full p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
                     <input type="password" id="login-pass" placeholder="Senha" class="w-full p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
-                    <button onclick="checkLogin()" class="w-full bg-[#002e5d] text-white p-4 rounded-2xl font-bold active:scale-95 transition-transform">ENTRAR</button>
+                    <button onclick="checkLogin()" class="w-full bg-[#002e5d] text-white p-4 rounded-2xl font-bold shadow-lg">ENTRAR</button>
                     <hr>
-                    <p class="text-xs text-gray-500">É o seu primeiro acesso? <br>
+                    <p class="text-xs text-gray-500 italic">É o seu primeiro acesso?<br>
                         <button onclick="switchTab('first-login')" class="text-blue-900 font-bold underline mt-2">Ativar minha conta agora</button>
                     </p>
                 </div>
             </div>
         </div>
 
-        <!-- Tela de Primeiro Login (Definição de Senha) -->
+        <!-- Tela de Primeiro Login -->
         <div id="view-first-login" class="hidden py-10">
             <div class="bg-white p-8 rounded-3xl shadow-sm border text-center">
                 <h2 class="text-xl font-bold mb-2">Primeiro Acesso</h2>
-                <p class="text-xs text-gray-500 mb-6">Se o seu nome foi pré-autorizado pelo administrador, defina sua senha abaixo.</p>
+                <p class="text-[10px] text-gray-500 mb-6 uppercase">Defina sua senha de acesso</p>
                 <div class="space-y-4">
                     <input type="text" id="first-user" placeholder="Digite seu usuário" class="w-full p-4 border rounded-2xl outline-none">
                     <input type="password" id="first-pass" placeholder="Crie uma Senha" class="w-full p-4 border rounded-2xl outline-none">
                     <input type="password" id="first-pass-confirm" placeholder="Confirme a Senha" class="w-full p-4 border rounded-2xl outline-none">
-                    <button onclick="processFirstLogin()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-bold active:scale-95 transition-transform">ATIVAR CONTA</button>
-                    <button onclick="switchTab('login')" class="text-xs text-gray-500 underline">Voltar para o Login</button>
+                    <button onclick="processFirstLogin()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-bold">ATIVAR MINHA CONTA</button>
+                    <button onclick="switchTab('login')" class="text-xs text-gray-500 underline">Voltar para Login</button>
                 </div>
             </div>
         </div>
@@ -96,10 +96,23 @@
             </div>
         </div>
 
-        <!-- Gerenciar Usuários (Admin) -->
+        <!-- Lista de Chamada -->
+        <div id="view-attendance" class="hidden space-y-4">
+            <div class="flex overflow-x-auto gap-2 pb-2 no-scrollbar" id="orgFilters"></div>
+            <input type="text" id="searchMember" placeholder="🔍 Buscar nome..." class="w-full p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
+            <div id="memberList" class="space-y-2"></div>
+        </div>
+
+        <!-- Resgate -->
+        <div id="view-analysis" class="hidden space-y-4">
+            <h2 class="text-center font-bold text-orange-600 uppercase text-xs tracking-widest mb-4">Membros ausentes há +21 dias</h2>
+            <div id="missingList" class="space-y-3"></div>
+        </div>
+
+        <!-- Gerenciar Usuários -->
         <div id="view-admin-users" class="hidden space-y-4">
             <div class="bg-white p-6 rounded-2xl shadow-sm border">
-                <h3 class="font-bold text-xs uppercase mb-4 text-gray-400 tracking-widest">Pré-Autorizar Novo Usuário</h3>
+                <h3 class="font-bold text-xs uppercase mb-4 text-gray-400 tracking-widest text-center">Pré-Autorizar Novo Login</h3>
                 <div class="space-y-3">
                     <input type="text" id="admin-new-name" placeholder="Nome Completo" class="w-full p-3 border rounded-xl">
                     <input type="text" id="admin-new-user" placeholder="Usuário (login)" class="w-full p-3 border rounded-xl">
@@ -107,47 +120,60 @@
                         <option value="user">Usuário Comum</option>
                         <option value="admin">Administrador</option>
                     </select>
-                    <p class="text-[9px] text-gray-400">* O usuário definirá a senha dele no primeiro acesso.</p>
-                    <button onclick="adminCreateUser()" class="w-full bg-blue-900 text-white p-3 rounded-xl font-bold text-xs">AUTORIZAR ACESSO</button>
+                    <button onclick="adminCreateUser()" class="w-full bg-blue-900 text-white p-3 rounded-xl font-bold text-xs">CADASTRAR</button>
                 </div>
             </div>
             <div id="users-list" class="space-y-2"></div>
         </div>
 
-        <!-- Views de Membros e Chamada (Mantidas) -->
-        <div id="view-attendance" class="hidden space-y-4">
-            <div class="flex overflow-x-auto gap-2 pb-2 no-scrollbar" id="orgFilters"></div>
-            <input type="text" id="searchMember" placeholder="🔍 Buscar nome..." class="w-full p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
-            <div id="memberList" class="space-y-2"></div>
-        </div>
-        <div id="view-analysis" class="hidden space-y-4"><div id="missingList" class="space-y-3"></div></div>
+        <!-- Adicionar Membro -->
         <div id="view-add" class="hidden">
             <div class="bg-white p-6 rounded-2xl shadow-sm border space-y-4">
+                <h2 class="font-bold text-center text-xs uppercase tracking-widest text-gray-400">Novo Membro na Lista</h2>
                 <input type="text" id="newName" placeholder="NOME DO MEMBRO" class="w-full p-4 border rounded-xl uppercase">
                 <select id="newOrg" class="w-full p-4 border rounded-xl bg-gray-50 text-xs">
                     <option value="ÉLDERES">ÉLDERES</option><option value="SOCORRO">SOCORRO</option>
-                    <option value="MOÇAS">MOÇAS</option><option value="RAPAZES">RAPAZES</option><option value="PRIMÁRIA">PRIMÁRIA</option><option value="VISITANTE">VISITANTE</option>
+                    <option value="MOÇAS">MOÇAS</option><option value="RAPAZES">RAPAZES</option>
+                    <option value="PRIMÁRIA">PRIMÁRIA</option><option value="VISITANTE">VISITANTE</option>
                 </select>
                 <button onclick="addMember()" class="w-full bg-[#002e5d] text-white p-4 rounded-xl font-bold">CADASTRAR</button>
             </div>
         </div>
 
-        <!-- Modal de Edição de Usuário (Reset Senha / Cargo) -->
-        <div id="userEditModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4">
+        <!-- MODAIS -->
+
+        <!-- Modal Editar Membro (O QUE VOCÊ PEDIU) -->
+        <div id="memberEditModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4">
             <div class="bg-white w-full max-w-sm rounded-2xl p-6 space-y-4 shadow-2xl">
-                <h3 class="font-bold border-b pb-2 uppercase text-xs">Editar Login</h3>
-                <div class="space-y-3">
-                    <input type="text" id="edit-user-name" placeholder="Nome" class="w-full p-3 border rounded-xl text-sm">
-                    <input type="text" id="edit-user-pass" placeholder="Nova Senha (deixe em branco para não mudar)" class="w-full p-3 border rounded-xl text-sm">
-                    <select id="edit-user-role" class="w-full p-3 border rounded-xl bg-gray-50 text-sm">
-                        <option value="user">Usuário Comum</option>
-                        <option value="admin">Administrador</option>
-                    </select>
-                </div>
+                <h3 class="font-bold border-b pb-2 uppercase text-xs text-gray-500">Editar Membro</h3>
+                <input type="text" id="edit-member-name" class="w-full p-3 border rounded-xl uppercase">
+                <select id="edit-member-org" class="w-full p-3 border rounded-xl bg-gray-50 uppercase text-xs">
+                    <option value="ÉLDERES">ÉLDERES</option><option value="SOCORRO">SOCORRO</option>
+                    <option value="MOÇAS">MOÇAS</option><option value="RAPAZES">RAPAZES</option>
+                    <option value="PRIMÁRIA">PRIMÁRIA</option><option value="VISITANTE">VISITANTE</option>
+                </select>
                 <div class="flex gap-2 pt-4">
+                    <button onclick="deleteMemberAction()" class="flex-1 bg-red-100 text-red-600 p-3 rounded-xl font-bold text-[10px]">EXCLUIR</button>
+                    <button onclick="saveMemberAction()" class="flex-[2] bg-blue-900 text-white p-3 rounded-xl font-bold text-[10px]">SALVAR ALTERAÇÕES</button>
+                </div>
+                <button onclick="closeMemberEdit()" class="w-full text-xs text-gray-400 py-2">Cancelar</button>
+            </div>
+        </div>
+
+        <!-- Modal Editar Usuário -->
+        <div id="userEditModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-sm rounded-2xl p-6 space-y-4">
+                <h3 class="font-bold border-b pb-2 uppercase text-xs">Editar Login</h3>
+                <input type="text" id="edit-user-name" class="w-full p-3 border rounded-xl text-sm">
+                <input type="text" id="edit-user-pass" placeholder="Nova Senha (opcional)" class="w-full p-3 border rounded-xl text-sm">
+                <select id="edit-user-role" class="w-full p-3 border rounded-xl text-sm">
+                    <option value="user">Usuário Comum</option><option value="admin">Administrador</option>
+                </select>
+                <div class="flex gap-2">
                     <button onclick="closeUserEdit()" class="flex-1 border p-3 rounded-xl font-bold text-xs">CANCELAR</button>
                     <button onclick="saveUserUpdate()" class="flex-1 bg-blue-900 text-white p-3 rounded-xl font-bold text-xs">SALVAR</button>
                 </div>
+                <button onclick="deleteUserAction()" class="w-full text-red-400 text-[10px] font-bold">EXCLUIR LOGIN</button>
             </div>
         </div>
 
@@ -157,7 +183,7 @@
     <nav id="nav-bar" class="hidden fixed bottom-0 w-full bg-white border-t flex justify-around py-3 shadow-2xl z-50">
         <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-home text-xl"></i><span class="text-[10px]">Início</span></button>
         <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-check-double text-xl"></i><span class="text-[10px]">Chamada</span></button>
-        <button onclick="switchTab('analysis')" id="nav-analysis" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-heart-circle-bolt text-xl"></i><span class="text-[10px]">Resgate</span></button>
+        <button onclick="switchTab('analysis')" id="nav-analysis" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-hand-holding-heart text-xl"></i><span class="text-[10px]">Resgate</span></button>
         <button onclick="switchTab('add')" id="nav-add" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-plus-circle text-xl"></i><span class="text-[10px]">Novo</span></button>
     </nav>
 
@@ -181,62 +207,41 @@
         let members = []; let allAppUsers = []; let attendanceHistory = {};
         let currentFilter = 'TODOS'; let chartInstance = null;
         let selectedDate = new Date().toISOString().split('T')[0];
-        let userIdEditing = null;
+        let memberIdEditing = null; let userIdEditing = null;
 
-        // Seletor de Datas
         const dateSelect = document.getElementById('dateSelect');
         for(let i=0; i<8; i++) {
             let d = new Date(); d.setDate(d.getDate() - (d.getDay() + (7 * i)) % 56);
             let iso = d.toISOString().split('T')[0];
-            dateSelect.innerHTML += `<option value="${iso}">${i==0 ? 'DOMINGO HOJE' : iso.split('-')[2]+'/'+iso.split('-')[1]}</option>`;
+            dateSelect.innerHTML += `<option value="${iso}">${i==0 ? 'HOJE' : iso.split('-')[2]+'/'+iso.split('-')[1]}</option>`;
         }
         selectedDate = dateSelect.value;
 
-        // --- LÓGICA DE PRIMEIRO ACESSO ---
+        // --- AUTH ---
         window.processFirstLogin = async () => {
             const userIn = document.getElementById('first-user').value.toLowerCase().trim();
             const passIn = document.getElementById('first-pass').value.trim();
             const passConf = document.getElementById('first-pass-confirm').value.trim();
-
-            if(!userIn || !passIn || !passConf) return alert("Preencha todos os campos!");
-            if(passIn !== passConf) return alert("As senhas não coincidem!");
-            if(passIn.length < 4) return alert("A senha deve ter pelo menos 4 caracteres!");
-
+            if(!userIn || !passIn || passIn !== passConf) return alert("Dados inválidos ou senhas diferentes!");
             const q = query(collection(db, "usuarios"), where("username", "==", userIn));
             const snap = await getDocs(q);
-
-            if(snap.empty) return alert("Este usuário não está pré-autorizado no sistema.");
-
-            const userDoc = snap.docs[0];
-            const userData = userDoc.data();
-
-            if(userData.password && userData.password !== "") {
-                return alert("Esta conta já foi ativada anteriormente. Use a tela de login normal ou peça ao administrador para resetar sua senha.");
-            }
-
-            // Ativa o usuário gravando a senha
-            await updateDoc(doc(db, "usuarios", userDoc.id), { password: passIn });
-            alert("Sucesso! Sua conta foi ativada. Agora faça login com sua nova senha.");
-            switchTab('login');
+            if(snap.empty) return alert("Usuário não autorizado!");
+            const uDoc = snap.docs[0];
+            if(uDoc.data().password) return alert("Conta já ativa!");
+            await updateDoc(doc(db, "usuarios", uDoc.id), { password: passIn });
+            alert("Conta ativada!"); switchTab('login');
         };
 
-        // --- LOGIN NORMAL ---
         window.checkLogin = async () => {
-            const userIn = document.getElementById('login-user').value.toLowerCase().trim();
-            const passIn = document.getElementById('login-pass').value.trim();
-            
-            if(!passIn) return alert("Digite sua senha. Se for o primeiro acesso, clique no botão abaixo.");
-
-            const q = query(collection(db, "usuarios"), where("username", "==", userIn), where("password", "==", passIn));
+            const u = document.getElementById('login-user').value.toLowerCase().trim();
+            const p = document.getElementById('login-pass').value.trim();
+            const q = query(collection(db, "usuarios"), where("username", "==", u), where("password", "==", p));
             const snap = await getDocs(q);
-
             if (!snap.empty) {
-                const data = snap.docs[0].data();
-                data.id = snap.docs[0].id;
+                const data = snap.docs[0].data(); data.id = snap.docs[0].id;
                 localStorage.setItem('user_data', JSON.stringify(data));
-                currentUser = data;
-                startApp();
-            } else { alert("Usuário ou senha incorretos!"); }
+                currentUser = data; startApp();
+            } else alert("Erro no login!");
         };
 
         window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
@@ -251,110 +256,79 @@
             document.getElementById('header-login-title').classList.add('hidden');
             document.getElementById('user-first-name').innerText = currentUser.name.split(' ')[0];
             document.getElementById('menu-user-name').innerText = currentUser.name;
-            document.getElementById('menu-user-role').innerText = currentUser.role === 'admin' ? 'Administrador' : 'Secretário';
-
+            document.getElementById('menu-user-role').innerText = currentUser.role === 'admin' ? 'Admin' : 'Secretário';
             if(currentUser.role === 'admin') {
                 document.getElementById('btn-admin-view').classList.remove('hidden');
                 document.getElementById('admin-chart-area').classList.remove('hidden');
             }
-            switchTab('dashboard');
-            listenData();
+            switchTab('dashboard'); listenData();
         }
 
-        // --- GERENCIAR USUÁRIOS (ADMIN) ---
-        window.adminCreateUser = async () => {
-            const name = document.getElementById('admin-new-name').value.trim();
-            const user = document.getElementById('admin-new-user').value.toLowerCase().trim();
-            const role = document.getElementById('admin-new-role').value;
-
-            if(!name || !user) return alert("Informe nome e usuário!");
-            
-            // Verifica se usuário já existe
-            const q = query(collection(db, "usuarios"), where("username", "==", user));
-            const check = await getDocs(q);
-            if(!check.empty) return alert("Este usuário já existe.");
-
-            await addDoc(collection(db, "usuarios"), { name, username: user, password: "", role });
-            alert("Usuário autorizado com sucesso! Ele já pode fazer o 'Primeiro Acesso'.");
-            document.getElementById('admin-new-name').value = '';
-            document.getElementById('admin-new-user').value = '';
+        // --- MEMBROS EDICAO ---
+        window.openMemberEdit = (id) => {
+            const m = members.find(x => x.id === id);
+            memberIdEditing = id;
+            document.getElementById('edit-member-name').value = m.name;
+            document.getElementById('edit-member-org').value = m.org || 'ÉLDERES';
+            document.getElementById('memberEditModal').classList.remove('hidden');
         };
 
+        window.closeMemberEdit = () => { document.getElementById('memberEditModal').classList.add('hidden'); };
+
+        window.saveMemberAction = async () => {
+            const name = document.getElementById('edit-member-name').value.trim().toUpperCase();
+            const org = document.getElementById('edit-member-org').value;
+            await updateDoc(doc(db, "membros", memberIdEditing), { name, org });
+            closeMemberEdit();
+        };
+
+        window.deleteMemberAction = async () => {
+            if(confirm("Deseja mesmo excluir este membro permanentemente?")) {
+                await deleteDoc(doc(db, "membros", memberIdEditing));
+                closeMemberEdit();
+            }
+        };
+
+        // --- USUARIOS EDICAO ---
         window.openEditUser = (id) => {
-            const u = allAppUsers.find(x => x.id === id);
-            userIdEditing = id;
+            const u = allAppUsers.find(x => x.id === id); userIdEditing = id;
             document.getElementById('edit-user-name').value = u.name;
-            document.getElementById('edit-user-pass').value = ''; // Não mostra a senha atual por segurança
             document.getElementById('edit-user-role').value = u.role;
             document.getElementById('userEditModal').classList.remove('hidden');
         };
-
-        window.closeUserEdit = () => { document.getElementById('userEditModal').classList.add('hidden'); };
-
+        window.closeUserEdit = () => document.getElementById('userEditModal').classList.add('hidden');
         window.saveUserUpdate = async () => {
-            const newName = document.getElementById('edit-user-name').value;
-            const newPass = document.getElementById('edit-user-pass').value;
-            const newRole = document.getElementById('edit-user-role').value;
-            
-            const upData = { name: newName, role: newRole };
-            if(newPass !== "") upData.password = newPass;
-
-            await updateDoc(doc(db, "usuarios", userIdEditing), upData);
-            alert("Acesso atualizado!");
-            closeUserEdit();
+            const up = { name: document.getElementById('edit-user-name').value, role: document.getElementById('edit-user-role').value };
+            if(document.getElementById('edit-user-pass').value) up.password = document.getElementById('edit-user-pass').value;
+            await updateDoc(doc(db, "usuarios", userIdEditing), up); closeUserEdit();
+        };
+        window.deleteUserAction = async () => {
+            const u = allAppUsers.find(x => x.id === userIdEditing);
+            if(u.username === 'admin') return alert("Impossível deletar o admin principal!");
+            if(confirm("Excluir login?")) { await deleteDoc(doc(db, "usuarios", userIdEditing)); closeUserEdit(); }
         };
 
-        window.deleteUser = async (id) => {
-            const u = allAppUsers.find(x => x.id === id);
-            if(u.username === 'admin') return alert("Admin principal não pode ser deletado.");
-            if(confirm(`Remover acesso de ${u.name}?`)) await deleteDoc(doc(db, "usuarios", id));
-        };
-
-        function renderUsers() {
-            const list = document.getElementById('users-list');
-            list.innerHTML = '<h4 class="text-[10px] font-bold text-gray-400 uppercase mt-4">Logins Autorizados</h4>';
-            allAppUsers.forEach(u => {
-                const hasPassword = u.password && u.password !== "";
-                list.innerHTML += `
-                    <div class="bg-white p-4 rounded-2xl shadow-sm flex justify-between items-center text-xs border border-gray-100">
-                        <div>
-                            <p class="font-bold text-blue-900">${u.name} <span class="bg-blue-50 text-[8px] px-1 rounded uppercase">${u.role}</span></p>
-                            <p class="opacity-50 text-[9px] uppercase tracking-widest">${u.username} • ${hasPassword ? 'Ativo ✅' : 'Pendente ⏳'}</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="openEditUser('${u.id}')" class="text-gray-400 p-2"><i class="fas fa-edit"></i></button>
-                            ${u.username !== 'admin' ? `<button onclick="deleteUser('${u.id}')" class="text-red-300 p-2"><i class="fas fa-trash"></i></button>` : ''}
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        // --- LÓGICA DE DADOS ---
+        // --- DADOS ---
         function listenData() {
             onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => {
-                members = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                render();
+                members = snap.docs.map(d => ({id: d.id, ...d.data()})); render();
             });
             onSnapshot(collection(db, "historico"), (snap) => {
                 attendanceHistory = {}; snap.docs.forEach(d => attendanceHistory[d.id] = d.data().presents || []);
-                if(currentUser.role === 'admin') updateChart();
-                render();
+                if(currentUser.role === 'admin') updateChart(); render();
             });
             onSnapshot(collection(db, "usuarios"), (snap) => {
                 allAppUsers = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 if(currentUser && currentUser.role === 'admin') renderUsers();
             });
-            document.getElementById('connection-status').innerText = "ONLINE";
-            document.getElementById('connection-status').classList.replace('bg-red-500', 'bg-green-600');
         }
 
         window.togglePresence = async (memberId) => {
-            const histRef = doc(db, "historico", selectedDate);
+            const hRef = doc(db, "historico", selectedDate);
             let cur = attendanceHistory[selectedDate] || [];
-            if(cur.includes(memberId)) { cur = cur.filter(i => i !== memberId); } 
+            if(cur.includes(memberId)) cur = cur.filter(i => i !== memberId);
             else { cur.push(memberId); await updateDoc(doc(db, "membros", memberId), { lastAttended: selectedDate }); }
-            await setDoc(histRef, { presents: cur });
+            await setDoc(hRef, { presents: cur });
         };
 
         window.addMember = async () => {
@@ -368,23 +342,51 @@
         function render() {
             const search = document.getElementById('searchMember').value.toLowerCase();
             const list = document.getElementById('memberList');
-            const missingList = document.getElementById('missingList');
-            const presentsToday = attendanceHistory[selectedDate] || [];
-            list.innerHTML = ''; missingList.innerHTML = '';
-            let countP = 0; let countT = 0;
+            const missList = document.getElementById('missingList');
+            const curPres = attendanceHistory[selectedDate] || [];
+            list.innerHTML = ''; missList.innerHTML = '';
+            let pC = 0; let tC = 0;
+
             members.forEach(m => {
-                const isP = presentsToday.includes(m.id);
-                if(m.org !== 'VISITANTE') { countT++; if(isP) countP++; }
+                const isP = curPres.includes(m.id);
+                if(m.org !== 'VISITANTE') { tC++; if(isP) pC++; }
+
+                // Lógica Resgate (+21 dias)
                 const diff = Math.floor((new Date() - new Date(m.lastAttended)) / (1000*60*60*24));
                 if(m.org !== 'VISITANTE' && diff > 21) {
-                    missingList.innerHTML += `<div class="bg-white p-4 rounded-xl border-r-4 border-orange-500 flex justify-between items-center"><div><p class="font-bold text-sm">${m.name}</p><p class="text-[9px] font-bold text-orange-600">${m.org} • ${Math.floor(diff/7)} SEMANAS</p></div><a href="https://wa.me/?text=Olá, sentimos sua falta na sacramental!" class="text-green-500"><i class="fab fa-whatsapp text-2xl"></i></a></div>`;
+                    missList.innerHTML += `<div class="bg-white p-4 rounded-xl border-r-4 border-orange-500 flex justify-between items-center"><div><p class="font-bold text-sm">${m.name}</p><p class="text-[9px] font-bold text-orange-600">${m.org} • ${Math.floor(diff/7)} SEMANAS AUSENTE</p></div><a href="https://wa.me/?text=Olá, sentimos sua falta na sacramental!" class="text-green-500"><i class="fab fa-whatsapp text-2xl"></i></a></div>`;
                 }
+
                 if((currentFilter === 'TODOS' || m.org === currentFilter) && m.name.toLowerCase().includes(search)) {
-                    list.innerHTML += `<div class="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border-l-4 ${isP ? 'border-green-500' : 'border-gray-200'}"><input type="checkbox" ${isP ? 'checked' : ''} onchange="togglePresence('${m.id}')" class="rounded-full text-blue-900"><div onclick="togglePresence('${m.id}')" class="flex-1"><p class="font-bold text-sm text-gray-700">${m.name}</p><p class="text-[9px] text-gray-400 font-bold uppercase">${m.org}</p></div></div>`;
+                    list.innerHTML += `<div class="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border-l-4 ${isP ? 'border-green-500' : 'border-gray-200'}">
+                        <input type="checkbox" ${isP ? 'checked' : ''} onchange="togglePresence('${m.id}')" class="rounded-full w-5 h-5 text-blue-900">
+                        <div onclick="togglePresence('${m.id}')" class="flex-1">
+                            <p class="font-bold text-sm text-gray-700 leading-tight">${m.name}</p>
+                            <p class="text-[9px] text-gray-400 font-bold uppercase">${m.org}</p>
+                        </div>
+                        <button onclick="openMemberEdit('${m.id}')" class="text-gray-300 px-2"><i class="fas fa-edit text-sm"></i></button>
+                    </div>`;
                 }
             });
-            document.getElementById('stats-present').innerText = countP;
-            document.getElementById('stats-total').innerText = countT;
+            document.getElementById('stats-present').innerText = pC;
+            document.getElementById('stats-total').innerText = tC;
+        }
+
+        // --- DEMAIS FUNÇÕES ---
+        window.adminCreateUser = async () => {
+            const n = document.getElementById('admin-new-name').value;
+            const u = document.getElementById('admin-new-user').value.toLowerCase().trim();
+            const r = document.getElementById('admin-new-role').value;
+            if(!n || !u) return alert("Preencha!");
+            await addDoc(collection(db, "usuarios"), { name: n, username: u, password: "", role: r });
+            alert("Autorizado!"); document.getElementById('admin-new-name').value = '';
+        };
+
+        function renderUsers() {
+            const l = document.getElementById('users-list'); l.innerHTML = '';
+            allAppUsers.forEach(u => {
+                l.innerHTML += `<div class="bg-white p-4 rounded-2xl flex justify-between items-center text-xs border"><div><p class="font-bold">${u.name} [${u.role}]</p><p class="opacity-50">${u.username} • ${u.password?'Ativo':'Pendente'}</p></div><button onclick="openEditUser('${u.id}')" class="text-gray-400 p-2"><i class="fas fa-cog"></i></button></div>`;
+            });
         }
 
         function updateChart() {
@@ -407,19 +409,14 @@
             window.scrollTo(0,0);
         };
 
-        window.setFilter = (f) => {
-            currentFilter = f;
-            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-            document.getElementById('pill-'+f).classList.add('active');
-            render();
-        };
-
+        window.setFilter = (f) => { currentFilter = f; document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active')); document.getElementById('pill-'+f).classList.add('active'); render(); };
         dateSelect.addEventListener('change', (e) => { selectedDate = e.target.value; render(); });
         document.getElementById('searchMember').addEventListener('input', render);
 
-        const orgs = ['TODOS', 'ÉLDERES', 'SOCORRO', 'MOÇAS', 'RAPAZES', 'PRIMÁRIA', 'VISITANTE'];
-        const fArea = document.getElementById('orgFilters');
-        orgs.forEach(o => { fArea.innerHTML += `<button onclick="setFilter('${o}')" class="filter-pill ${o=='TODOS'?'active':''} px-4 py-2 rounded-full border bg-white text-[10px] font-bold" id="pill-${o}">${o}</button>`; });
+        const filterArea = document.getElementById('orgFilters');
+        ['TODOS', 'ÉLDERES', 'SOCORRO', 'MOÇAS', 'RAPAZES', 'PRIMÁRIA', 'VISITANTE'].forEach(o => {
+            filterArea.innerHTML += `<button onclick="setFilter('${o}')" class="filter-pill ${o=='TODOS'?'active':''} px-4 py-2 rounded-full border bg-white text-[10px] font-bold" id="pill-${o}">${o}</button>`;
+        });
 
         if(currentUser) startApp(); else switchTab('login');
     </script>
