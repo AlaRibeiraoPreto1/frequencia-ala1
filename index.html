@@ -7,20 +7,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { -webkit-tap-highlight-color: transparent; }
+        body { -webkit-tap-highlight-color: transparent; background-color: #f8fafc; }
         .hidden { display: none; }
+        input[type="checkbox"] { cursor: pointer; }
+        /* Impede zoom automático no iPhone ao focar em inputs */
+        input[type="text"], input[type="password"] { font-size: 16px !important; }
     </style>
 </head>
-<body class="bg-gray-50 font-sans pb-24">
+<body class="font-sans pb-24">
 
     <!-- Header -->
     <header class="bg-[#002e5d] text-white p-4 shadow-lg sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
             <div>
-                <h1 class="text-lg font-bold leading-tight italic">Frequência Sacramental</h1>
+                <h1 class="text-lg font-bold italic leading-tight">Frequência Sacramental</h1>
                 <p id="currentDateDisplay" class="text-[10px] opacity-80 uppercase tracking-widest"></p>
             </div>
-            <div id="connection-status" class="text-[10px] bg-red-500 px-2 py-1 rounded">Desconectado</div>
+            <div id="connection-status" class="text-[10px] bg-red-500 px-2 py-1 rounded font-bold uppercase">Conectando...</div>
         </div>
     </header>
 
@@ -30,10 +33,10 @@
         <div id="view-login" class="py-10 text-center">
             <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
                 <i class="fas fa-church text-5xl text-[#002e5d] mb-4"></i>
-                <h2 class="text-xl font-bold mb-6 text-gray-800">Acesso da Unidade</h2>
-                <input type="password" id="access-code" placeholder="Código de Acesso" class="w-full p-4 border rounded-xl mb-4 text-center text-2xl tracking-widest outline-none focus:ring-2 focus:ring-blue-500">
+                <h2 class="text-xl font-bold mb-2 text-gray-800">Acesso da Ala</h2>
+                <p class="text-sm text-gray-500 mb-6">Digite o código de acesso para continuar</p>
+                <input type="password" id="access-code" placeholder="••••" class="w-full p-4 border rounded-xl mb-4 text-center text-3xl tracking-widest outline-none focus:ring-2 focus:ring-blue-500">
                 <button onclick="checkLogin()" class="w-full bg-[#002e5d] text-white p-4 rounded-xl font-bold shadow-md active:scale-95 transition-transform">Entrar</button>
-                <p class="text-xs text-gray-400 mt-4 italic">Peça o código ao secretário da ala.</p>
             </div>
         </div>
 
@@ -41,11 +44,11 @@
         <div id="view-dashboard" class="hidden space-y-4">
             <div class="grid grid-cols-2 gap-3">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-green-500 text-center">
-                    <p class="text-gray-400 text-[10px] font-bold uppercase">Presentes</p>
+                    <p class="text-gray-400 text-[10px] font-bold uppercase">Presentes Hoje</p>
                     <p id="stats-present" class="text-4xl font-black text-green-600">0</p>
                 </div>
                 <div class="bg-white p-5 rounded-2xl shadow-sm border-b-4 border-blue-800 text-center">
-                    <p class="text-gray-400 text-[10px] font-bold uppercase">Membros</p>
+                    <p class="text-gray-400 text-[10px] font-bold uppercase">Total na Lista</p>
                     <p id="stats-total" class="text-4xl font-black text-[#002e5d]">0</p>
                 </div>
             </div>
@@ -55,7 +58,7 @@
                     <h3 class="font-bold text-gray-800 text-sm">Trabalho de Resgate</h3>
                     <p class="text-xs text-gray-500">Membros ausentes há 3+ semanas.</p>
                 </div>
-                <button onclick="switchTab('analysis')" class="bg-orange-100 text-orange-700 font-bold px-4 py-2 rounded-lg text-xs">VER LISTA</button>
+                <button onclick="switchTab('analysis')" class="bg-orange-100 text-orange-700 font-bold px-4 py-2 rounded-lg text-xs">VER</button>
             </div>
         </div>
 
@@ -63,39 +66,41 @@
         <div id="view-attendance" class="hidden space-y-4">
             <div class="relative">
                 <i class="fas fa-search absolute left-4 top-4 text-gray-400"></i>
-                <input type="text" id="searchMember" placeholder="Buscar membro..." class="w-full p-4 pl-12 border rounded-2xl shadow-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                <input type="text" id="searchMember" placeholder="Buscar por nome..." class="w-full p-4 pl-12 border rounded-2xl shadow-sm focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
             <div id="memberList" class="space-y-3">
-                <!-- Injetado via JS -->
+                <!-- Conteúdo via Firebase -->
             </div>
         </div>
 
         <!-- Lista de Resgate -->
-        <div id="view-analysis" class="hidden space-y-4 text-center">
-            <div class="inline-block bg-red-100 text-red-700 px-4 py-1 rounded-full text-[10px] font-bold mb-2 uppercase tracking-tighter">Foco em Ministração</div>
-            <div id="missingList" class="space-y-3 text-left">
-                <!-- Injetado via JS -->
+        <div id="view-analysis" class="hidden space-y-4">
+            <div class="text-center mb-4">
+                <div class="inline-block bg-red-100 text-red-700 px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter">Ministração e Resgate</div>
+            </div>
+            <div id="missingList" class="space-y-3">
+                <!-- Conteúdo via Firebase -->
             </div>
         </div>
 
         <!-- Adicionar Membro -->
         <div id="view-add" class="hidden">
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h2 class="text-lg font-bold mb-4 text-gray-800">Cadastrar Novo Membro</h2>
-                <input type="text" id="newName" placeholder="Nome Completo" class="w-full p-4 border rounded-xl mb-4 outline-none focus:ring-2 focus:ring-blue-500 uppercase">
-                <button onclick="addMember()" class="w-full bg-[#002e5d] text-white p-4 rounded-xl font-bold shadow-md active:scale-95 transition-transform">Salvar Membro</button>
+                <h2 class="text-lg font-bold mb-4 text-gray-800 text-center">Cadastrar Novo Membro</h2>
+                <input type="text" id="newName" placeholder="NOME COMPLETO" class="w-full p-4 border rounded-xl mb-4 outline-none focus:ring-2 focus:ring-blue-500 uppercase">
+                <button onclick="addMember()" class="w-full bg-[#002e5d] text-white p-4 rounded-xl font-bold shadow-md active:scale-95 transition-transform">Salvar na Lista</button>
             </div>
         </div>
 
     </main>
 
-    <!-- Menu Inferior (Mobile) -->
+    <!-- Menu Inferior -->
     <nav id="nav-bar" class="hidden fixed bottom-0 w-full bg-white border-t border-gray-100 flex justify-around py-3 px-2 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] z-50">
         <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-gray-400 transition-colors">
-            <i class="fas fa-th-large text-xl"></i><span class="text-[10px] font-medium">Início</span>
+            <i class="fas fa-chart-pie text-xl"></i><span class="text-[10px] font-medium">Início</span>
         </button>
         <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center gap-1 text-gray-400 transition-colors">
-            <i class="fas fa-check-double text-xl"></i><span class="text-[10px] font-medium">Chamada</span>
+            <i class="fas fa-clipboard-check text-xl"></i><span class="text-[10px] font-medium">Chamada</span>
         </button>
         <button onclick="switchTab('analysis')" id="nav-analysis" class="flex flex-col items-center gap-1 text-gray-400 transition-colors">
             <i class="fas fa-heart text-xl"></i><span class="text-[10px] font-medium">Resgate</span>
@@ -109,19 +114,16 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // ==========================================
-        // COLE SUAS CHAVES DO FIREBASE ABAIXO:
-        // ==========================================
+        // CONFIGURAÇÃO ATUALIZADA DO FIREBASE
         const firebaseConfig = {
-            apiKey: "SUA_API_KEY_AQUI",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            projectId: "SEU_PROJETO",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "SEU_ID",
-            appId: "SEU_APP_ID"
+          apiKey: "AIzaSyAaEKx9n4N847WW97FhfZxLZYtsa5cTsE0",
+          authDomain: "frequencia-da-ala.firebaseapp.com",
+          projectId: "frequencia-da-ala",
+          storageBucket: "frequencia-da-ala.firebasestorage.app",
+          messagingSenderId: "823110082594",
+          appId: "1:823110082594:web:525d38b65a5ab74ec9ea7b"
         };
 
-        // Inicialização
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const membersRef = collection(db, "membros");
@@ -130,14 +132,14 @@
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('currentDateDisplay').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
 
-        // Login Simples
+        // Login Simples (CÓDIGO: 1234)
         window.checkLogin = () => {
             const code = document.getElementById('access-code').value;
-            if(code === "1234") { // <--- Altere seu código de acesso aqui
-                localStorage.setItem('ala_auth', 'true');
+            if(code === "1234") { 
+                localStorage.setItem('ala_auth_status', 'autenticado');
                 startApp();
             } else {
-                alert("Código de acesso inválido!");
+                alert("Código incorreto!");
             }
         };
 
@@ -155,6 +157,9 @@
                 document.getElementById('connection-status').innerText = "ONLINE";
                 document.getElementById('connection-status').classList.replace('bg-red-500', 'bg-green-600');
                 render();
+            }, (error) => {
+                console.error("Erro no Firebase:", error);
+                document.getElementById('connection-status').innerText = "ERRO DE CONEXÃO";
             });
         }
 
@@ -166,11 +171,16 @@
         };
 
         window.addMember = async () => {
-            const name = document.getElementById('newName').value.trim().toUpperCase();
+            const nameInput = document.getElementById('newName');
+            const name = nameInput.value.trim().toUpperCase();
             if(!name) return;
-            await addDoc(membersRef, { name, lastAttended: "2024-01-01" });
-            document.getElementById('newName').value = "";
-            switchTab('attendance');
+            try {
+                await addDoc(membersRef, { name, lastAttended: "2024-01-01" });
+                nameInput.value = "";
+                switchTab('attendance');
+            } catch (e) {
+                alert("Erro ao salvar. Verifique se o Firestore está no 'Modo de Teste' nas Regras.");
+            }
         };
 
         function render() {
@@ -186,31 +196,32 @@
                 const isPresent = m.lastAttended === today;
                 if(isPresent) presentCount++;
 
-                const daysAbsent = Math.floor((new Date() - new Date(m.lastAttended)) / (1000*60*60*24));
-                const needsRescue = daysAbsent > 21;
+                const lastDate = new Date(m.lastAttended);
+                const diffDays = Math.floor((new Date() - lastDate) / (1000*60*60*24));
+                const needsRescue = diffDays > 21;
 
-                // Template Chamada
+                // Item Lista Chamada
                 if(m.name.toLowerCase().includes(search)) {
                     list.innerHTML += `
                         <div class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border-l-4 ${isPresent ? 'border-green-500' : 'border-gray-100'}">
                             <div onclick="togglePresence('${m.id}', '${m.lastAttended}')" class="flex-1">
                                 <p class="font-bold text-gray-800 text-sm">${m.name}</p>
-                                <p class="text-[10px] text-gray-400 uppercase italic">Última: ${m.lastAttended === '2024-01-01' ? 'Nunca' : m.lastAttended}</p>
+                                <p class="text-[10px] text-gray-400 uppercase italic">Visto em: ${m.lastAttended === '2024-01-01' ? 'Sem registro' : m.lastAttended}</p>
                             </div>
                             <input type="checkbox" ${isPresent ? 'checked' : ''} onchange="togglePresence('${m.id}', '${m.lastAttended}')" class="w-6 h-6 rounded-full border-gray-300 text-blue-900 focus:ring-0">
                         </div>
                     `;
                 }
 
-                // Template Resgate
+                // Item Lista Resgate
                 if(needsRescue) {
                     missingList.innerHTML += `
                         <div class="bg-white p-4 rounded-xl shadow-sm border-r-4 border-orange-500 flex justify-between items-center">
                             <div>
                                 <p class="font-bold text-gray-800 text-sm">${m.name}</p>
-                                <p class="text-[10px] text-orange-600 font-bold uppercase">Ausente há ${Math.floor(daysAbsent/7)} semanas</p>
+                                <p class="text-[10px] text-orange-600 font-bold uppercase">Ausente há ${Math.floor(diffDays/7)} semanas</p>
                             </div>
-                            <a href="https://wa.me/?text=Olá ${m.name.split(' ')[0]}, sentimos sua falta na Sacramental! Esperamos que esteja tudo bem." class="w-10 h-10 bg-green-500 text-white flex items-center justify-center rounded-full shadow-lg">
+                            <a href="https://wa.me/?text=Olá ${m.name.split(' ')[0]}, sentimos sua falta hoje! Esperamos que esteja tudo bem conosco." class="w-10 h-10 bg-green-500 text-white flex items-center justify-center rounded-full shadow-lg active:scale-90 transition-transform">
                                 <i class="fab fa-whatsapp"></i>
                             </a>
                         </div>
@@ -225,12 +236,16 @@
         window.switchTab = (tab) => {
             document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
             document.getElementById(`view-${tab}`).classList.remove('hidden');
-            document.querySelectorAll('nav button').forEach(b => b.classList.replace('text-blue-900', 'text-gray-400'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.replace('text-[#002e5d]', 'text-gray-400'));
             document.getElementById(`nav-${tab}`).classList.replace('text-gray-400', 'text-[#002e5d]');
+            window.scrollTo(0,0);
         };
 
         document.getElementById('searchMember').addEventListener('input', render);
-        if(localStorage.getItem('ala_auth')) startApp();
+
+        if(localStorage.getItem('ala_auth_status') === 'autenticado') {
+            startApp();
+        }
     </script>
 </body>
 </html>
