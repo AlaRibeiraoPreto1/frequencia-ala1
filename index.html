@@ -218,32 +218,67 @@
                     </div>
                 </section>
 
-                <!-- NOVO MEMBRO -->
-                <section id="view-add" class="hidden flex justify-center">
-                    <div class="glass-card p-10 w-full max-w-xl space-y-8 shadow-xl">
-                        <h3 class="text-xl font-black text-[#002e5d] uppercase tracking-tighter text-center">Novo Cadastro</h3>
-                        <div class="space-y-6">
-                            <input type="text" id="newName" placeholder="NOME COMPLETO" class="w-full p-5 bg-slate-50 border-none rounded-3xl uppercase font-bold text-sm">
-                            <input type="text" id="newFamily" placeholder="SOBRENOME DA FAMÍLIA" class="w-full p-5 bg-slate-50 border-none rounded-3xl uppercase font-bold text-sm">
-                            <div class="grid grid-cols-2 gap-4">
-                                <select id="newOrg" class="p-5 bg-slate-50 border-none rounded-3xl text-xs font-bold uppercase">
-                                    <option value="Quórum de Élderes">ÉLDERES</option>
-                                    <option value="Sociedade de Socorro">SOCORRO</option>
-                                    <option value="Moças">MOÇAS</option>
-                                    <option value="Rapazes">RAPAZES</option>
-                                    <option value="Primária">PRIMÁRIA</option>
-                                    <option value="Visitante">VISITANTE</option>
-                                </select>
-                                <select id="newCat" class="p-5 bg-slate-50 border-none rounded-3xl text-xs font-bold uppercase">
-                                    <option value="Membro">MEMBRO</option>
-                                    <option value="Recém-Converso">RECÉM-CONVERSO</option>
-                                    <option value="Novo Morador">NOVO MORADOR</option>
-                                </select>
-                            </div>
-                            <button onclick="addMember()" class="w-full bg-[#002e5d] text-white p-6 rounded-[32px] font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all">Salvar Membro</button>
-                        </div>
-                    </div>
-                </section>
+               <!-- NOVO FORMULÁRIO DE CADASTRO -->
+<section id="view-add" class="hidden flex justify-center">
+    <div class="glass-card p-8 w-full max-w-xl space-y-6 shadow-xl">
+        <h3 class="text-xl font-black text-[#002e5d] uppercase tracking-tighter text-center italic">Novo Cadastro</h3>
+        
+        <div class="space-y-4">
+            <!-- Nome -->
+            <div class="space-y-1">
+                <label class="text-[10px] font-black text-slate-400 uppercase px-4">Nome Completo</label>
+                <input type="text" id="newName" oninput="formatNameInput(this)" placeholder="Ex: João Silva Santos" class="w-full p-4 bg-slate-50 border-none rounded-[20px] font-bold text-sm outline-none focus:ring-2 focus:ring-[#002e5d]">
+            </div>
+
+            <!-- Família com Busca Dinâmica -->
+            <div class="space-y-1 relative">
+                <label class="text-[10px] font-black text-slate-400 uppercase px-4">Família (Sobrenome)</label>
+                <input type="text" id="familySearch" oninput="handleFamilySearch(this.value)" placeholder="Digite o sobrenome da família..." class="w-full p-4 bg-slate-50 border-none rounded-[20px] font-bold text-sm outline-none focus:ring-2 focus:ring-[#002e5d]">
+                
+                <!-- Lista de Sugestões de Família -->
+                <div id="familySuggestions" class="hidden absolute left-0 right-0 top-[100%] mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-[150] max-h-48 overflow-y-auto no-scrollbar"></div>
+                
+                <!-- Checkbox Chefe de Família -->
+                <div id="headOfFamilyContainer" class="flex items-center gap-3 px-4 mt-2">
+                    <input type="checkbox" id="isHeadOfFamily" class="w-4 h-4 accent-[#002e5d]">
+                    <label for="isHeadOfFamily" class="text-xs font-bold text-slate-500 italic">Sou o chefe desta família</label>
+                </div>
+            </div>
+
+            <!-- Organização -->
+            <div class="space-y-1">
+                <label class="text-[10px] font-black text-slate-400 uppercase px-4">Organização</label>
+                <select id="newOrg" class="w-full p-4 bg-slate-50 border-none rounded-[20px] text-xs font-bold uppercase cursor-pointer">
+                    <option value="Quórum de Élderes">Quórum de Élderes</option>
+                    <option value="Sociedade de Socorro">Sociedade de Socorro</option>
+                    <option value="Moças">Moças</option>
+                    <option value="Rapazes">Rapazes</option>
+                    <option value="Primária">Primária</option>
+                </select>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Tipo de Membro -->
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black text-slate-400 uppercase px-4">Tipo de Membro</label>
+                    <select id="newCat" class="w-full p-4 bg-slate-50 border-none rounded-[20px] text-xs font-bold uppercase cursor-pointer">
+                        <option value="Membro">Membro da Ala</option>
+                        <option value="Recém-Converso">Recém-Converso</option>
+                        <option value="Novo Morador">Novo Morador</option>
+                        <option value="Visitante">Visitante</option>
+                    </select>
+                </div>
+                <!-- Celular -->
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black text-slate-400 uppercase px-4">Celular (WhatsApp)</label>
+                    <input type="tel" id="newPhone" oninput="formatPhone(this)" placeholder="(00) 00000-0000" class="w-full p-4 bg-slate-50 border-none rounded-[20px] font-bold text-sm outline-none">
+                </div>
+            </div>
+
+            <button onclick="saveNewMember()" class="w-full bg-[#002e5d] text-white p-6 rounded-[32px] font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all mt-4">Concluir Cadastro</button>
+        </div>
+    </div>
+</section>
 
                 <!-- ADMIN USUÁRIOS -->
                 <section id="view-admin-users" class="hidden space-y-8">
@@ -598,6 +633,97 @@
             document.getElementById('view-login').classList.remove('hidden');
             document.getElementById('loading-screen').classList.add('hidden');
         }
+
+        // Função para Capitalizar o nome (Primeiras letras em Maiúsculo)
+window.formatNameInput = (el) => {
+    let words = el.value.split(' ');
+    for (let i = 0; i < words.length; i++) {
+        if (words[i].length > 0) {
+            words[i] = words[i][0].toUpperCase() + words[i].substr(1).toLowerCase();
+        }
+    }
+    el.value = words.join(' ');
+};
+
+// Formatação básica de telefone
+window.formatPhone = (el) => {
+    let v = el.value.replace(/\D/g,'');
+    v = v.replace(/^(\d{2})(\d)/g,"($1) $2");
+    v = v.replace(/(\d)(\d{4})$/,"$1-$2");
+    el.value = v;
+};
+
+// Busca Dinâmica de Famílias
+window.handleFamilySearch = (query) => {
+    const suggestions = document.getElementById('familySuggestions');
+    const headCheckbox = document.getElementById('headOfFamilyContainer');
+    
+    if (query.length < 2) {
+        suggestions.classList.add('hidden');
+        headCheckbox.classList.remove('hidden');
+        return;
+    }
+
+    // Filtra membros que são chefes de família (isHead: true)
+    const heads = members.filter(m => m.isHead && m.familia.toLowerCase().includes(query.toLowerCase()));
+
+    if (heads.length > 0) {
+        suggestions.classList.remove('hidden');
+        suggestions.innerHTML = heads.map(h => `
+            <div onclick="selectFamily('${h.familia}', '${h.name}')" class="p-4 hover:bg-slate-50 border-b border-slate-50 cursor-pointer transition-all">
+                <p class="text-sm font-bold text-[#002e5d] uppercase">${h.familia}</p>
+                <p class="text-[10px] text-slate-400 font-bold uppercase">Chefe: ${h.name}</p>
+            </div>
+        `).join('');
+    } else {
+        suggestions.classList.add('hidden');
+        headCheckbox.classList.remove('hidden');
+    }
+};
+
+window.selectFamily = (family, headName) => {
+    document.getElementById('familySearch').value = family;
+    document.getElementById('familySuggestions').classList.add('hidden');
+    document.getElementById('headOfFamilyContainer').classList.add('hidden'); // Esconde checkbox pois família já existe
+};
+
+// Lógica de Salvar o Novo Membro
+window.saveNewMember = async () => {
+    const name = document.getElementById('newName').value;
+    const familia = document.getElementById('familySearch').value.toUpperCase();
+    const org = document.getElementById('newOrg').value;
+    const cat = document.getElementById('newCat').value;
+    const phone = document.getElementById('newPhone').value;
+    const isHead = document.getElementById('isHeadOfFamily').checked;
+
+    if (!name || !familia) {
+        alert("Nome e Família são obrigatórios!");
+        return;
+    }
+
+    try {
+        await addDoc(collection(db, "membros"), {
+            name: name,
+            familia: familia,
+            org: org,
+            categoria: cat,
+            telefone: phone,
+            isHead: isHead, // Salva se ele é o chefe
+            lastAttended: "2024-01-01"
+        });
+
+        alert("Membro cadastrado com sucesso!");
+        // Limpar campos
+        document.getElementById('newName').value = '';
+        document.getElementById('familySearch').value = '';
+        document.getElementById('newPhone').value = '';
+        document.getElementById('isHeadOfFamily').checked = false;
+        switchTab('attendance');
+    } catch (e) {
+        console.error("Erro ao salvar: ", e);
+        alert("Erro ao cadastrar.");
+    }
+};
 
     </script>
 </body>
