@@ -45,7 +45,8 @@
         </div>
     </div>
 
-    <main class="container mx-auto p-4 max-w-md">
+<!-- No computador ele fica largo (4xl), no celular fica estreito (md) -->
+<main class="container mx-auto p-4 max-w-md md:max-w-6xl">
         
         <!-- View Login -->
         <div id="view-login" class="py-10 text-center">
@@ -82,10 +83,19 @@
                     <p id="stats-total" class="text-3xl font-black text-[#002e5d]">0</p>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm">
-                <h3 class="text-[10px] font-bold text-gray-400 uppercase mb-4 text-center">Saúde das Organizações (%)</h3>
-                <canvas id="heatmapChart" height="200"></canvas>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Gráfico 1 -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm">
+                    <h3 class="text-[10px] font-bold text-gray-400 uppercase mb-4 text-center">Saúde das Organizações (%)</h3>
+                    <canvas id="heatmapChart" height="200"></canvas>
+                </div>
+            <!-- Gráfico 2 (Opcional ou Histórico) -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm hidden md:block">
+                <h3 class="text-[10px] font-bold text-gray-400 uppercase mb-4 text-center">Frequência Semanal</h3>
+                <canvas id="attendanceChart" height="200"></canvas>
             </div>
+        </div>
         </div>
 
         <!-- Registrar Frequência -->
@@ -188,13 +198,23 @@
     </main>
 
     <!-- Menu Inferior -->
-    <nav id="nav-bar" class="hidden fixed bottom-0 w-full bg-white border-t flex justify-around py-3 shadow-2xl z-50">
-        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-home text-xl"></i><span class="text-[10px]">Início</span></button>
-        <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-check-double text-xl"></i><span class="text-[10px]">Registrar</span></button>
-        <button onclick="switchTab('analysis')" id="nav-analysis" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-hand-holding-heart text-xl"></i><span class="text-[10px]">Resgate</span></button>
-        <button onclick="switchTab('reports')" id="nav-reports" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-file-contract text-xl"></i><span class="text-[10px]">Relatórios</span></button>
-        <button onclick="switchTab('add')" id="nav-add" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-plus-circle text-xl"></i><span class="text-[10px]">Novo</span></button>
-    </nav>
+    <!-- MENU INFERIOR (Aparece apenas no Celular: md:hidden) -->
+<nav id="nav-bar" class="hidden fixed bottom-0 w-full bg-white border-t flex justify-around py-3 shadow-2xl z-50 md:hidden">
+    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-home text-xl"></i><span class="text-[10px]">Início</span></button>
+    <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-check-double text-xl"></i><span class="text-[10px]">Registrar</span></button>
+    <button onclick="switchTab('analysis')" id="nav-analysis" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-hand-holding-heart text-xl"></i><span class="text-[10px]">Resgate</span></button>
+    <button onclick="switchTab('reports')" id="nav-reports" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-file-contract text-xl"></i><span class="text-[10px]">Relatórios</span></button>
+    <button onclick="switchTab('add')" id="nav-add" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-plus-circle text-xl"></i><span class="text-[10px]">Novo</span></button>
+</nav>
+
+<!-- MENU DESKTOP (Aparece apenas no Computador: md:flex) -->
+<div id="desktop-nav" class="hidden md:flex bg-white shadow-sm border-b mb-6 p-2 sticky top-[64px] z-40 justify-center gap-4">
+    <button onclick="switchTab('dashboard')" class="px-4 py-2 hover:bg-gray-100 rounded-lg text-sm font-bold text-gray-600"><i class="fas fa-home mr-2"></i>Início</button>
+    <button onclick="switchTab('attendance')" class="px-4 py-2 hover:bg-gray-100 rounded-lg text-sm font-bold text-gray-600"><i class="fas fa-check-double mr-2"></i>Registrar</button>
+    <button onclick="switchTab('analysis')" class="px-4 py-2 hover:bg-gray-100 rounded-lg text-sm font-bold text-gray-600"><i class="fas fa-hand-holding-heart mr-2"></i>Resgate</button>
+    <button onclick="switchTab('reports')" class="px-4 py-2 hover:bg-gray-100 rounded-lg text-sm font-bold text-gray-600"><i class="fas fa-file-contract mr-2"></i>Relatórios</button>
+    <button onclick="switchTab('add')" class="px-4 py-2 hover:bg-gray-100 rounded-lg text-sm font-bold text-gray-600"><i class="fas fa-plus-circle mr-2"></i>Novo Membro</button>
+</div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -268,6 +288,7 @@
             document.getElementById('menu-user-role').innerText = currentUser.role;
             if(currentUser.role === 'admin') document.getElementById('btn-admin-view').classList.remove('hidden');
             switchTab('dashboard'); listenData();
+             document.getElementById('desktop-nav').classList.remove('md:hidden'); // Garante que apareça no PC
         }
 
         function listenData() {
