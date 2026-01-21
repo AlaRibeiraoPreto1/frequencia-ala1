@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Frequência Pro - LDS</title>
+    <title>Frequência Sacramental</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -14,6 +14,7 @@
         .filter-pill.active { background-color: #002e5d; color: white; border-color: #002e5d; }
         #side-menu { transition: transform 0.3s ease-in-out; }
         .menu-open { transform: translateX(0) !important; }
+        select { appearance: none; -webkit-appearance: none; }
     </style>
 </head>
 <body class="font-sans pb-24">
@@ -22,10 +23,10 @@
     <header class="bg-[#002e5d] text-white p-4 shadow-lg sticky top-0 z-[60]">
         <div class="container mx-auto flex justify-between items-center">
             <div id="header-info" class="hidden">
-                <p class="text-[10px] opacity-70 uppercase tracking-widest font-bold">Olá, <span id="user-first-name">Usuário</span></p>
-                <select id="dateSelect" class="bg-transparent text-sm font-bold outline-none border-none"></select>
+                <p class="text-xs opacity-70 uppercase tracking-widest font-bold">Olá, <span id="user-first-name">Usuário</span></p>
+                <h1 class="text-lg font-bold italic leading-tight">Frequência Sacramental</h1>
             </div>
-            <div id="header-login-title" class="font-bold italic">Frequência Ala</div>
+            <div id="header-login-title" class="font-bold italic">Frequência Sacramental</div>
             <button onclick="toggleMenu()" id="menu-btn" class="hidden p-2"><i class="fas fa-bars text-xl"></i></button>
         </div>
     </header>
@@ -96,16 +97,26 @@
             </div>
         </div>
 
-        <!-- Lista de Chamada -->
+        <!-- Registrar Frequência -->
         <div id="view-attendance" class="hidden space-y-4">
+            <!-- Novo Seletor de Data Visual -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-50 flex items-center justify-between">
+                <div>
+                    <p class="text-[10px] font-bold text-blue-900 uppercase tracking-tighter">Data da Reunião</p>
+                    <select id="dateSelect" class="text-sm font-bold bg-transparent outline-none border-none text-gray-700"></select>
+                </div>
+                <i class="fas fa-calendar-day text-blue-200 text-2xl"></i>
+            </div>
+
             <div class="flex overflow-x-auto gap-2 pb-2 no-scrollbar" id="orgFilters"></div>
+            
             <input type="text" id="searchMember" placeholder="🔍 Buscar nome..." class="w-full p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
             <div id="memberList" class="space-y-2"></div>
         </div>
 
         <!-- Resgate -->
         <div id="view-analysis" class="hidden space-y-4">
-            <h2 class="text-center font-bold text-orange-600 uppercase text-xs tracking-widest mb-4">Membros ausentes há +21 dias</h2>
+            <h2 class="text-center font-bold text-orange-600 uppercase text-xs tracking-widest mb-4">Ausentes há +21 dias</h2>
             <div id="missingList" class="space-y-3"></div>
         </div>
 
@@ -143,7 +154,7 @@
             </div>
         </div>
 
-        <!-- MODAL EDITAR MEMBRO -->
+        <!-- Modais -->
         <div id="memberEditModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4">
             <div class="bg-white w-full max-w-sm rounded-2xl p-6 space-y-4 shadow-2xl">
                 <h3 class="font-bold border-b pb-2 uppercase text-xs text-gray-500">Editar Registro</h3>
@@ -164,7 +175,6 @@
             </div>
         </div>
 
-        <!-- Modal Editar Usuário -->
         <div id="userEditModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4">
             <div class="bg-white w-full max-w-sm rounded-2xl p-6 space-y-4 shadow-2xl">
                 <h3 class="font-bold border-b pb-2 uppercase text-xs">Editar Login</h3>
@@ -186,7 +196,7 @@
     <!-- Menu Inferior -->
     <nav id="nav-bar" class="hidden fixed bottom-0 w-full bg-white border-t flex justify-around py-3 shadow-2xl z-50">
         <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-home text-xl"></i><span class="text-[10px]">Início</span></button>
-        <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-check-double text-xl"></i><span class="text-[10px]">Chamada</span></button>
+        <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-check-double text-xl"></i><span class="text-[10px]">Registrar</span></button>
         <button onclick="switchTab('analysis')" id="nav-analysis" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-hand-holding-heart text-xl"></i><span class="text-[10px]">Resgate</span></button>
         <button onclick="switchTab('add')" id="nav-add" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-plus-circle text-xl"></i><span class="text-[10px]">Novo</span></button>
     </nav>
@@ -213,27 +223,30 @@
         let selectedDate = new Date().toISOString().split('T')[0];
         let memberIdEditing = null; let userIdEditing = null;
 
+        // Configurar Seletor de Datas
         const dateSelect = document.getElementById('dateSelect');
-        for(let i=0; i<8; i++) {
-            let d = new Date(); d.setDate(d.getDate() - (d.getDay() + (7 * i)) % 56);
+        const domingos = [];
+        for(let i=0; i<12; i++) {
+            let d = new Date(); d.setDate(d.getDate() - (d.getDay() + (7 * i)) % 84);
             let iso = d.toISOString().split('T')[0];
-            dateSelect.innerHTML += `<option value="${iso}">${i==0 ? 'HOJE' : iso.split('-')[2]+'/'+iso.split('-')[1]}</option>`;
+            let formatada = d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
+            domingos.push({iso, formatada});
+            dateSelect.innerHTML += `<option value="${iso}">${i==0 ? 'DOMINGO HOJE ('+formatada+')' : 'DOMINGO, '+formatada}</option>`;
         }
         selectedDate = dateSelect.value;
 
         // --- AUTH ---
         window.processFirstLogin = async () => {
-            const userIn = document.getElementById('first-user').value.toLowerCase().trim();
-            const passIn = document.getElementById('first-pass').value.trim();
-            const passConf = document.getElementById('first-pass-confirm').value.trim();
-            if(!userIn || !passIn || passIn !== passConf) return alert("Dados inválidos!");
-            const q = query(collection(db, "usuarios"), where("username", "==", userIn));
+            const u = document.getElementById('first-user').value.toLowerCase().trim();
+            const p1 = document.getElementById('first-pass').value.trim();
+            const p2 = document.getElementById('first-pass-confirm').value.trim();
+            if(!u || !p1 || p1 !== p2) return alert("Verifique os campos e as senhas!");
+            const q = query(collection(db, "usuarios"), where("username", "==", u));
             const snap = await getDocs(q);
-            if(snap.empty) return alert("Não autorizado!");
-            const uDoc = snap.docs[0];
-            if(uDoc.data().password) return alert("Já ativo!");
-            await updateDoc(doc(db, "usuarios", uDoc.id), { password: passIn });
-            alert("Ativado!"); switchTab('login');
+            if(snap.empty) return alert("Usuário não autorizado!");
+            if(snap.docs[0].data().password) return alert("Conta já ativa!");
+            await updateDoc(doc(db, "usuarios", snap.docs[0].id), { password: p1 });
+            alert("Sucesso!"); switchTab('login');
         };
 
         window.checkLogin = async () => {
@@ -242,10 +255,10 @@
             const q = query(collection(db, "usuarios"), where("username", "==", u), where("password", "==", p));
             const snap = await getDocs(q);
             if (!snap.empty) {
-                const data = snap.docs[0].data(); data.id = snap.docs[0].id;
-                localStorage.setItem('user_data', JSON.stringify(data));
-                currentUser = data; startApp();
-            } else alert("Login inválido!");
+                const d = snap.docs[0].data(); d.id = snap.docs[0].id;
+                localStorage.setItem('user_data', JSON.stringify(d));
+                currentUser = d; startApp();
+            } else alert("Dados incorretos!");
         };
 
         window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
@@ -268,51 +281,7 @@
             switchTab('dashboard'); listenData();
         }
 
-        // --- MEMBROS EDICAO ---
-        window.openMemberEdit = (id) => {
-            const m = members.find(x => x.id === id);
-            memberIdEditing = id;
-            document.getElementById('edit-member-name').value = m.name;
-            document.getElementById('edit-member-org').value = m.org || 'Quórum de Élderes';
-            document.getElementById('memberEditModal').classList.remove('hidden');
-        };
-
-        window.closeMemberEdit = () => { document.getElementById('memberEditModal').classList.add('hidden'); };
-
-        window.saveMemberAction = async () => {
-            const name = document.getElementById('edit-member-name').value.trim().toUpperCase();
-            const org = document.getElementById('edit-member-org').value;
-            await updateDoc(doc(db, "membros", memberIdEditing), { name, org });
-            closeMemberEdit();
-        };
-
-        window.deleteMemberAction = async () => {
-            if(confirm("Excluir membro permanentemente?")) {
-                await deleteDoc(doc(db, "membros", memberIdEditing));
-                closeMemberEdit();
-            }
-        };
-
-        // --- USUARIOS EDICAO ---
-        window.openEditUser = (id) => {
-            const u = allAppUsers.find(x => x.id === id); userIdEditing = id;
-            document.getElementById('edit-user-name').value = u.name;
-            document.getElementById('edit-user-role').value = u.role;
-            document.getElementById('userEditModal').classList.remove('hidden');
-        };
-        window.closeUserEdit = () => document.getElementById('userEditModal').classList.add('hidden');
-        window.saveUserUpdate = async () => {
-            const up = { name: document.getElementById('edit-user-name').value, role: document.getElementById('edit-user-role').value };
-            if(document.getElementById('edit-user-pass').value) up.password = document.getElementById('edit-user-pass').value;
-            await updateDoc(doc(db, "usuarios", userIdEditing), up); closeUserEdit();
-        };
-        window.deleteUserAction = async () => {
-            const u = allAppUsers.find(x => x.id === userIdEditing);
-            if(u.username === 'admin') return alert("Não é possível deletar o administrador!");
-            if(confirm("Excluir login?")) { await deleteDoc(doc(db, "usuarios", userIdEditing)); closeUserEdit(); }
-        };
-
-        // --- DADOS ---
+        // --- DADOS CORE ---
         function listenData() {
             onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => {
                 members = snap.docs.map(d => ({id: d.id, ...d.data()})); render();
@@ -327,44 +296,43 @@
             });
         }
 
-        window.togglePresence = async (memberId) => {
+        window.togglePresence = async (memberId, memberName) => {
             const hRef = doc(db, "historico", selectedDate);
             let cur = attendanceHistory[selectedDate] || [];
-            if(cur.includes(memberId)) cur = cur.filter(i => i !== memberId);
-            else { cur.push(memberId); await updateDoc(doc(db, "membros", memberId), { lastAttended: selectedDate }); }
+            const isPresent = cur.includes(memberId);
+
+            if(isPresent) {
+                // PEDIR CONFIRMAÇÃO PARA DESMARCAR
+                if(!confirm(`Deseja realmente remover a presença de ${memberName}?`)) return;
+                cur = cur.filter(i => i !== memberId);
+            } else {
+                cur.push(memberId);
+                await updateDoc(doc(db, "membros", memberId), { lastAttended: selectedDate });
+            }
             await setDoc(hRef, { presents: cur });
         };
 
-        window.addMember = async () => {
-            const n = document.getElementById('newName').value.trim().toUpperCase();
-            const o = document.getElementById('newOrg').value;
-            if(!n) return;
-            await addDoc(collection(db, "membros"), { name: n, org: o, lastAttended: "2024-01-01" });
-            document.getElementById('newName').value = ""; switchTab('attendance');
-        };
-
         function render() {
-            const search = document.getElementById('searchMember').value.toLowerCase();
+            const s = document.getElementById('searchMember').value.toLowerCase();
             const list = document.getElementById('memberList');
-            const missList = document.getElementById('missingList');
-            const curPres = attendanceHistory[selectedDate] || [];
-            list.innerHTML = ''; missList.innerHTML = '';
+            const miss = document.getElementById('missingList');
+            const todayP = attendanceHistory[selectedDate] || [];
+            list.innerHTML = ''; miss.innerHTML = '';
             let pC = 0; let tC = 0;
 
             members.forEach(m => {
-                const isP = curPres.includes(m.id);
+                const isP = todayP.includes(m.id);
                 if(m.org !== 'Visitante') { tC++; if(isP) pC++; }
 
-                // Lógica Resgate (+21 dias)
                 const diff = Math.floor((new Date() - new Date(m.lastAttended)) / (1000*60*60*24));
                 if(m.org !== 'Visitante' && diff > 21) {
-                    missList.innerHTML += `<div class="bg-white p-4 rounded-xl border-r-4 border-orange-500 flex justify-between items-center"><div><p class="font-bold text-sm text-gray-800">${m.name}</p><p class="text-[9px] font-bold text-orange-600 uppercase">${m.org} • ${Math.floor(diff/7)} SEMANAS AUSENTE</p></div><a href="https://wa.me/?text=Olá, sentimos sua falta na reunião sacramental!" class="text-green-500"><i class="fab fa-whatsapp text-2xl"></i></a></div>`;
+                    miss.innerHTML += `<div class="bg-white p-4 rounded-xl border-r-4 border-orange-500 flex justify-between items-center shadow-sm"><div><p class="font-bold text-sm text-gray-800">${m.name}</p><p class="text-[9px] font-bold text-orange-600 uppercase">${m.org} • AUSENTE ${Math.floor(diff/7)} SEMANAS</p></div><a href="https://wa.me/?text=Olá, sentimos sua falta na reunião sacramental!" class="text-green-500"><i class="fab fa-whatsapp text-2xl"></i></a></div>`;
                 }
 
-                if((currentFilter === 'TODOS' || m.org === currentFilter) && m.name.toLowerCase().includes(search)) {
+                if((currentFilter === 'TODOS' || m.org === currentFilter) && m.name.toLowerCase().includes(s)) {
                     list.innerHTML += `<div class="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border-l-4 ${isP ? 'border-green-500' : 'border-gray-200'}">
-                        <input type="checkbox" ${isP ? 'checked' : ''} onchange="togglePresence('${m.id}')" class="rounded-full w-5 h-5 text-blue-900">
-                        <div onclick="togglePresence('${m.id}')" class="flex-1">
+                        <input type="checkbox" ${isP ? 'checked' : ''} onchange="togglePresence('${m.id}', '${m.name}')" class="rounded-full w-5 h-5 text-blue-900 border-gray-300">
+                        <div onclick="togglePresence('${m.id}', '${m.name}')" class="flex-1">
                             <p class="font-bold text-sm text-gray-700 leading-tight">${m.name}</p>
                             <p class="text-[9px] text-gray-400 font-bold uppercase">${m.org}</p>
                         </div>
@@ -376,38 +344,41 @@
             document.getElementById('stats-total').innerText = tC;
         }
 
-        window.adminCreateUser = async () => {
-            const n = document.getElementById('admin-new-name').value;
-            const u = document.getElementById('admin-new-user').value.toLowerCase().trim();
-            const r = document.getElementById('admin-new-role').value;
-            if(!n || !u) return alert("Preencha!");
-            await addDoc(collection(db, "usuarios"), { name: n, username: u, password: "", role: r });
-            alert("Autorizado!"); document.getElementById('admin-new-name').value = '';
+        // --- AUXILIARES ---
+        window.openMemberEdit = (id) => {
+            const m = members.find(x => x.id === id); memberIdEditing = id;
+            document.getElementById('edit-member-name').value = m.name;
+            document.getElementById('edit-member-org').value = m.org;
+            document.getElementById('memberEditModal').classList.remove('hidden');
+        };
+        window.closeMemberEdit = () => document.getElementById('memberEditModal').classList.add('hidden');
+        window.saveMemberAction = async () => {
+            await updateDoc(doc(db, "membros", memberIdEditing), { name: document.getElementById('edit-member-name').value.toUpperCase(), org: document.getElementById('edit-member-org').value });
+            closeMemberEdit();
+        };
+        window.deleteMemberAction = async () => { if(confirm("Excluir?")) { await deleteDoc(doc(db, "membros", memberIdEditing)); closeMemberEdit(); } };
+
+        window.addMember = async () => {
+            const n = document.getElementById('newName').value.trim().toUpperCase();
+            if(!n) return;
+            await addDoc(collection(db, "membros"), { name: n, org: document.getElementById('newOrg').value, lastAttended: "2024-01-01" });
+            document.getElementById('newName').value = ""; switchTab('attendance');
         };
 
-        function renderUsers() {
-            const l = document.getElementById('users-list'); l.innerHTML = '';
-            allAppUsers.forEach(u => {
-                l.innerHTML += `<div class="bg-white p-4 rounded-2xl flex justify-between items-center text-xs border"><div><p class="font-bold text-blue-900">${u.name} <span class="bg-gray-100 text-[8px] p-1 rounded uppercase">${u.role}</span></p><p class="opacity-50">${u.username} • ${u.password?'Ativo':'Pendente'}</p></div><button onclick="openEditUser('${u.id}')" class="text-gray-400 p-2"><i class="fas fa-cog"></i></button></div>`;
-            });
-        }
-
-        function updateChart() {
+        window.updateChart = () => {
             const ctx = document.getElementById('attendanceChart').getContext('2d');
             const dates = Object.keys(attendanceHistory).sort().slice(-5);
             const counts = dates.map(d => attendanceHistory[d].length);
             if(chartInstance) chartInstance.destroy();
             chartInstance = new Chart(ctx, { type: 'line', data: { labels: dates.map(d => d.split('-')[2]+'/'+d.split('-')[1]), datasets: [{ data: counts, borderColor: '#002e5d', backgroundColor: 'rgba(0, 46, 93, 0.1)', fill: true, tension: 0.4 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 5 } } } } });
-        }
+        };
 
         window.toggleMenu = () => { document.getElementById('side-menu').classList.toggle('menu-open'); document.getElementById('menu-overlay').classList.toggle('hidden'); };
         window.switchTab = (tab) => {
             document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
             document.getElementById(`view-${tab}`).classList.remove('hidden');
-            if(document.getElementById('nav-bar')) {
-                document.querySelectorAll('nav button').forEach(b => b.classList.replace('text-[#002e5d]', 'text-gray-400'));
-                if(document.getElementById(`nav-${tab}`)) document.getElementById(`nav-${tab}`).classList.replace('text-gray-400', 'text-[#002e5d]');
-            }
+            document.querySelectorAll('nav button').forEach(b => b.classList.replace('text-[#002e5d]', 'text-gray-400'));
+            if(document.getElementById(`nav-${tab}`)) document.getElementById(`nav-${tab}`).classList.replace('text-gray-400', 'text-[#002e5d]');
             if(document.getElementById('side-menu').classList.contains('menu-open')) toggleMenu();
             window.scrollTo(0,0);
         };
@@ -416,6 +387,7 @@
         dateSelect.addEventListener('change', (e) => { selectedDate = e.target.value; render(); });
         document.getElementById('searchMember').addEventListener('input', render);
 
+        // Renderizar Filtros
         const filterArea = document.getElementById('orgFilters');
         ['TODOS', 'Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária', 'Visitante'].forEach(o => {
             const id = o.replace(/\s+/g, '');
