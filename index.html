@@ -14,7 +14,6 @@
         .filter-pill.active { background-color: #002e5d; color: white; border-color: #002e5d; }
         #side-menu { transition: transform 0.3s ease-in-out; }
         .menu-open { transform: translateX(0) !important; }
-        .report-card { border-left: 4px solid #002e5d; }
     </style>
 </head>
 <body class="font-sans pb-24 text-gray-800">
@@ -39,10 +38,7 @@
             <p id="menu-user-role" class="text-[10px] opacity-70 uppercase tracking-widest"></p>
         </div>
         <div class="flex-1 p-4 space-y-2 overflow-y-auto">
-            <button onclick="switchTab('dashboard')" class="w-full text-left p-3 hover:bg-gray-100 rounded-xl text-sm"><i class="fas fa-chart-line mr-3 text-blue-900"></i>Painel de Análise</button>
-            <button onclick="switchTab('attendance')" class="w-full text-left p-3 hover:bg-gray-100 rounded-xl text-sm"><i class="fas fa-check-double mr-3 text-blue-900"></i>Registrar Frequência</button>
-            <button onclick="switchTab('analysis')" class="w-full text-left p-3 hover:bg-gray-100 rounded-xl text-sm"><i class="fas fa-hand-holding-heart mr-3 text-blue-900"></i>Resgate e Alertas</button>
-            <button onclick="switchTab('reports')" class="w-full text-left p-3 hover:bg-gray-100 rounded-xl text-sm"><i class="fas fa-file-contract mr-3 text-blue-900"></i>Relatórios Estratégicos</button>
+            <button onclick="switchTab('dashboard')" class="w-full text-left p-3 hover:bg-gray-100 rounded-xl text-sm"><i class="fas fa-home mr-3 text-blue-900"></i>Início</button>
             <button id="btn-admin-view" onclick="switchTab('admin-users')" class="hidden w-full text-left p-3 hover:bg-gray-100 rounded-xl text-sm"><i class="fas fa-users-cog mr-3 text-blue-900"></i>Gerenciar Logins</button>
             <hr>
             <button onclick="logout()" class="w-full text-left p-3 text-red-600 hover:bg-red-50 rounded-xl text-sm font-bold"><i class="fas fa-sign-out-alt mr-3"></i>Sair</button>
@@ -51,14 +47,14 @@
 
     <main class="container mx-auto p-4 max-w-md">
         
-        <!-- Login & First Login (Mantidos) -->
+        <!-- View Login -->
         <div id="view-login" class="py-10 text-center">
             <div class="bg-white p-8 rounded-3xl shadow-sm border space-y-4">
                 <i class="fas fa-user-shield text-5xl text-[#002e5d]"></i>
                 <h2 class="text-xl font-bold">Acesso</h2>
                 <input type="text" id="login-user" placeholder="Usuário" class="w-full p-4 border rounded-2xl outline-none">
                 <input type="password" id="login-pass" placeholder="Senha" class="w-full p-4 border rounded-2xl outline-none">
-                <button onclick="checkLogin()" class="w-full bg-[#002e5d] text-white p-4 rounded-2xl font-bold">ENTRAR</button>
+                <button onclick="checkLogin()" class="w-full bg-[#002e5d] text-white p-4 rounded-2xl font-bold shadow-lg">ENTRAR</button>
                 <button onclick="switchTab('first-login')" class="text-xs text-blue-900 underline">Primeiro Acesso?</button>
             </div>
         </div>
@@ -70,10 +66,11 @@
                 <input type="password" id="first-pass" placeholder="Nova Senha" class="w-full p-4 border rounded-2xl mb-2">
                 <input type="password" id="first-pass-confirm" placeholder="Confirme a Senha" class="w-full p-4 border rounded-2xl mb-4">
                 <button onclick="processFirstLogin()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-bold">ATIVAR</button>
+                <button onclick="switchTab('login')" class="text-xs text-gray-400 mt-4">Voltar</button>
             </div>
         </div>
 
-        <!-- DASHBOARD COM HEATMAP -->
+        <!-- Dashboard -->
         <div id="view-dashboard" class="hidden space-y-4">
             <div class="grid grid-cols-2 gap-3 text-center">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border-b-4 border-green-500">
@@ -86,67 +83,50 @@
                 </div>
             </div>
             <div class="bg-white p-4 rounded-2xl shadow-sm">
-                <h3 class="text-[10px] font-bold text-gray-400 uppercase mb-4 text-center">Saúde por Organização (%)</h3>
+                <h3 class="text-[10px] font-bold text-gray-400 uppercase mb-4 text-center">Saúde das Organizações (%)</h3>
                 <canvas id="heatmapChart" height="200"></canvas>
-            </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm">
-                <h3 class="text-[10px] font-bold text-gray-400 uppercase mb-2 text-center">Histórico Recente</h3>
-                <canvas id="attendanceChart" height="120"></canvas>
             </div>
         </div>
 
-        <!-- REGISTRAR FREQUÊNCIA -->
+        <!-- Registrar Frequência -->
         <div id="view-attendance" class="hidden space-y-4">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-100 flex items-center justify-between">
-                <div>
-                    <p class="text-[10px] font-bold text-blue-900 uppercase">Domingo de Referência</p>
-                    <select id="dateSelect" class="text-sm font-bold bg-transparent outline-none border-none text-gray-700 cursor-pointer"></select>
-                </div>
-                <i class="fas fa-calendar-alt text-blue-800 text-xl"></i>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-100">
+                <p class="text-[10px] font-bold text-blue-900 uppercase">Domingo de Referência</p>
+                <select id="dateSelect" class="w-full text-sm font-bold bg-transparent outline-none border-none text-gray-700 py-1"></select>
             </div>
             <div class="flex overflow-x-auto gap-2 pb-2 no-scrollbar" id="orgFilters"></div>
             <input type="text" id="searchMember" placeholder="🔍 Buscar nome..." class="w-full p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
             <div id="memberList" class="space-y-2"></div>
         </div>
 
-        <!-- RELATÓRIOS ESTRATÉGICOS -->
+        <!-- Relatórios -->
         <div id="view-reports" class="hidden space-y-6">
-            <div class="bg-[#002e5d] text-white p-4 rounded-2xl shadow-md">
-                <h2 class="font-bold text-sm uppercase tracking-widest"><i class="fas fa-brain mr-2"></i>Inteligência Pastoral</h2>
-                <p class="text-[10px] opacity-80">Identificando padrões para o Conselho de Ala</p>
-            </div>
-
-            <!-- Sinal Amarelo -->
             <section class="space-y-3">
-                <h3 class="text-xs font-bold text-gray-500 uppercase"><i class="fas fa-exclamation-circle text-yellow-500 mr-2"></i>Sinal Amarelo (Frequência em Queda)</h3>
+                <h3 class="text-xs font-bold text-yellow-600 uppercase tracking-widest"><i class="fas fa-exclamation-triangle mr-2"></i>Sinal Amarelo (Frequência em Queda)</h3>
                 <div id="report-yellow" class="space-y-2"></div>
             </section>
-
-            <!-- Famílias -->
             <section class="space-y-3">
-                <h3 class="text-xs font-bold text-gray-500 uppercase"><i class="fas fa-users text-blue-500 mr-2"></i>Ausências por Família</h3>
-                <div id="report-family" class="space-y-2 text-xs"></div>
+                <h3 class="text-xs font-bold text-blue-600 uppercase tracking-widest"><i class="fas fa-users mr-2"></i>Ausência por Família (Hoje)</h3>
+                <div id="report-family" class="space-y-2"></div>
             </section>
-
-            <!-- Retenção -->
             <section class="space-y-3">
-                <h3 class="text-xs font-bold text-gray-500 uppercase"><i class="fas fa-seedling text-green-500 mr-2"></i>Retenção (Novos e Conversos)</h3>
+                <h3 class="text-xs font-bold text-green-600 uppercase tracking-widest"><i class="fas fa-seedling mr-2"></i>Novos e Conversos</h3>
                 <div id="report-retention" class="space-y-2"></div>
             </section>
         </div>
 
-        <!-- RESGATE (AUSENTES +21 DIAS) -->
+        <!-- Resgate -->
         <div id="view-analysis" class="hidden space-y-4">
-            <h2 class="text-center font-bold text-orange-600 uppercase text-xs tracking-widest"><i class="fas fa-bullhorn mr-2"></i>Foco de Resgate (+21 dias)</h2>
+            <h2 class="text-center font-bold text-orange-600 uppercase text-xs tracking-widest">Ausentes há +21 dias</h2>
             <div id="missingList" class="space-y-3"></div>
         </div>
 
-        <!-- NOVO MEMBRO (COM NOVOS CAMPOS) -->
-        <div id="view-add" class="hidden">
+        <!-- Cadastro de Membro (RESTAURADO) -->
+        <div id="view-add" class="hidden space-y-4">
             <div class="bg-white p-6 rounded-3xl shadow-sm border space-y-4">
-                <h2 class="font-bold text-center text-xs uppercase text-gray-400">Novo Cadastro</h2>
-                <input type="text" id="newName" placeholder="NOME COMPLETO" class="w-full p-4 border rounded-2xl uppercase text-sm">
-                <input type="text" id="newFamily" placeholder="SOBRENOME DA FAMÍLIA" class="w-full p-4 border rounded-2xl uppercase text-sm">
+                <h2 class="font-bold text-center uppercase text-sm tracking-widest text-blue-900">Novo Cadastro</h2>
+                <input type="text" id="newName" placeholder="NOME COMPLETO" class="w-full p-4 border rounded-2xl uppercase text-sm outline-none focus:ring-2 focus:ring-blue-900">
+                <input type="text" id="newFamily" placeholder="SOBRENOME DA FAMÍLIA" class="w-full p-4 border rounded-2xl uppercase text-sm outline-none focus:ring-2 focus:ring-blue-900">
                 <div class="grid grid-cols-2 gap-2">
                     <select id="newOrg" class="p-4 border rounded-2xl bg-gray-50 text-[10px] font-bold">
                         <option value="Quórum de Élderes">ÉLDERES</option>
@@ -162,20 +142,29 @@
                         <option value="Novo Morador">NOVO MORADOR</option>
                     </select>
                 </div>
-                <button onclick="addMember()" class="w-full bg-[#002e5d] text-white p-4 rounded-2xl font-bold">CADASTRAR</button>
+                <button onclick="addMember()" class="w-full bg-[#002e5d] text-white p-4 rounded-2xl font-bold active:scale-95 transition-all">CADASTRAR MEMBRO</button>
             </div>
         </div>
 
-        <!-- GERENCIAR LOGINS -->
+        <!-- Gerenciar Usuários (RESTAURADO) -->
         <div id="view-admin-users" class="hidden space-y-4">
+            <div class="bg-white p-6 rounded-3xl border space-y-3">
+                <h3 class="font-bold text-xs uppercase text-gray-400">Autorizar Novo Acesso</h3>
+                <input type="text" id="admin-new-name" placeholder="Nome Completo" class="w-full p-3 border rounded-xl">
+                <input type="text" id="admin-new-user" placeholder="Usuário (login)" class="w-full p-3 border rounded-xl">
+                <select id="admin-new-role" class="w-full p-3 border rounded-xl bg-gray-50 text-sm">
+                    <option value="user">Usuário Comum</option>
+                    <option value="admin">Administrador</option>
+                </select>
+                <button onclick="adminCreateUser()" class="w-full bg-blue-900 text-white p-3 rounded-xl font-bold text-xs">AUTORIZAR</button>
+            </div>
             <div id="users-list" class="space-y-2"></div>
-            <button onclick="switchTab('add-user-form')" class="w-full p-4 bg-gray-200 rounded-2xl font-bold text-xs">AUTORIZAR NOVO LOGIN</button>
         </div>
 
-        <!-- MODAL EDITAR MEMBRO -->
+        <!-- Modal Editar Membro -->
         <div id="memberEditModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4">
             <div class="bg-white w-full max-w-sm rounded-3xl p-6 space-y-4 shadow-2xl">
-                <h3 class="font-bold border-b pb-2 uppercase text-xs text-gray-400">Editar Perfil</h3>
+                <h3 class="font-bold border-b pb-2 uppercase text-xs">Editar Perfil</h3>
                 <input type="text" id="edit-member-name" class="w-full p-3 border rounded-xl uppercase text-sm">
                 <input type="text" id="edit-member-family" placeholder="FAMÍLIA" class="w-full p-3 border rounded-xl uppercase text-sm">
                 <div class="grid grid-cols-2 gap-2">
@@ -192,7 +181,7 @@
                     <button onclick="deleteMemberAction()" class="flex-1 bg-red-100 text-red-600 p-3 rounded-xl font-bold text-[10px]">EXCLUIR</button>
                     <button onclick="saveMemberAction()" class="flex-[2] bg-blue-900 text-white p-3 rounded-xl font-bold text-[10px]">SALVAR</button>
                 </div>
-                <button onclick="closeMemberEdit()" class="w-full text-xs text-gray-400">Cancelar</button>
+                <button onclick="closeMemberEdit()" class="w-full text-xs text-gray-400 mt-2">Cancelar</button>
             </div>
         </div>
 
@@ -204,6 +193,7 @@
         <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-check-double text-xl"></i><span class="text-[10px]">Registrar</span></button>
         <button onclick="switchTab('analysis')" id="nav-analysis" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-hand-holding-heart text-xl"></i><span class="text-[10px]">Resgate</span></button>
         <button onclick="switchTab('reports')" id="nav-reports" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-file-contract text-xl"></i><span class="text-[10px]">Relatórios</span></button>
+        <button onclick="switchTab('add')" id="nav-add" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-plus-circle text-xl"></i><span class="text-[10px]">Novo</span></button>
     </nav>
 
     <script type="module">
@@ -228,18 +218,30 @@
         let selectedDate = new Date().toISOString().split('T')[0];
         let memberIdEditing = null;
 
-        // Gerar domingos (últimos 3 meses)
+        // Gerar domingos
         const dateSelect = document.getElementById('dateSelect');
         const domingosISO = [];
-        for(let i=0; i<12; i++) {
-            let d = new Date(); d.setDate(d.getDate() - (d.getDay() + (7 * i)) % 84);
+        for(let i=0; i<8; i++) {
+            let d = new Date(); d.setDate(d.getDate() - (d.getDay() + (7 * i)) % 56);
             let iso = d.toISOString().split('T')[0];
             domingosISO.push(iso);
-            dateSelect.innerHTML += `<option value="${iso}">${i==0?'HOJE':iso.split('-')[2]+'/'+iso.split('-')[1]} - Domingo</option>`;
+            dateSelect.innerHTML += `<option value="${iso}">${i==0?'DOMINGO HOJE':iso.split('-')[2]+'/'+iso.split('-')[1]}</option>`;
         }
         selectedDate = dateSelect.value;
 
-        // --- AUTH (Mantido) ---
+        // AUTH
+        window.processFirstLogin = async () => {
+            const u = document.getElementById('first-user').value.toLowerCase().trim();
+            const p1 = document.getElementById('first-pass').value.trim();
+            const p2 = document.getElementById('first-pass-confirm').value.trim();
+            if(!u || p1 !== p2) return alert("Erro nas senhas!");
+            const q = query(collection(db, "usuarios"), where("username", "==", u));
+            const snap = await getDocs(q);
+            if(snap.empty) return alert("Não autorizado!");
+            await updateDoc(doc(db, "usuarios", snap.docs[0].id), { password: p1 });
+            alert("Ativado!"); switchTab('login');
+        };
+
         window.checkLogin = async () => {
             const u = document.getElementById('login-user').value.toLowerCase().trim();
             const p = document.getElementById('login-pass').value.trim();
@@ -249,13 +251,13 @@
                 const d = snap.docs[0].data(); d.id = snap.docs[0].id;
                 localStorage.setItem('user_data', JSON.stringify(d));
                 currentUser = d; startApp();
-            } else alert("Erro!");
+            } else alert("Erro no login!");
         };
+
         window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
 
         function startApp() {
             if(!currentUser) return;
-            document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
             document.getElementById('view-login').classList.add('hidden');
             document.getElementById('nav-bar').classList.remove('hidden');
             document.getElementById('header-info').classList.remove('hidden');
@@ -278,10 +280,10 @@
             });
             onSnapshot(collection(db, "usuarios"), (snap) => {
                 allAppUsers = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                if(currentUser && currentUser.role === 'admin') renderUsers();
             });
         }
 
-        // --- FUNÇÕES DE REGISTRO ---
         window.togglePresence = async (memberId, memberName) => {
             const hRef = doc(db, "historico", selectedDate);
             let cur = attendanceHistory[selectedDate] || [];
@@ -298,65 +300,65 @@
         window.addMember = async () => {
             const name = document.getElementById('newName').value.trim().toUpperCase();
             const family = document.getElementById('newFamily').value.trim().toUpperCase();
-            const org = document.getElementById('newOrg').value;
-            const cat = document.getElementById('newCat').value;
-            if(!name) return;
-            await addDoc(collection(db, "membros"), { name, familia: family || 'NÃO INFORMADA', org, categoria: cat, lastAttended: "2024-01-01" });
+            if(!name) return alert("Digite o nome!");
+            await addDoc(collection(db, "membros"), { 
+                name, 
+                familia: family || 'NÃO INFORMADO', 
+                org: document.getElementById('newOrg').value, 
+                categoria: document.getElementById('newCat').value, 
+                lastAttended: "2024-01-01" 
+            });
             document.getElementById('newName').value = ""; document.getElementById('newFamily').value = ""; switchTab('attendance');
         };
 
-        // --- INTELIGÊNCIA E RELATÓRIOS ---
+        window.adminCreateUser = async () => {
+            const n = document.getElementById('admin-new-name').value;
+            const u = document.getElementById('admin-new-user').value.toLowerCase().trim();
+            const r = document.getElementById('admin-new-role').value;
+            if(!n || !u) return alert("Preencha!");
+            await addDoc(collection(db, "usuarios"), { name: n, username: u, password: "", role: r });
+            alert("Autorizado!"); document.getElementById('admin-new-name').value = '';
+        };
+
+        function renderUsers() {
+            const l = document.getElementById('users-list'); l.innerHTML = '';
+            allAppUsers.forEach(u => {
+                l.innerHTML += `<div class="bg-white p-4 rounded-2xl flex justify-between items-center text-xs border"><div><p class="font-bold text-blue-900">${u.name}</p><p class="opacity-50 uppercase text-[9px]">${u.username} • ${u.password?'Ativo':'Pendente'}</p></div><p class="text-[9px] font-bold text-gray-400 uppercase">${u.role}</p></div>`;
+            });
+        }
+
+        // RELATÓRIOS
         function calculateReports() {
-            const yellowList = document.getElementById('report-yellow');
-            const familyList = document.getElementById('report-family');
-            const retentionList = document.getElementById('report-retention');
-            yellowList.innerHTML = ''; familyList.innerHTML = ''; retentionList.innerHTML = '';
-
-            const last4Dom = domingosISO.slice(0, 4);
-            const prev4Dom = domingosISO.slice(4, 8);
+            const yellow = document.getElementById('report-yellow');
+            const family = document.getElementById('report-family');
+            const retention = document.getElementById('report-retention');
+            yellow.innerHTML = ''; family.innerHTML = ''; retention.innerHTML = '';
             const families = {};
-
+            
             members.forEach(m => {
                 if(m.org === 'Visitante') return;
-
-                // 1. Sinal Amarelo
-                let freqLast = last4Dom.filter(d => (attendanceHistory[d] || []).includes(m.id)).length;
-                let freqPrev = prev4Dom.filter(d => (attendanceHistory[d] || []).includes(m.id)).length;
-                if(freqPrev >= 3 && freqLast <= 1) {
-                    yellowList.innerHTML += `<div class="bg-yellow-50 p-3 rounded-xl border-l-4 border-yellow-400 flex justify-between items-center text-xs"><span><b>${m.name}</b><br>Freq. caiu de ${freqPrev}/4 para ${freqLast}/4</span><i class="fas fa-chart-line-down text-yellow-600"></i></div>`;
-                }
-
-                // 2. Agrupamento Familiar
+                // Sinal Amarelo (Simplificado para 4 domingos)
+                let freq = domingosISO.slice(0, 4).filter(d => (attendanceHistory[d] || []).includes(m.id)).length;
+                if(freq === 1) yellow.innerHTML += `<div class="bg-white p-3 rounded-xl border-l-4 border-yellow-400 text-xs"><b>${m.name}</b> vinha sempre e faltou 3 dos últimos 4.</div>`;
+                
+                // Famílias
                 const fam = m.familia || 'SEM FAMÍLIA';
                 if(!families[fam]) families[fam] = { total: 0, present: 0 };
                 families[fam].total++;
                 if((attendanceHistory[selectedDate] || []).includes(m.id)) families[fam].present++;
 
-                // 3. Retenção
-                if(m.categoria === 'Recém-Converso' || m.categoria === 'Novo Morador') {
+                // Retenção
+                if(m.categoria !== 'Membro') {
                     const isP = (attendanceHistory[selectedDate] || []).includes(m.id);
-                    retentionList.innerHTML += `<div class="p-3 rounded-xl border ${isP?'border-green-200 bg-green-50':'border-red-200 bg-red-50'} text-xs flex justify-between items-center"><span><b>${m.name}</b> (${m.categoria})</span> <i class="fas ${isP?'fa-check text-green-600':'fa-times text-red-600'}"></i></div>`;
+                    retention.innerHTML += `<div class="p-3 rounded-xl border ${isP?'bg-green-50':'bg-red-50'} text-xs flex justify-between"><span>${m.name}</span> <i class="fas ${isP?'fa-check text-green-600':'fa-times text-red-600'}"></i></div>`;
                 }
             });
-
-            // Renderizar Famílias com problemas
             Object.keys(families).forEach(f => {
-                if(families[f].present === 0) {
-                    familyList.innerHTML += `<div class="bg-white p-3 rounded-xl border flex justify-between items-center shadow-sm"><span>Família <b>${f}</b></span> <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px]">0 de ${families[f].total} presentes</span></div>`;
-                }
+                if(families[f].present === 0) family.innerHTML += `<div class="bg-white p-3 rounded-xl border text-xs">Família <b>${f}</b> (0 de ${families[f].total} presentes hoje)</div>`;
             });
         }
 
-        // --- GRÁFICOS ---
         function updateCharts() {
-            // Histórico Linear
-            const ctx1 = document.getElementById('attendanceChart').getContext('2d');
-            const dates = domingosISO.slice(0, 5).reverse();
-            const counts = dates.map(d => (attendanceHistory[d] || []).length);
-            if(chartInstance) chartInstance.destroy();
-            chartInstance = new Chart(ctx1, { type: 'line', data: { labels: dates.map(d=>d.split('-')[2]+'/'+d.split('-')[1]), datasets: [{ data: counts, borderColor: '#002e5d', fill: true, tension: 0.4 }] }, options: { plugins: { legend: false }, scales: { y: { beginAtZero: true } } } });
-
-            // Heatmap por Organização
             const ctx2 = document.getElementById('heatmapChart').getContext('2d');
             const orgs = ['Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária'];
             const stats = orgs.map(o => {
@@ -365,10 +367,9 @@
                 return total > 0 ? Math.round((pres/total)*100) : 0;
             });
             if(heatmapInstance) heatmapInstance.destroy();
-            heatmapInstance = new Chart(ctx2, { type: 'bar', data: { labels: ['ÉLD', 'SOC', 'MOÇ', 'RAP', 'PRI'], datasets: [{ data: stats, backgroundColor: ['#1e40af','#be185d','#059669','#d97706','#7c3aed'] }] }, options: { indexAxis: 'y', plugins: { legend: false }, scales: { x: { max: 100 } } } });
+            heatmapInstance = new Chart(ctx2, { type: 'bar', data: { labels: ['ÉLD', 'SOC', 'MOÇ', 'RAP', 'PRI'], datasets: [{ data: stats, backgroundColor: '#002e5d' }] }, options: { indexAxis: 'y', plugins: { legend: false }, scales: { x: { max: 100 } } } });
         }
 
-        // --- INTERFACE (MANTIDA) ---
         window.render = () => {
             const s = document.getElementById('searchMember').value.toLowerCase();
             const list = document.getElementById('memberList');
@@ -380,20 +381,18 @@
             members.forEach(m => {
                 const isP = curP.includes(m.id);
                 if(m.org !== 'Visitante') { tC++; if(isP) pC++; }
-
                 const diff = Math.floor((new Date() - new Date(m.lastAttended)) / (1000*60*60*24));
                 if(m.org !== 'Visitante' && diff > 21) {
-                    missList.innerHTML += `<div class="bg-white p-4 rounded-xl border-r-4 border-orange-500 flex justify-between items-center shadow-sm"><div><p class="font-bold text-sm">${m.name}</p><p class="text-[9px] font-bold text-orange-600 uppercase">${m.familia} • ${Math.floor(diff/7)} SEMANAS AUSENTE</p></div><a href="https://wa.me/?text=Olá, sentimos sua falta na reunião sacramental!" class="text-green-500"><i class="fab fa-whatsapp text-2xl"></i></a></div>`;
+                    missList.innerHTML += `<div class="bg-white p-4 rounded-xl border-r-4 border-orange-500 flex justify-between items-center shadow-sm"><div><p class="font-bold text-sm">${m.name}</p><p class="text-[9px] font-bold text-orange-600 uppercase">${m.familia} • ${Math.floor(diff/7)} SEMANAS</p></div><a href="https://wa.me/?text=Olá, sentimos sua falta!" class="text-green-500"><i class="fab fa-whatsapp text-2xl"></i></a></div>`;
                 }
-
                 if((currentFilter === 'TODOS' || m.org === currentFilter) && m.name.toLowerCase().includes(s)) {
                     list.innerHTML += `<div class="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border-l-4 ${isP ? 'border-green-500' : 'border-gray-200'}">
-                        <input type="checkbox" ${isP ? 'checked' : ''} onchange="togglePresence('${m.id}', '${m.name}')" class="rounded-full w-5 h-5 text-blue-900">
+                        <input type="checkbox" ${isP ? 'checked' : ''} onchange="togglePresence('${m.id}', '${m.name}')" class="rounded-full w-5 h-5">
                         <div onclick="togglePresence('${m.id}', '${m.name}')" class="flex-1">
-                            <p class="font-bold text-sm text-gray-700 leading-tight">${m.name}</p>
-                            <p class="text-[9px] text-gray-400 font-bold uppercase">${m.familia} • ${m.org}</p>
+                            <p class="font-bold text-sm">${m.name}</p>
+                            <p class="text-[9px] text-gray-400 uppercase">${m.org} • ${m.familia}</p>
                         </div>
-                        <button onclick="openMemberEdit('${m.id}')" class="text-gray-300 px-2"><i class="fas fa-edit text-sm"></i></button>
+                        <button onclick="openMemberEdit('${m.id}')" class="text-gray-300 px-2"><i class="fas fa-edit"></i></button>
                     </div>`;
                 }
             });
