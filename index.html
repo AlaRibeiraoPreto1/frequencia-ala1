@@ -12,7 +12,6 @@
         .hidden { display: none; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .filter-pill.active { background-color: #002e5d; color: white; border-color: #002e5d; }
-        /* Menu Lateral */
         #side-menu { transition: transform 0.3s ease-in-out; }
         .menu-open { transform: translateX(0) !important; }
     </style>
@@ -27,19 +26,16 @@
                 <select id="dateSelect" class="bg-transparent text-sm font-bold outline-none border-none"></select>
             </div>
             <div id="header-login-title" class="font-bold italic">Frequência Ala</div>
-            
-            <button onclick="toggleMenu()" id="menu-btn" class="hidden p-2">
-                <i class="fas fa-bars text-xl"></i>
-            </button>
+            <button onclick="toggleMenu()" id="menu-btn" class="hidden p-2"><i class="fas fa-bars text-xl"></i></button>
         </div>
     </header>
 
-    <!-- Menu Lateral (Drawer) -->
+    <!-- Menu Lateral -->
     <div id="menu-overlay" onclick="toggleMenu()" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[70]"></div>
     <div id="side-menu" class="fixed top-0 right-0 w-64 h-full bg-white z-[80] shadow-2xl transform translate-x-full flex flex-col">
         <div class="p-6 bg-[#002e5d] text-white">
-            <p id="menu-user-name" class="font-bold italic">Usuário</p>
-            <p id="menu-user-role" class="text-[10px] opacity-70 uppercase"></p>
+            <p id="menu-user-name" class="font-bold">Usuário</p>
+            <p id="menu-user-role" class="text-[10px] opacity-70 uppercase tracking-widest"></p>
         </div>
         <div class="flex-1 p-4 space-y-2">
             <button onclick="switchTab('dashboard')" class="w-full text-left p-3 hover:bg-gray-100 rounded-xl text-sm"><i class="fas fa-home mr-3 text-blue-900"></i>Início</button>
@@ -47,20 +43,38 @@
             <hr>
             <button onclick="logout()" class="w-full text-left p-3 text-red-600 hover:bg-red-50 rounded-xl text-sm font-bold"><i class="fas fa-sign-out-alt mr-3"></i>Sair do Sistema</button>
         </div>
-        <div class="p-4 text-center text-[10px] text-gray-400">Versão 5.0 - Conectado ao Firebase</div>
     </div>
 
     <main class="container mx-auto p-4 max-w-md">
         
-        <!-- Tela de Login (Usuário e Senha) -->
+        <!-- Tela de Login -->
         <div id="view-login" class="py-10">
-            <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 text-center">
-                <i class="fas fa-church text-5xl text-[#002e5d] mb-4"></i>
-                <h2 class="text-xl font-bold mb-6 text-gray-800 tracking-tight">Login da Unidade</h2>
+            <div class="bg-white p-8 rounded-3xl shadow-sm border text-center">
+                <i class="fas fa-user-circle text-5xl text-[#002e5d] mb-4"></i>
+                <h2 class="text-xl font-bold mb-6">Acesso ao Sistema</h2>
                 <div class="space-y-4">
                     <input type="text" id="login-user" placeholder="Usuário" class="w-full p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
                     <input type="password" id="login-pass" placeholder="Senha" class="w-full p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
-                    <button onclick="checkLogin()" class="w-full bg-[#002e5d] text-white p-4 rounded-2xl font-bold shadow-lg active:scale-95 transition-transform">ENTRAR</button>
+                    <button onclick="checkLogin()" class="w-full bg-[#002e5d] text-white p-4 rounded-2xl font-bold active:scale-95 transition-transform">ENTRAR</button>
+                    <hr>
+                    <p class="text-xs text-gray-500">É o seu primeiro acesso? <br>
+                        <button onclick="switchTab('first-login')" class="text-blue-900 font-bold underline mt-2">Ativar minha conta agora</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tela de Primeiro Login (Definição de Senha) -->
+        <div id="view-first-login" class="hidden py-10">
+            <div class="bg-white p-8 rounded-3xl shadow-sm border text-center">
+                <h2 class="text-xl font-bold mb-2">Primeiro Acesso</h2>
+                <p class="text-xs text-gray-500 mb-6">Se o seu nome foi pré-autorizado pelo administrador, defina sua senha abaixo.</p>
+                <div class="space-y-4">
+                    <input type="text" id="first-user" placeholder="Digite seu usuário" class="w-full p-4 border rounded-2xl outline-none">
+                    <input type="password" id="first-pass" placeholder="Crie uma Senha" class="w-full p-4 border rounded-2xl outline-none">
+                    <input type="password" id="first-pass-confirm" placeholder="Confirme a Senha" class="w-full p-4 border rounded-2xl outline-none">
+                    <button onclick="processFirstLogin()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-bold active:scale-95 transition-transform">ATIVAR CONTA</button>
+                    <button onclick="switchTab('login')" class="text-xs text-gray-500 underline">Voltar para o Login</button>
                 </div>
             </div>
         </div>
@@ -77,55 +91,63 @@
                     <p id="stats-total" class="text-4xl font-black text-[#002e5d]">0</p>
                 </div>
             </div>
-
             <div id="admin-chart-area" class="hidden bg-white p-4 rounded-2xl shadow-sm">
-                <h3 class="text-[10px] font-bold text-gray-400 uppercase mb-4 text-center">Tendência Semanal</h3>
                 <canvas id="attendanceChart" height="150"></canvas>
             </div>
         </div>
 
-        <!-- Lista de Chamada -->
-        <div id="view-attendance" class="hidden space-y-4">
-            <div class="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
-                <button onclick="setFilter('TODOS')" class="filter-pill active px-4 py-2 rounded-full border bg-white text-[10px] font-bold" id="pill-TODOS">TODOS</button>
-                <button onclick="setFilter('ÉLDERES')" class="filter-pill px-4 py-2 rounded-full border bg-white text-[10px] font-bold" id="pill-ÉLDERES">ÉLDERES</button>
-                <button onclick="setFilter('SOCORRO')" class="filter-pill px-4 py-2 rounded-full border bg-white text-[10px] font-bold" id="pill-SOCORRO">SOCORRO</button>
-                <button onclick="setFilter('MOÇAS')" class="filter-pill px-4 py-2 rounded-full border bg-white text-[10px] font-bold" id="pill-MOÇAS">MOÇAS</button>
-                <button onclick="setFilter('RAPAZES')" class="filter-pill px-4 py-2 rounded-full border bg-white text-[10px] font-bold" id="pill-RAPAZES">RAPAZES</button>
-                <button onclick="setFilter('PRIMÁRIA')" class="filter-pill px-4 py-2 rounded-full border bg-white text-[10px] font-bold" id="pill-PRIMÁRIA">PRIMÁRIA</button>
-            </div>
-            <input type="text" id="searchMember" placeholder="🔍 Buscar nome..." class="w-full p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
-            <div id="memberList" class="space-y-2"></div>
-        </div>
-
-        <!-- Gerenciar Usuários (Admin Only) -->
+        <!-- Gerenciar Usuários (Admin) -->
         <div id="view-admin-users" class="hidden space-y-4">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border mb-6">
-                <h3 class="font-bold mb-4 text-sm uppercase">Novo Acesso</h3>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border">
+                <h3 class="font-bold text-xs uppercase mb-4 text-gray-400 tracking-widest">Pré-Autorizar Novo Usuário</h3>
                 <div class="space-y-3">
-                    <input type="text" id="user-new-name" placeholder="Nome da Pessoa" class="w-full p-3 border rounded-xl text-sm">
-                    <input type="text" id="user-new-user" placeholder="Usuário (login)" class="w-full p-3 border rounded-xl text-sm">
-                    <input type="text" id="user-new-pass" placeholder="Senha" class="w-full p-3 border rounded-xl text-sm">
-                    <select id="user-new-role" class="w-full p-3 border rounded-xl bg-gray-50 text-sm">
+                    <input type="text" id="admin-new-name" placeholder="Nome Completo" class="w-full p-3 border rounded-xl">
+                    <input type="text" id="admin-new-user" placeholder="Usuário (login)" class="w-full p-3 border rounded-xl">
+                    <select id="admin-new-role" class="w-full p-3 border rounded-xl bg-gray-50 text-sm">
                         <option value="user">Usuário Comum</option>
                         <option value="admin">Administrador</option>
                     </select>
-                    <button onclick="createNewUser()" class="w-full bg-blue-900 text-white p-3 rounded-xl font-bold text-xs uppercase">Criar Login</button>
+                    <p class="text-[9px] text-gray-400">* O usuário definirá a senha dele no primeiro acesso.</p>
+                    <button onclick="adminCreateUser()" class="w-full bg-blue-900 text-white p-3 rounded-xl font-bold text-xs">AUTORIZAR ACESSO</button>
                 </div>
             </div>
             <div id="users-list" class="space-y-2"></div>
         </div>
 
-        <!-- As outras views (Resgate, Novo Membro, Edição) permanecem aqui... -->
+        <!-- Views de Membros e Chamada (Mantidas) -->
+        <div id="view-attendance" class="hidden space-y-4">
+            <div class="flex overflow-x-auto gap-2 pb-2 no-scrollbar" id="orgFilters"></div>
+            <input type="text" id="searchMember" placeholder="🔍 Buscar nome..." class="w-full p-4 border rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
+            <div id="memberList" class="space-y-2"></div>
+        </div>
         <div id="view-analysis" class="hidden space-y-4"><div id="missingList" class="space-y-3"></div></div>
         <div id="view-add" class="hidden">
             <div class="bg-white p-6 rounded-2xl shadow-sm border space-y-4">
                 <input type="text" id="newName" placeholder="NOME DO MEMBRO" class="w-full p-4 border rounded-xl uppercase">
-                <select id="newOrg" class="w-full p-4 border rounded-xl bg-gray-50 uppercase text-xs">
+                <select id="newOrg" class="w-full p-4 border rounded-xl bg-gray-50 text-xs">
                     <option value="ÉLDERES">ÉLDERES</option><option value="SOCORRO">SOCORRO</option>
-                    <option value="MOÇAS">MOÇAS</option><option value="RAPAZES">RAPAZES</option><option value="PRIMÁRIA">PRIMÁRIA</option>
+                    <option value="MOÇAS">MOÇAS</option><option value="RAPAZES">RAPAZES</option><option value="PRIMÁRIA">PRIMÁRIA</option><option value="VISITANTE">VISITANTE</option>
                 </select>
                 <button onclick="addMember()" class="w-full bg-[#002e5d] text-white p-4 rounded-xl font-bold">CADASTRAR</button>
+            </div>
+        </div>
+
+        <!-- Modal de Edição de Usuário (Reset Senha / Cargo) -->
+        <div id="userEditModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-sm rounded-2xl p-6 space-y-4 shadow-2xl">
+                <h3 class="font-bold border-b pb-2 uppercase text-xs">Editar Login</h3>
+                <div class="space-y-3">
+                    <input type="text" id="edit-user-name" placeholder="Nome" class="w-full p-3 border rounded-xl text-sm">
+                    <input type="text" id="edit-user-pass" placeholder="Nova Senha (deixe em branco para não mudar)" class="w-full p-3 border rounded-xl text-sm">
+                    <select id="edit-user-role" class="w-full p-3 border rounded-xl bg-gray-50 text-sm">
+                        <option value="user">Usuário Comum</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <div class="flex gap-2 pt-4">
+                    <button onclick="closeUserEdit()" class="flex-1 border p-3 rounded-xl font-bold text-xs">CANCELAR</button>
+                    <button onclick="saveUserUpdate()" class="flex-1 bg-blue-900 text-white p-3 rounded-xl font-bold text-xs">SALVAR</button>
+                </div>
             </div>
         </div>
 
@@ -133,7 +155,7 @@
 
     <!-- Menu Inferior -->
     <nav id="nav-bar" class="hidden fixed bottom-0 w-full bg-white border-t flex justify-around py-3 shadow-2xl z-50">
-        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-chart-pie text-xl"></i><span class="text-[10px]">Início</span></button>
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-home text-xl"></i><span class="text-[10px]">Início</span></button>
         <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-check-double text-xl"></i><span class="text-[10px]">Chamada</span></button>
         <button onclick="switchTab('analysis')" id="nav-analysis" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-heart-circle-bolt text-xl"></i><span class="text-[10px]">Resgate</span></button>
         <button onclick="switchTab('add')" id="nav-add" class="flex flex-col items-center gap-1 text-gray-400"><i class="fas fa-plus-circle text-xl"></i><span class="text-[10px]">Novo</span></button>
@@ -156,63 +178,77 @@
         const db = getFirestore(app);
         
         let currentUser = JSON.parse(localStorage.getItem('user_data')) || null;
-        let members = [];
-        let allAppUsers = [];
-        let attendanceHistory = {};
-        let currentFilter = 'TODOS';
-        let chartInstance = null;
+        let members = []; let allAppUsers = []; let attendanceHistory = {};
+        let currentFilter = 'TODOS'; let chartInstance = null;
         let selectedDate = new Date().toISOString().split('T')[0];
+        let userIdEditing = null;
 
         // Seletor de Datas
         const dateSelect = document.getElementById('dateSelect');
         for(let i=0; i<8; i++) {
             let d = new Date(); d.setDate(d.getDate() - (d.getDay() + (7 * i)) % 56);
             let iso = d.toISOString().split('T')[0];
-            dateSelect.innerHTML += `<option value="${iso}">${i==0 ? 'HOJE' : iso.split('-')[2]+'/'+iso.split('-')[1]}</option>`;
+            dateSelect.innerHTML += `<option value="${iso}">${i==0 ? 'DOMINGO HOJE' : iso.split('-')[2]+'/'+iso.split('-')[1]}</option>`;
         }
         selectedDate = dateSelect.value;
 
-        // --- SISTEMA DE LOGIN ---
+        // --- LÓGICA DE PRIMEIRO ACESSO ---
+        window.processFirstLogin = async () => {
+            const userIn = document.getElementById('first-user').value.toLowerCase().trim();
+            const passIn = document.getElementById('first-pass').value.trim();
+            const passConf = document.getElementById('first-pass-confirm').value.trim();
+
+            if(!userIn || !passIn || !passConf) return alert("Preencha todos os campos!");
+            if(passIn !== passConf) return alert("As senhas não coincidem!");
+            if(passIn.length < 4) return alert("A senha deve ter pelo menos 4 caracteres!");
+
+            const q = query(collection(db, "usuarios"), where("username", "==", userIn));
+            const snap = await getDocs(q);
+
+            if(snap.empty) return alert("Este usuário não está pré-autorizado no sistema.");
+
+            const userDoc = snap.docs[0];
+            const userData = userDoc.data();
+
+            if(userData.password && userData.password !== "") {
+                return alert("Esta conta já foi ativada anteriormente. Use a tela de login normal ou peça ao administrador para resetar sua senha.");
+            }
+
+            // Ativa o usuário gravando a senha
+            await updateDoc(doc(db, "usuarios", userDoc.id), { password: passIn });
+            alert("Sucesso! Sua conta foi ativada. Agora faça login com sua nova senha.");
+            switchTab('login');
+        };
+
+        // --- LOGIN NORMAL ---
         window.checkLogin = async () => {
             const userIn = document.getElementById('login-user').value.toLowerCase().trim();
             const passIn = document.getElementById('login-pass').value.trim();
+            
+            if(!passIn) return alert("Digite sua senha. Se for o primeiro acesso, clique no botão abaixo.");
 
             const q = query(collection(db, "usuarios"), where("username", "==", userIn), where("password", "==", passIn));
-            const querySnapshot = await getDocs(q);
+            const snap = await getDocs(q);
 
-            if (!querySnapshot.empty) {
-                const userData = querySnapshot.docs[0].data();
-                userData.id = querySnapshot.docs[0].id;
-                localStorage.setItem('user_data', JSON.stringify(userData));
-                currentUser = userData;
+            if (!snap.empty) {
+                const data = snap.docs[0].data();
+                data.id = snap.docs[0].id;
+                localStorage.setItem('user_data', JSON.stringify(data));
+                currentUser = data;
                 startApp();
-            } else {
-                // Caso não exista nenhum usuário, cria o primeiro admin
-                const usersCheck = await getDocs(collection(db, "usuarios"));
-                if(usersCheck.empty && userIn === 'admin' && passIn === '1234') {
-                    const firstAdmin = { name: "Administrador", username: "admin", password: "1234", role: "admin" };
-                    await addDoc(collection(db, "usuarios"), firstAdmin);
-                    alert("Primeiro acesso configurado. Tente logar novamente.");
-                } else {
-                    alert("Usuário ou senha inválidos!");
-                }
-            }
+            } else { alert("Usuário ou senha incorretos!"); }
         };
 
-        window.logout = () => {
-            localStorage.removeItem('user_data');
-            location.reload();
-        };
+        window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
 
         function startApp() {
             if(!currentUser) return;
-            
+            document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
             document.getElementById('view-login').classList.add('hidden');
             document.getElementById('nav-bar').classList.remove('hidden');
             document.getElementById('header-info').classList.remove('hidden');
             document.getElementById('menu-btn').classList.remove('hidden');
             document.getElementById('header-login-title').classList.add('hidden');
-            
             document.getElementById('user-first-name').innerText = currentUser.name.split(' ')[0];
             document.getElementById('menu-user-name').innerText = currentUser.name;
             document.getElementById('menu-user-role').innerText = currentUser.role === 'admin' ? 'Administrador' : 'Secretário';
@@ -221,99 +257,112 @@
                 document.getElementById('btn-admin-view').classList.remove('hidden');
                 document.getElementById('admin-chart-area').classList.remove('hidden');
             }
-
             switchTab('dashboard');
             listenData();
         }
 
         // --- GERENCIAR USUÁRIOS (ADMIN) ---
-        window.createNewUser = async () => {
-            const name = document.getElementById('user-new-name').value.trim();
-            const user = document.getElementById('user-new-user').value.toLowerCase().trim();
-            const pass = document.getElementById('user-new-pass').value.trim();
-            const role = document.getElementById('user-new-role').value;
+        window.adminCreateUser = async () => {
+            const name = document.getElementById('admin-new-name').value.trim();
+            const user = document.getElementById('admin-new-user').value.toLowerCase().trim();
+            const role = document.getElementById('admin-new-role').value;
 
-            if(!name || !user || !pass) return alert("Preencha tudo!");
-            await addDoc(collection(db, "usuarios"), { name, username: user, password: pass, role });
-            alert("Novo login criado com sucesso!");
+            if(!name || !user) return alert("Informe nome e usuário!");
+            
+            // Verifica se usuário já existe
+            const q = query(collection(db, "usuarios"), where("username", "==", user));
+            const check = await getDocs(q);
+            if(!check.empty) return alert("Este usuário já existe.");
+
+            await addDoc(collection(db, "usuarios"), { name, username: user, password: "", role });
+            alert("Usuário autorizado com sucesso! Ele já pode fazer o 'Primeiro Acesso'.");
+            document.getElementById('admin-new-name').value = '';
+            document.getElementById('admin-new-user').value = '';
+        };
+
+        window.openEditUser = (id) => {
+            const u = allAppUsers.find(x => x.id === id);
+            userIdEditing = id;
+            document.getElementById('edit-user-name').value = u.name;
+            document.getElementById('edit-user-pass').value = ''; // Não mostra a senha atual por segurança
+            document.getElementById('edit-user-role').value = u.role;
+            document.getElementById('userEditModal').classList.remove('hidden');
+        };
+
+        window.closeUserEdit = () => { document.getElementById('userEditModal').classList.add('hidden'); };
+
+        window.saveUserUpdate = async () => {
+            const newName = document.getElementById('edit-user-name').value;
+            const newPass = document.getElementById('edit-user-pass').value;
+            const newRole = document.getElementById('edit-user-role').value;
+            
+            const upData = { name: newName, role: newRole };
+            if(newPass !== "") upData.password = newPass;
+
+            await updateDoc(doc(db, "usuarios", userIdEditing), upData);
+            alert("Acesso atualizado!");
+            closeUserEdit();
+        };
+
+        window.deleteUser = async (id) => {
+            const u = allAppUsers.find(x => x.id === id);
+            if(u.username === 'admin') return alert("Admin principal não pode ser deletado.");
+            if(confirm(`Remover acesso de ${u.name}?`)) await deleteDoc(doc(db, "usuarios", id));
         };
 
         function renderUsers() {
             const list = document.getElementById('users-list');
-            list.innerHTML = '<h3 class="font-bold text-xs uppercase mt-4 mb-2">Usuários Cadastrados</h3>';
+            list.innerHTML = '<h4 class="text-[10px] font-bold text-gray-400 uppercase mt-4">Logins Autorizados</h4>';
             allAppUsers.forEach(u => {
+                const hasPassword = u.password && u.password !== "";
                 list.innerHTML += `
-                    <div class="bg-white p-3 rounded-xl shadow-sm border flex justify-between items-center text-xs">
+                    <div class="bg-white p-4 rounded-2xl shadow-sm flex justify-between items-center text-xs border border-gray-100">
                         <div>
-                            <p class="font-bold">${u.name} <span class="text-[8px] bg-gray-100 px-1 rounded">${u.role}</span></p>
-                            <p class="opacity-50">${u.username} / ${u.password}</p>
+                            <p class="font-bold text-blue-900">${u.name} <span class="bg-blue-50 text-[8px] px-1 rounded uppercase">${u.role}</span></p>
+                            <p class="opacity-50 text-[9px] uppercase tracking-widest">${u.username} • ${hasPassword ? 'Ativo ✅' : 'Pendente ⏳'}</p>
                         </div>
-                        ${u.username !== 'admin' ? `<button onclick="deleteUser('${u.id}')" class="text-red-500 p-2"><i class="fas fa-trash"></i></button>` : ''}
+                        <div class="flex gap-2">
+                            <button onclick="openEditUser('${u.id}')" class="text-gray-400 p-2"><i class="fas fa-edit"></i></button>
+                            ${u.username !== 'admin' ? `<button onclick="deleteUser('${u.id}')" class="text-red-300 p-2"><i class="fas fa-trash"></i></button>` : ''}
+                        </div>
                     </div>
                 `;
             });
         }
 
-        window.deleteUser = async (id) => {
-            if(confirm("Excluir este acesso?")) await deleteDoc(doc(db, "usuarios", id));
-        };
-
-        // --- LOGICA CORE ---
+        // --- LÓGICA DE DADOS ---
         function listenData() {
             onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => {
                 members = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 render();
             });
             onSnapshot(collection(db, "historico"), (snap) => {
-                attendanceHistory = {};
-                snap.docs.forEach(d => attendanceHistory[d.id] = d.data().presents || []);
+                attendanceHistory = {}; snap.docs.forEach(d => attendanceHistory[d.id] = d.data().presents || []);
                 if(currentUser.role === 'admin') updateChart();
                 render();
             });
             onSnapshot(collection(db, "usuarios"), (snap) => {
                 allAppUsers = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                if(currentUser.role === 'admin') renderUsers();
+                if(currentUser && currentUser.role === 'admin') renderUsers();
             });
             document.getElementById('connection-status').innerText = "ONLINE";
             document.getElementById('connection-status').classList.replace('bg-red-500', 'bg-green-600');
         }
 
-        // --- INTERFACE ---
-        window.toggleMenu = () => {
-            document.getElementById('side-menu').classList.toggle('menu-open');
-            document.getElementById('menu-overlay').classList.toggle('hidden');
-        };
-
-        window.switchTab = (tab) => {
-            document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
-            document.getElementById(`view-${tab}`).classList.remove('hidden');
-            document.querySelectorAll('nav button').forEach(b => b.classList.replace('text-[#002e5d]', 'text-gray-400'));
-            if(document.getElementById(`nav-${tab}`)) document.getElementById(`nav-${tab}`).classList.replace('text-gray-400', 'text-[#002e5d]');
-            if(document.getElementById('side-menu').classList.contains('menu-open')) toggleMenu();
-            window.scrollTo(0,0);
-        };
-
-        // --- AS OUTRAS FUNÇÕES (Render, TogglePresence, UpdateChart, AddMember) ---
-        // Reaproveitando a lógica anterior, apenas ajustando render para filtrar por login
         window.togglePresence = async (memberId) => {
             const histRef = doc(db, "historico", selectedDate);
-            let currentPresents = attendanceHistory[selectedDate] || [];
-            if(currentPresents.includes(memberId)) {
-                currentPresents = currentPresents.filter(id => id !== memberId);
-            } else {
-                currentPresents.push(memberId);
-                await updateDoc(doc(db, "membros", memberId), { lastAttended: selectedDate });
-            }
-            await setDoc(histRef, { presents: currentPresents });
+            let cur = attendanceHistory[selectedDate] || [];
+            if(cur.includes(memberId)) { cur = cur.filter(i => i !== memberId); } 
+            else { cur.push(memberId); await updateDoc(doc(db, "membros", memberId), { lastAttended: selectedDate }); }
+            await setDoc(histRef, { presents: cur });
         };
 
         window.addMember = async () => {
-            const name = document.getElementById('newName').value.trim().toUpperCase();
-            const org = document.getElementById('newOrg').value;
-            if(!name) return;
-            await addDoc(collection(db, "membros"), { name, org, lastAttended: "2024-01-01" });
-            document.getElementById('newName').value = "";
-            switchTab('attendance');
+            const n = document.getElementById('newName').value.trim().toUpperCase();
+            const o = document.getElementById('newOrg').value;
+            if(!n) return;
+            await addDoc(collection(db, "membros"), { name: n, org: o, lastAttended: "2024-01-01" });
+            document.getElementById('newName').value = ""; switchTab('attendance');
         };
 
         function render() {
@@ -321,19 +370,15 @@
             const list = document.getElementById('memberList');
             const missingList = document.getElementById('missingList');
             const presentsToday = attendanceHistory[selectedDate] || [];
-
             list.innerHTML = ''; missingList.innerHTML = '';
             let countP = 0; let countT = 0;
-
             members.forEach(m => {
                 const isP = presentsToday.includes(m.id);
-                countT++; if(isP) countP++;
-
+                if(m.org !== 'VISITANTE') { countT++; if(isP) countP++; }
                 const diff = Math.floor((new Date() - new Date(m.lastAttended)) / (1000*60*60*24));
-                if(diff > 21) {
-                    missingList.innerHTML += `<div class="bg-white p-4 rounded-xl border-r-4 border-orange-500 flex justify-between items-center shadow-sm"><div><p class="font-bold text-sm">${m.name}</p><p class="text-[9px] font-bold text-orange-600">${m.org} • ${Math.floor(diff/7)} SEMANAS</p></div><a href="https://wa.me/?text=Olá, sentimos sua falta na sacramental!" class="text-green-500 text-xl"><i class="fab fa-whatsapp"></i></a></div>`;
+                if(m.org !== 'VISITANTE' && diff > 21) {
+                    missingList.innerHTML += `<div class="bg-white p-4 rounded-xl border-r-4 border-orange-500 flex justify-between items-center"><div><p class="font-bold text-sm">${m.name}</p><p class="text-[9px] font-bold text-orange-600">${m.org} • ${Math.floor(diff/7)} SEMANAS</p></div><a href="https://wa.me/?text=Olá, sentimos sua falta na sacramental!" class="text-green-500"><i class="fab fa-whatsapp text-2xl"></i></a></div>`;
                 }
-
                 if((currentFilter === 'TODOS' || m.org === currentFilter) && m.name.toLowerCase().includes(search)) {
                     list.innerHTML += `<div class="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border-l-4 ${isP ? 'border-green-500' : 'border-gray-200'}"><input type="checkbox" ${isP ? 'checked' : ''} onchange="togglePresence('${m.id}')" class="rounded-full text-blue-900"><div onclick="togglePresence('${m.id}')" class="flex-1"><p class="font-bold text-sm text-gray-700">${m.name}</p><p class="text-[9px] text-gray-400 font-bold uppercase">${m.org}</p></div></div>`;
                 }
@@ -350,6 +395,18 @@
             chartInstance = new Chart(ctx, { type: 'line', data: { labels: dates.map(d => d.split('-')[2]+'/'+d.split('-')[1]), datasets: [{ data: counts, borderColor: '#002e5d', backgroundColor: 'rgba(0,46,93,0.1)', fill: true, tension: 0.4 }] }, options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 5 } } } } });
         }
 
+        window.toggleMenu = () => { document.getElementById('side-menu').classList.toggle('menu-open'); document.getElementById('menu-overlay').classList.toggle('hidden'); };
+        window.switchTab = (tab) => {
+            document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
+            document.getElementById(`view-${tab}`).classList.remove('hidden');
+            if(document.getElementById('nav-bar')) {
+                document.querySelectorAll('nav button').forEach(b => b.classList.replace('text-[#002e5d]', 'text-gray-400'));
+                if(document.getElementById(`nav-${tab}`)) document.getElementById(`nav-${tab}`).classList.replace('text-gray-400', 'text-[#002e5d]');
+            }
+            if(document.getElementById('side-menu').classList.contains('menu-open')) toggleMenu();
+            window.scrollTo(0,0);
+        };
+
         window.setFilter = (f) => {
             currentFilter = f;
             document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
@@ -360,7 +417,11 @@
         dateSelect.addEventListener('change', (e) => { selectedDate = e.target.value; render(); });
         document.getElementById('searchMember').addEventListener('input', render);
 
-        if(currentUser) startApp();
+        const orgs = ['TODOS', 'ÉLDERES', 'SOCORRO', 'MOÇAS', 'RAPAZES', 'PRIMÁRIA', 'VISITANTE'];
+        const fArea = document.getElementById('orgFilters');
+        orgs.forEach(o => { fArea.innerHTML += `<button onclick="setFilter('${o}')" class="filter-pill ${o=='TODOS'?'active':''} px-4 py-2 rounded-full border bg-white text-[10px] font-bold" id="pill-${o}">${o}</button>`; });
+
+        if(currentUser) startApp(); else switchTab('login');
     </script>
 </body>
 </html>
