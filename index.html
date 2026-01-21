@@ -215,8 +215,63 @@
                             <h3 class="font-black text-green-600 uppercase text-[10px] tracking-widest border-b pb-4 mb-4">Retenção de Novos Membros</h3>
                             <div id="report-retention" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                         </div>
+
+                        <!-- Procure a grade dentro de view-reports e adicione este card no topo -->
+<div class="glass-card p-6 border-l-[12px] border-slate-800 cursor-pointer hover:bg-slate-50 transition-all mb-6" onclick="switchTab('members-list')">
+    <div class="flex items-center justify-between">
+        <div>
+            <h3 class="font-black text-slate-800 uppercase text-[10px] tracking-widest mb-1">Base de Dados</h3>
+            <p class="text-lg font-black text-[#002e5d] italic">Listas e Gestão de Membros</p>
+            <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Editar nomes, famílias e organizações</p>
+        </div>
+        <i class="fas fa-users-rectangle text-3xl text-slate-200"></i>
+    </div>
+</div>
                     </div>
                 </section>
+
+                
+
+        <!-- SEÇÃO DE GESTÃO DE MEMBROS (ACESSADA POR RELATÓRIOS) -->
+<section id="view-members-list" class="hidden space-y-6">
+    <div class="flex items-center gap-4 mb-2">
+        <button onclick="switchTab('reports')" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-[#002e5d]">
+            <i class="fas fa-arrow-left text-xs"></i>
+        </button>
+        <h2 class="font-black text-[#002e5d] uppercase text-xs tracking-widest">Gestão de Listas</h2>
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-4 justify-between items-center bg-white p-6 rounded-[32px] border border-slate-100">
+        <div class="relative w-full md:max-w-md">
+            <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-300"></i>
+            <input type="text" id="searchManageMembers" oninput="renderMembersList()" placeholder="Buscar para editar..." class="w-full pl-14 p-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-[#002e5d]">
+        </div>
+        <div class="flex gap-2 w-full md:w-auto overflow-x-auto no-scrollbar">
+            <select id="filterOrgList" onchange="renderMembersList()" class="p-3 bg-slate-50 rounded-xl text-[10px] font-bold uppercase border-none outline-none text-slate-500">
+                <option value="TODOS">Todas Organizações</option>
+                <option value="Quórum de Élderes">Quórum de Élderes</option>
+                <option value="Sociedade de Socorro">Sociedade de Socorro</option>
+                <option value="Moças">Moças</option>
+                <option value="Rapazes">Rapazes</option>
+                <option value="Primária">Primária</option>
+            </select>
+            <select id="filterCatList" onchange="renderMembersList()" class="p-3 bg-slate-50 rounded-xl text-[10px] font-bold uppercase border-none outline-none text-slate-500">
+                <option value="TODOS">Todos Status</option>
+                <option value="Membro">Membro</option>
+                <option value="Recém-Converso">Recém-Converso</option>
+                <option value="Novo Morador">Novo Morador</option>
+                <option value="Visitante">Visitante</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="manageMembersContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-10">
+        <!-- Injetado via JS -->
+    </div>
+</section>
+
+
+                
 
                <!-- NOVO FORMULÁRIO DE CADASTRO -->
 <section id="view-add" class="hidden flex justify-center">
@@ -421,6 +476,9 @@
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             const view = document.getElementById(`view-${tab}`);
             if(view) view.classList.remove('hidden');
+            if(tab === 'members-list') renderMembersList();
+            if(tab === 'reports') calculateReports(); 
+
             
             // Sidebar UI
             document.querySelectorAll('aside button').forEach(b => b.classList.remove('nav-btn-active', 'text-slate-800'));
@@ -723,6 +781,35 @@ window.saveNewMember = async () => {
         console.error("Erro ao salvar: ", e);
         alert("Erro ao cadastrar.");
     }
+};
+
+        window.renderMembersList = () => {
+    const container = document.getElementById('manageMembersContainer');
+    const search = document.getElementById('searchManageMembers').value.toLowerCase();
+    const orgFilter = document.getElementById('filterOrgList').value;
+    const catFilter = document.getElementById('filterCatList').value;
+    container.innerHTML = '';
+
+    members.forEach(m => {
+        const matchS = m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search));
+        const matchO = orgFilter === 'TODOS' || m.org === orgFilter;
+        const matchC = catFilter === 'TODOS' || m.categoria === catFilter;
+
+        if(matchS && matchO && matchC) {
+            container.innerHTML += `
+                <div class="glass-card p-6 flex justify-between items-center border-l-8 border-slate-200">
+                    <div class="min-w-0">
+                        <h4 class="font-bold text-sm text-slate-800 truncate">${m.name}</h4>
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">${m.org} • ${m.categoria || 'Membro'}</p>
+                        <p class="text-[9px] font-bold text-blue-900 uppercase mt-1">Família ${m.familia} ${m.isHead ? '<b>(CHEFE)</b>' : ''}</p>
+                    </div>
+                    <button onclick="openMemberEdit('${m.id}')" class="w-12 h-12 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center hover:bg-[#002e5d] hover:text-white transition-all shadow-sm">
+                        <i class="fas fa-pen-to-square"></i>
+                    </button>
+                </div>
+            `;
+        }
+    });
 };
 
     </script>
