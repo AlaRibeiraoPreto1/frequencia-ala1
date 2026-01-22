@@ -475,27 +475,54 @@
         window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
 
         window.switchTab = (tab) => {
-            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-            const view = document.getElementById(`view-${tab}`);
-            if(view) view.classList.remove('hidden');
-            if(tab === 'members-list') renderMembersList();
-            if(tab === 'reports') calculateReports(); 
+    // 1. Esconde TODAS as seções do site
+    document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+    
+    // 2. Tenta encontrar a seção solicitada
+    const view = document.getElementById(`view-${tab}`);
+    
+    if (view) {
+        // 3. Mostra a seção
+        view.classList.remove('hidden');
+        
+        // 4. Lógica específica para telas fora do login
+        if (tab === 'login' || tab === 'first-login') {
+            document.getElementById('app-layout').classList.add('hidden');
+            document.getElementById('view-login').classList.toggle('hidden', tab !== 'login');
+            document.getElementById('view-first-login').classList.toggle('hidden', tab !== 'first-login');
+        } else {
+            // Se não for login, garante que o layout principal apareça
+            document.getElementById('app-layout').classList.remove('hidden');
+        }
 
-            
-            // Sidebar UI
-            document.querySelectorAll('aside button').forEach(b => b.classList.remove('nav-btn-active', 'text-slate-800'));
-            const sideBtn = document.getElementById(`side-${tab}`);
-            if(sideBtn) sideBtn.classList.add('nav-btn-active', 'text-slate-800');
-            
-            // Mobile UI
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('text-[#002e5d]', 'scale-125'));
-            const navBtn = document.getElementById(`nav-${tab}`);
-            if(navBtn) navBtn.classList.add('text-[#002e5d]', 'scale-125');
+        // 5. Atualiza os menus (Sidebar e Mobile)
+        updateNavigationUI(tab);
+    }
+    
+    // 6. Carrega dados se necessário
+    if(tab === 'members-list') renderMembersList();
+    if(tab === 'reports') renderReports(); // ou sua função de relatórios
+    
+    window.scrollTo(0,0);
+};
 
-            const titles = {'dashboard':'Painel Geral','attendance':'Registrar Frequência','analysis':'Resgate','reports':'Relatórios','add':'Novo','admin-users':'Usuários'};
-            document.getElementById('mobile-page-title').innerText = titles[tab] || 'Ala';
-            window.scrollTo(0,0);
-        };
+// Função auxiliar para limpar e marcar os botões dos menus
+function updateNavigationUI(tab) {
+    // Sidebar Desktop
+    document.querySelectorAll('aside button').forEach(b => b.classList.remove('nav-btn-active', 'text-slate-800'));
+    const sideBtn = document.getElementById(`side-${tab}`);
+    if(sideBtn) sideBtn.classList.add('nav-btn-active', 'text-slate-800');
+    
+    // Menu Mobile
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('text-[#002e5d]', 'scale-125'));
+    const navBtn = document.getElementById(`nav-${tab}`);
+    if(navBtn) navBtn.classList.add('text-[#002e5d]', 'scale-125');
+
+    // Título Mobile
+    const titles = {'dashboard':'Painel Geral','attendance':'Registrar Frequência','analysis':'Resgate','reports':'Relatórios','add':'Novo','members-list':'Gestão de Listas'};
+    const mobileTitle = document.getElementById('mobile-page-title');
+    if(mobileTitle) mobileTitle.innerText = titles[tab] || 'Ala';
+}
 
         function listenData() {
             onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => {
