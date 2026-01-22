@@ -103,6 +103,18 @@
         </div>
     </section>
 
+            <!-- PRIMEIRO ACESSO -->
+                <section id="view-first-login" class="hidden flex flex-col items-center py-10">
+                    <div class="glass-card p-10 w-full max-w-sm text-center space-y-6 shadow-xl">
+                        <h2 class="font-black text-xl italic uppercase">Primeiro Acesso</h2>
+                        <input type="text" id="first-user" placeholder="Login Autorizado" class="w-full p-4 rounded-2xl bg-slate-50 border text-sm">
+                        <input type="password" id="first-pass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-50 border text-sm">
+                        <input type="password" id="first-pass-confirm" placeholder="Confirme Senha" class="w-full p-4 rounded-2xl bg-slate-50 border text-sm">
+                        <button onclick="processFirstLogin()" class="w-full bg-green-600 text-white p-5 rounded-2xl font-black uppercase text-xs">Ativar Conta</button>
+                        <button onclick="switchTab('login')" class="text-xs text-slate-400 underline">Voltar</button>
+                    </div>
+                </section>
+
     <!-- LAYOUT PRINCIPAL -->
     <div id="app-layout" class="hidden app-layout">
         
@@ -217,17 +229,17 @@
                         </div>
 
                         <!-- Procure a grade dentro de view-reports e adicione este card no topo -->
-<div class="glass-card p-6 border-l-[12px] border-slate-800 cursor-pointer hover:bg-slate-50 transition-all mb-6" onclick="switchTab('members-list')">
-    <div class="flex items-center justify-between">
-        <div>
-            <h3 class="font-black text-slate-800 uppercase text-[10px] tracking-widest mb-1">Base de Dados</h3>
-            <p class="text-lg font-black text-[#002e5d] italic">Listas e Gestão de Membros</p>
-            <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Editar nomes, famílias e organizações</p>
-        </div>
-        <i class="fas fa-users-rectangle text-3xl text-slate-200"></i>
-    </div>
-</div>
-                    </div>
+                        <div class="glass-card p-6 border-l-[12px] border-slate-800 cursor-pointer hover:bg-slate-50 transition-all mb-6" onclick="switchTab('members-list')">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-black text-slate-800 uppercase text-[10px] tracking-widest mb-1">Base de Dados</h3>
+                                    <p class="text-lg font-black text-[#002e5d] italic">Listas e Gestão de Membros</p>
+                                    <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Editar nomes, famílias e organizações</p>
+                                </div>
+                                    <i class="fas fa-users-rectangle text-3xl text-slate-200"></i>
+                                </div>
+                            </div>
+                        </div>
                 </section>
 
                 
@@ -350,17 +362,7 @@
                     <div id="users-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </section>
 
-                <!-- PRIMEIRO ACESSO -->
-                <section id="view-first-login" class="hidden flex flex-col items-center py-10">
-                    <div class="glass-card p-10 w-full max-w-sm text-center space-y-6 shadow-xl">
-                        <h2 class="font-black text-xl italic uppercase">Primeiro Acesso</h2>
-                        <input type="text" id="first-user" placeholder="Login Autorizado" class="w-full p-4 rounded-2xl bg-slate-50 border text-sm">
-                        <input type="password" id="first-pass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-50 border text-sm">
-                        <input type="password" id="first-pass-confirm" placeholder="Confirme Senha" class="w-full p-4 rounded-2xl bg-slate-50 border text-sm">
-                        <button onclick="processFirstLogin()" class="w-full bg-green-600 text-white p-5 rounded-2xl font-black uppercase text-xs">Ativar Conta</button>
-                        <button onclick="switchTab('login')" class="text-xs text-slate-400 underline">Voltar</button>
-                    </div>
-                </section>
+        
 
             </div>
         </main>
