@@ -204,6 +204,44 @@
                         </div>
                     </div>
                     <div id="orgFilters" class="flex overflow-x-auto gap-2 no-scrollbar py-2"></div>
+
+                    <!-- BLOCO DE CONTADORES (LÍDERES E VISITANTES) -->
+<div id="admin-counters" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+    <!-- Contador Líderes -->
+    <div class="glass-card p-6 flex items-center justify-between border-l-8 border-amber-500 shadow-sm">
+        <div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Líderes da Estaca</p>
+            <p class="text-xs font-bold text-slate-600">Presentes na reunião</p>
+        </div>
+        <div class="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl">
+            <button onclick="updateCount('lideresCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 transition-all">
+                <i class="fas fa-minus text-xs"></i>
+            </button>
+            <span id="display-lideres" class="text-xl font-black text-[#002e5d] min-w-[20px] text-center">0</span>
+            <button onclick="updateCount('lideresCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] shadow-md flex items-center justify-center text-white transition-all">
+                <i class="fas fa-plus text-xs"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Contador Visitantes -->
+    <div class="glass-card p-6 flex items-center justify-between border-l-8 border-blue-400 shadow-sm">
+        <div>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Visitantes Gerais</p>
+            <p class="text-xs font-bold text-slate-600">Não registrados na ala</p>
+        </div>
+        <div class="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl">
+            <button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 transition-all">
+                <i class="fas fa-minus text-xs"></i>
+            </button>
+            <span id="display-visitantes" class="text-xl font-black text-[#002e5d] min-w-[20px] text-center">0</span>
+            <button onclick="updateCount('visitantesCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] shadow-md flex items-center justify-center text-white transition-all">
+                <i class="fas fa-plus text-xs"></i>
+            </button>
+        </div>
+    </div>
+</div>
+                    
                     <div id="memberList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
                 </section>
 
@@ -553,6 +591,33 @@ function updateNavigationUI(tab) {
             await setDoc(hRef, { presents: cur });
         };
 
+        // Função para aumentar ou diminuir os contadores (SÓ PARA ADMIN)
+window.updateCount = async (tipo, delta) => {
+    if (currentUser.role !== 'admin') return;
+
+    let currentVal = attendanceHistory[selectedDate]?.[tipo] || 0;
+    let newVal = currentVal + delta;
+    if (newVal < 0) newVal = 0;
+
+    const hRef = doc(db, "historico", selectedDate);
+    // Salva no Firebase sem apagar o que já existe (merge)
+    await setDoc(hRef, { [tipo]: newVal }, { merge: true });
+};
+
+// Função para atualizar os números que aparecem na tela de registro
+function updateCounterDisplays() {
+    const data = attendanceHistory[selectedDate] || {};
+    document.getElementById('display-lideres').innerText = data.lideresCount || 0;
+    document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
+    
+    // Mostra os contadores na tela de registro, mas esconde os botões se não for admin
+    document.getElementById('admin-counters').classList.remove('hidden');
+    const buttons = document.querySelectorAll('.admin-only');
+    buttons.forEach(btn => {
+        btn.classList.toggle('hidden', currentUser.role !== 'admin');
+    });
+}
+        
         function renderAll() {
             renderAttendance();
             renderRescue();
@@ -589,8 +654,47 @@ function updateNavigationUI(tab) {
                     `;
                 }
             });
-            document.getElementById('stats-present').innerText = pC;
-            document.getElementById('stats-total').innerText = tC;
+            // CÁLCULO DO DASHBOARD DETALHADO
+    const histData = attendanceHistory[selectedDate] || {};
+    const countLideres = histData.lideresCount || 0;
+    const countVisitantes = histData.visitantesCount || 0;
+    const totalGeral = pC + countLideres + countVisitantes;
+
+    // 1. Atualiza o Total Grande
+    document.getElementById('stats-present').innerText = totalGeral;
+    document.getElementById('stats-total').innerText = tC;
+
+    // 2. Cria o detalhamento dinâmico
+    let detalhesHtml = `<p class="text-[10px] font-bold text-slate-400 uppercase mt-2">Detalhamento:</p>`;
+    detalhesHtml += `<p class="text-xs font-bold text-green-600">${pC} Membros</p>`;
+    
+    if(countLideres > 0) detalhesHtml += `<p class="text-xs font-bold text-amber-600">${countLideres} Líderes Estaca</p>`;
+    if(countVisitantes > 0) detalhesHtml += `<p class="text-xs font-bold text-blue-500">${countVisitantes} Visitantes</p>`;
+
+    // Procura o card de presentes no dashboard para injetar os detalhes
+    const presentCard = document.getElementById('stats-present').parentElement;
+    // Remove detalhes antigos se existirem para não duplicar
+    const oldDetail = presentCard.querySelector('.detalhes-area');
+    if(oldDetail) oldDetail.remove();
+    
+    // Cria uma nova div para os detalhes
+    const detailDiv = document.createElement('div');
+    detailDiv.className = 'detalhes-area mt-2 pt-2 border-t border-slate-50';
+    detailDiv.innerHTML = detalhesHtml;
+    presentCard.appendChild(detailDiv);
+
+    // Atualiza os contadores da tela de registro
+    updateCounterDisplays();
+
+    // BLOQUEIO DOS CHECKBOXES PARA NÃO-ADMIN
+    const allCheckboxes = document.querySelectorAll('#memberList input[type="checkbox"]');
+    allCheckboxes.forEach(cb => {
+        if(currentUser.role !== 'admin') {
+            cb.disabled = true;
+            cb.style.opacity = "0.5";
+            cb.parentElement.onclick = null; // Remove o clique de marcar
+        }
+    });
         }
 
         function renderRescue() {
@@ -832,9 +936,11 @@ window.saveNewMember = async () => {
                         <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">${m.org} • ${m.categoria || 'Membro'}</p>
                         <p class="text-[9px] font-bold text-blue-900 uppercase mt-1">Família ${m.familia} ${m.isHead ? '<b>(CHEFE)</b>' : ''}</p>
                     </div>
-                    <button onclick="openMemberEdit('${m.id}')" class="w-12 h-12 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center hover:bg-[#002e5d] hover:text-white transition-all shadow-sm">
-                        <i class="fas fa-pen-to-square"></i>
-                    </button>
+                    ${currentUser.role === 'admin' ? `
+    <button onclick="openMemberEdit('${m.id}')" class="w-12 h-12 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center hover:bg-[#002e5d] hover:text-white transition-all shadow-sm">
+        <i class="fas fa-pen-to-square"></i>
+    </button>
+` : ''}
                 </div>
             `;
         }
