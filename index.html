@@ -31,10 +31,9 @@
         .hidden { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
 
-        /* --- RESPONSIVIDADE --- */
         @media (min-width: 1024px) {
             .app-layout { display: flex !important; height: 100vh; overflow: hidden; }
-            .sidebar { width: 300px !important; flex-shrink: 0; display: flex !important; background: white; border-right: 1px solid #e2e8f0; flex-direction: column; }
+            .sidebar { width: 300px !important; display: flex !important; flex-direction: column; background: white; border-right: 1px solid #e2e8f0; flex-shrink: 0; }
             .main-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
             .content-container { width: 100%; max-width: 1100px; padding: 40px; }
         }
@@ -53,7 +52,6 @@
         .check-box { width: 28px; height: 28px; border-radius: 10px; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .check-active { background: var(--healing-teal); border-color: var(--healing-teal); color: white; }
 
-        /* Estilos de Lista */
         .family-divider { background-color: #f8fafc; padding: 8px 16px; border-radius: 12px; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; border: 1px solid #e2e8f0; display: block; width: 100%; }
         .card-presente { background-color: #ecfdf5 !important; border-left: 8px solid #10b981 !important; }
         .card-ausente { background-color: #ffffff !important; border-left: 8px solid #f1f5f9 !important; }
@@ -61,7 +59,6 @@
 </head>
 <body class="antialiased">
 
-    <!-- LOADING SCREEN -->
     <div id="loading-screen" class="fixed inset-0 bg-white z-[300] flex items-center justify-center">
         <div class="text-center space-y-4">
             <div class="w-12 h-12 border-4 border-slate-100 border-t-[#002e5d] rounded-full animate-spin mx-auto"></div>
@@ -69,82 +66,78 @@
         </div>
     </div>
 
-    <!-- VIEW LOGIN -->
+    <!-- LOGIN -->
     <section id="view-login" class="hidden min-h-screen flex items-center justify-center p-6 bg-slate-50">
         <div class="glass-card p-10 w-full max-w-sm text-center space-y-8 shadow-2xl">
             <div class="flex justify-center mb-6">
                 <img src="https://images-us-prod.cms.commerce.dynamics.com/cms/api/fswvqbgntk/imageFileData/MA2bhk?ver=9757" alt="Cristo" class="h-32 w-auto object-contain">
             </div>
-            <h2 class="text-2xl font-black text-slate-800 tracking-tighter">Acesso Restrito</h2>
+            <h2 class="text-2xl font-black text-slate-800">Sacramental</h2>
             <div class="space-y-3">
                 <input type="text" id="login-user" placeholder="Usuário" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm outline-none">
                 <input type="password" id="login-pass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm outline-none">
             </div>
-            <button onclick="checkLogin()" class="w-full bg-[#002e5d] text-white py-4 rounded-2xl font-bold shadow-xl active:scale-95 transition-all">ENTRAR</button>
+            <button onclick="checkLogin()" class="w-full bg-[#002e5d] text-white py-4 rounded-2xl font-bold shadow-xl active:scale-95 transition-all uppercase text-xs">Entrar</button>
             <button onclick="switchTab('first-login')" class="text-xs font-bold text-slate-400 underline">Primeiro Acesso?</button>
         </div>
     </section>
 
-    <!-- VIEW PRIMEIRO ACESSO -->
-    <section id="view-first-login" class="hidden min-h-screen flex items-center justify-center p-6 bg-slate-50">
-        <div class="glass-card p-10 w-full max-w-sm text-center space-y-6 shadow-xl">
-            <h2 class="font-black text-xl italic uppercase text-[#002e5d]">Primeiro Acesso</h2>
+    <!-- PRIMEIRO ACESSO -->
+    <section id="view-first-login" class="hidden min-h-screen flex items-center justify-center p-6 bg-slate-50 text-center">
+        <div class="glass-card p-10 w-full max-w-sm space-y-6 shadow-xl">
+            <h2 class="font-black text-xl italic uppercase text-[#002e5d]">Ativar Conta</h2>
             <div class="space-y-3">
                 <input type="text" id="first-user" placeholder="Login Autorizado" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm font-bold">
                 <input type="password" id="first-pass" placeholder="Crie uma Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm">
                 <input type="password" id="first-pass-confirm" placeholder="Confirme a Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm">
             </div>
-            <button onclick="processFirstLogin()" class="w-full bg-green-600 text-white p-5 rounded-2xl font-black uppercase text-xs shadow-lg active:scale-95">Ativar Conta</button>
-            <button onclick="switchTab('login')" class="text-xs text-slate-400 underline font-bold">Voltar</button>
+            <button onclick="processFirstLogin()" class="w-full bg-green-600 text-white p-5 rounded-2xl font-black uppercase text-xs">Ativar</button>
+            <button onclick="switchTab('login')" class="text-xs text-slate-400 underline">Voltar</button>
         </div>
     </section>
 
     <!-- APP LAYOUT -->
     <div id="app-layout" class="hidden app-layout">
-        
-        <!-- SIDEBAR (DESKTOP) -->
         <aside class="sidebar p-8">
             <div class="flex items-center gap-3 mb-12 px-2">
                 <div class="w-10 h-10 bg-[#002e5d] rounded-2xl flex items-center justify-center text-white shadow-lg"><i class="fas fa-church"></i></div>
-                <h1 class="font-black text-xs uppercase text-[#002e5d] leading-none tracking-tighter text-left">Frequência<br>Sacramental</h1>
+                <h1 class="font-black text-xs uppercase text-[#002e5d] leading-none tracking-tighter">Frequência<br>Sacramental</h1>
             </div>
             <nav class="flex-1 space-y-1">
-                <button onclick="switchTab('dashboard')" id="side-dashboard" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left"><i class="fas fa-grid-2 w-5"></i> Dashboard</button>
-                <button onclick="switchTab('attendance')" id="side-attendance" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left"><i class="fas fa-list-check w-5"></i> Registrar Frequência</button>
-                <button onclick="switchTab('analysis')" id="side-analysis" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left"><i class="fas fa-heart-pulse w-5"></i> Resgate</button>
-                <button onclick="switchTab('reports')" id="side-reports" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left"><i class="fas fa-file-invoice w-5"></i> Relatórios</button>
-                <button onclick="switchTab('add')" id="side-add" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left"><i class="fas fa-user-plus w-5"></i> Novo Membro</button>
+                <button onclick="switchTab('dashboard')" id="side-dashboard" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left"><i class="fas fa-grid-2 w-5 text-center"></i> Dashboard</button>
+                <button onclick="switchTab('attendance')" id="side-attendance" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left"><i class="fas fa-list-check w-5 text-center"></i> Registrar Frequência</button>
+                <button onclick="switchTab('analysis')" id="side-analysis" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left"><i class="fas fa-heart-pulse w-5 text-center"></i> Resgate</button>
+                <button onclick="switchTab('reports')" id="side-reports" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left"><i class="fas fa-file-invoice w-5 text-center"></i> Relatórios</button>
+                <button onclick="switchTab('add')" id="side-add" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left"><i class="fas fa-user-plus w-5 text-center"></i> Novo Membro</button>
                 <hr class="border-slate-50 my-6">
-                <button id="admin-btn" onclick="switchTab('admin-users')" class="hidden w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left"><i class="fas fa-users-cog w-5"></i> Gerenciar Logins</button>
+                <button id="admin-btn" onclick="switchTab('admin-users')" class="hidden w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left"><i class="fas fa-users-cog w-5 text-center"></i> Gerenciar Logins</button>
             </nav>
             <div class="bg-slate-50 p-6 rounded-[32px] mt-auto">
-                <p id="user-name-side" class="font-black text-[10px] uppercase text-slate-700 truncate tracking-tighter">...</p>
-                <button onclick="logout()" class="text-[9px] font-bold text-red-400 mt-2 hover:underline uppercase tracking-widest">Sair</button>
+                <p id="user-name-side" class="font-black text-[10px] uppercase text-slate-700 truncate">...</p>
+                <button onclick="logout()" class="text-[9px] font-bold text-red-400 mt-2 hover:underline uppercase">Sair</button>
             </div>
         </aside>
 
         <main class="main-content">
-            <!-- HEADER MOBILE -->
             <header class="lg:hidden p-6 flex justify-between items-center bg-white border-b border-slate-100 sticky top-0 z-[150]">
-                <h2 id="mobile-page-title" class="font-black text-[#002e5d] text-lg italic uppercase tracking-tighter">Dashboard</h2>
+                <h2 id="mobile-page-title" class="font-black text-[#002e5d] text-lg italic uppercase">Dashboard</h2>
                 <button onclick="logout()" class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center"><i class="fas fa-power-off text-sm"></i></button>
             </header>
 
-            <div class="content-container">
-                
-                <!-- SEÇÃO: DASHBOARD -->
+            <div class="content-container w-full">
+                <!-- DASHBOARD -->
                 <section id="view-dashboard" class="hidden space-y-8">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="glass-card p-8 border-l-[12px] border-green-500" id="dash-present-card">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Presentes Hoje</p>
+                        <div class="glass-card p-8 border-l-[12px] border-green-500">
+                            <p class="text-[10px] font-black text-slate-400 uppercase">Presentes Hoje</p>
                             <p id="stats-present" class="text-5xl font-black text-slate-800 leading-tight">0</p>
                         </div>
                         <div class="glass-card p-8 border-l-[12px] border-[#002e5d]">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Membros Ala</p>
+                            <p class="text-[10px] font-black text-slate-400 uppercase">Total Ala</p>
                             <p id="stats-total" class="text-5xl font-black text-slate-800 leading-tight">0</p>
                         </div>
                         <div class="glass-card p-8 border-l-[12px] border-orange-500">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resgate</p>
+                            <p class="text-[10px] font-black text-slate-400 uppercase">Resgate</p>
                             <p id="stats-rescue" class="text-5xl font-black text-slate-800 leading-tight">0</p>
                         </div>
                     </div>
@@ -154,56 +147,52 @@
                     </div>
                 </section>
 
-                <!-- SEÇÃO: REGISTRAR FREQUÊNCIA -->
+                <!-- REGISTRAR FREQUÊNCIA -->
                 <section id="view-attendance" class="hidden space-y-6">
                     <div class="sticky-search space-y-4">
                         <div class="flex gap-3">
                             <div class="relative flex-1">
                                 <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
-                                <input type="text" id="searchMember" oninput="renderAttendance()" placeholder="Buscar nome ou família..." class="w-full pl-12 p-4 rounded-2xl bg-white border-none outline-none shadow-sm focus:ring-2 focus:ring-[#002e5d] font-bold text-sm">
+                                <input type="text" id="searchMember" oninput="renderAttendance()" placeholder="Buscar nome ou família..." class="w-full pl-12 p-4 rounded-2xl bg-white border-none outline-none shadow-sm font-bold text-sm">
                             </div>
-                            <button onclick="toggleOptions()" class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#002e5d] shadow-sm border border-slate-100 active:scale-90">
-                                <i class="fas fa-sliders"></i>
-                            </button>
+                            <button onclick="toggleOptions()" class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#002e5d] shadow-sm border border-slate-100"><i class="fas fa-sliders"></i></button>
                         </div>
                     </div>
-
-                    <div id="attendance-options" class="hidden space-y-6 p-6 bg-white rounded-[32px] border border-slate-100 shadow-sm">
+                    <div id="attendance-options" class="hidden space-y-6 p-6 bg-white rounded-[32px] border shadow-sm">
                         <div class="space-y-2">
-                            <p class="text-[10px] font-black text-slate-400 uppercase ml-2">Data e Filtros</p>
+                            <p class="text-[10px] font-black text-slate-400 uppercase">Data e Filtros</p>
                             <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl">
                                 <i class="fas fa-calendar-day text-[#002e5d]"></i>
-                                <select id="dateSelect" onchange="renderAll()" class="bg-transparent font-black text-xs uppercase tracking-widest outline-none border-none flex-1"></select>
+                                <select id="dateSelect" onchange="renderAll()" class="bg-transparent font-black text-xs uppercase outline-none border-none flex-1 cursor-pointer"></select>
                             </div>
                             <div id="orgFilters" class="flex overflow-x-auto gap-2 no-scrollbar py-2"></div>
                         </div>
                         <div class="space-y-2">
-                            <p class="text-[10px] font-black text-slate-400 uppercase ml-2">Contadores Adicionais (Admin)</p>
+                            <p class="text-[10px] font-black text-slate-400 uppercase">Contadores Adicionais (Admin)</p>
                             <div id="admin-counters" class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center">
                                     <span class="text-[10px] font-bold text-slate-500 uppercase">Líderes Estaca</span>
                                     <div class="flex items-center gap-4">
-                                        <button onclick="updateCount('lideresCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button>
-                                        <span id="display-lideres" class="font-black text-lg text-[#002e5d]">0</span>
+                                        <button onclick="updateCount('lideresCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm">-</button>
+                                        <span id="display-lideres" class="font-black">0</span>
                                         <button onclick="updateCount('lideresCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button>
                                     </div>
                                 </div>
                                 <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center">
-                                    <span class="text-[10px] font-bold text-slate-500 uppercase">Visitantes</span>
+                                    <span class="text-[10px] font-bold text-slate-500 uppercase">Visitantes Gerais</span>
                                     <div class="flex items-center gap-4">
-                                        <button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button>
-                                        <span id="display-visitantes" class="font-black text-lg text-[#002e5d]">0</span>
+                                        <button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm">-</button>
+                                        <span id="display-visitantes" class="font-black">0</span>
                                         <button onclick="updateCount('visitantesCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                     <div id="memberList" class="space-y-2"></div>
                 </section>
 
-                <!-- SEÇÃO: RELATÓRIOS -->
+                <!-- RELATÓRIOS -->
                 <section id="view-reports" class="hidden space-y-8">
                     <div class="glass-card p-6 border-l-[12px] border-slate-800 cursor-pointer hover:bg-slate-50 transition-all mb-8" onclick="switchTab('members-list')">
                         <div class="flex items-center justify-between">
@@ -215,15 +204,19 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="glass-card p-8"><h3 class="font-black text-yellow-600 uppercase text-[10px] mb-4">Sinal Amarelo</h3><div id="report-yellow" class="space-y-3"></div></div>
-                        <div class="glass-card p-8"><h3 class="font-black text-blue-600 uppercase text-[10px] mb-4">Famílias Ausentes</h3><div id="report-family" class="space-y-3"></div></div>
-                        <div class="glass-card p-8 md:col-span-2"><h3 class="font-black text-green-600 uppercase text-[10px] mb-4">Retenção</h3><div id="report-retention" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div>
+                        <div class="glass-card p-8"><h3 class="font-black text-yellow-600 uppercase text-[10px] mb-4 tracking-widest">Sinal Amarelo</h3><div id="report-yellow" class="space-y-3"></div></div>
+                        <div class="glass-card p-8"><h3 class="font-black text-blue-600 uppercase text-[10px] mb-4 tracking-widest">Famílias Ausentes</h3><div id="report-family" class="space-y-3"></div></div>
+                        <div class="glass-card p-8 md:col-span-2"><h3 class="font-black text-green-600 uppercase text-[10px] mb-4 tracking-widest">Acompanhamento Retenção</h3><div id="report-retention" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div>
                     </div>
                 </section>
 
                 <!-- GESTÃO DE LISTAS -->
                 <section id="view-members-list" class="hidden space-y-6">
                     <button onclick="switchTab('reports')" class="flex items-center gap-2 text-[#002e5d] font-bold text-xs uppercase"><i class="fas fa-arrow-left"></i> Voltar</button>
+                    <div class="flex flex-col md:flex-row gap-4 bg-white p-6 rounded-[32px] border">
+                        <input type="text" id="searchManageMembers" oninput="renderMembersList()" placeholder="Buscar para editar..." class="flex-1 p-4 rounded-2xl bg-slate-50 outline-none text-sm font-bold border-none">
+                        <select id="filterOrgList" onchange="renderMembersList()" class="p-3 bg-slate-50 rounded-xl text-[10px] font-bold uppercase border-none"><option value="TODOS">Todas Orgs</option><option value="Quórum de Élderes">Élderes</option><option value="Sociedade de Socorro">Socorro</option><option value="Moças">Moças</option><option value="Rapazes">Rapazes</option><option value="Primária">Primária</option></select>
+                    </div>
                     <div id="manageMembersContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </section>
 
@@ -234,33 +227,39 @@
 
                 <!-- NOVO CADASTRO -->
                 <section id="view-add" class="hidden flex justify-center">
-                    <div class="glass-card p-10 w-full max-w-xl space-y-6">
+                    <div class="glass-card p-10 w-full max-w-xl space-y-6 shadow-xl">
                         <h3 class="text-xl font-black text-[#002e5d] uppercase text-center italic">Novo Cadastro</h3>
                         <div class="space-y-4">
                             <input type="text" id="newName" oninput="formatNameInput(this)" placeholder="Nome Completo" class="w-full p-4 bg-slate-50 border-none rounded-[20px] font-bold text-sm outline-none">
                             <div class="relative">
                                 <input type="text" id="familySearch" oninput="handleFamilySearch(this.value)" placeholder="Sobrenome da Família" class="w-full p-4 bg-slate-50 border-none rounded-[20px] font-bold text-sm outline-none">
                                 <div id="familySuggestions" class="hidden absolute left-0 right-0 top-[105%] bg-white rounded-2xl shadow-2xl z-[150] max-h-48 overflow-y-auto border"></div>
-                                <div class="flex items-center gap-3 px-4 mt-2"><input type="checkbox" id="isHeadOfFamily" class="w-4 h-4 accent-[#002e5d]"><label class="text-xs font-bold text-slate-500 italic">Chefe desta família</label></div>
+                                <div id="headOfFamilyContainer" class="flex items-center gap-3 px-4 mt-2"><input type="checkbox" id="isHeadOfFamily" class="w-4 h-4 accent-[#002e5d]"><label class="text-xs font-bold text-slate-500 italic">Chefe desta família</label></div>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <select id="newOrg" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black uppercase"><option value="Quórum de Élderes">ÉLDERES</option><option value="Sociedade de Socorro">SOCORRO</option><option value="Moças">MOÇAS</option><option value="Rapazes">RAPAZES</option><option value="Primária">PRIMÁRIA</option></select>
                                 <select id="newCat" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black uppercase"><option value="Membro">MEMBRO</option><option value="Recém-Converso">RECÉM-CONVERSO</option><option value="Novo Morador">NOVO MORADOR</option><option value="Visitante">VISITANTE</option></select>
                             </div>
-                            <button onclick="saveNewMember()" class="w-full bg-[#002e5d] text-white p-6 rounded-[32px] font-black shadow-2xl">CONCLUIR CADASTRO</button>
+                            <input type="tel" id="newPhone" oninput="formatPhone(this)" placeholder="Celular" class="w-full p-4 bg-slate-50 rounded-2xl font-bold text-sm border-none">
+                            <button onclick="saveNewMember()" class="w-full bg-[#002e5d] text-white p-6 rounded-[32px] font-black uppercase shadow-2xl">CONCLUIR CADASTRO</button>
                         </div>
                     </div>
                 </section>
 
-                <!-- ADMIN USUÁRIOS -->
+                <!-- GERENCIAR LOGINS -->
                 <section id="view-admin-users" class="hidden space-y-8">
+                    <div class="glass-card p-10 max-w-md mx-auto space-y-4">
+                        <h4 class="font-black text-xs text-center uppercase tracking-widest text-slate-400">Autorizar Login</h4>
+                        <input type="text" id="admin-new-name" placeholder="Nome" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none font-bold">
+                        <input type="text" id="admin-new-user" placeholder="Login de Usuário" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none font-bold">
+                        <select id="admin-new-role" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none font-bold uppercase text-xs"><option value="user">Secretário</option><option value="admin">Administrador</option></select>
+                        <button onclick="adminCreateUser()" class="w-full bg-[#002e5d] text-white p-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg">Autorizar</button>
+                    </div>
                     <div id="users-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </section>
-
             </div>
         </main>
 
-        <!-- NAVIGATION MOBILE -->
         <nav class="lg:hidden fixed bottom-6 left-6 right-6 h-20 glass-card flex justify-around items-center px-4 z-[200] border-2 border-white shadow-2xl">
             <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-home text-lg"></i></button>
             <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-clipboard-check text-lg"></i></button>
@@ -268,27 +267,9 @@
             <button onclick="switchTab('reports')" id="nav-reports" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-file-invoice text-lg"></i></button>
             <button onclick="switchTab('add')" id="nav-add" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-plus-circle text-lg"></i></button>
         </nav>
-
-        <!-- MODAL EDITAR MEMBRO -->
-        <div id="memberEditModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
-            <div class="glass-card w-full max-w-sm p-10 space-y-6">
-                <div class="flex justify-between items-center border-b pb-4">
-                    <h3 class="font-black uppercase text-xs text-slate-400">Editar Registro</h3>
-                    <button onclick="closeMemberEdit()" class="text-slate-300 hover:text-red-500"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="space-y-4">
-                    <input type="text" id="edit-member-name" oninput="formatNameInput(this)" class="w-full p-4 bg-slate-50 rounded-2xl uppercase text-sm font-bold">
-                    <input type="text" id="edit-member-family" class="w-full p-4 bg-slate-50 rounded-2xl uppercase text-sm font-bold">
-                    <select id="edit-member-org" class="w-full p-4 bg-slate-50 rounded-2xl text-xs font-bold"><option value="Quórum de Élderes">Quórum de Élderes</option><option value="Sociedade de Socorro">Sociedade de Socorro</option><option value="Moças">Moças</option><option value="Rapazes">Rapazes</option><option value="Primária">Primária</option><option value="Visitante">Visitante</option></select>
-                    <div class="flex items-center gap-3 px-4"><input type="checkbox" id="edit-member-isHead" class="w-4 h-4 accent-[#002e5d]"><label class="text-xs font-bold text-slate-500 italic">Chefe da Família</label></div>
-                </div>
-                <div class="flex gap-4 pt-4"><button onclick="deleteMemberAction()" class="flex-1 text-red-400 font-bold text-[10px] uppercase underline">Excluir</button><button onclick="saveMemberAction()" class="flex-[2] py-4 bg-[#002e5d] text-white rounded-2xl font-black text-xs shadow-lg">Gravar</button></div>
-            </div>
-        </div>
-
     </div>
 
-    <!-- SCRIPT CENTRALIZADO -->
+    <!-- SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy, setDoc, deleteDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -312,18 +293,16 @@
         let hChart = null; let aChart = null;
         let memberIdEditing = null;
 
-        // Init Dates
-        const dSelect = document.getElementById('dateSelect');
+        const dateSelect = document.getElementById('dateSelect');
         const domingosISO = [];
         for(let i=0; i<12; i++) {
             let d = new Date(); d.setDate(d.getDate() - (d.getDay() + (7 * i)) % 84);
             let iso = d.toISOString().split('T')[0];
             domingosISO.push(iso);
-            dSelect.innerHTML += `<option value="${iso}">${i==0 ? 'HOJE' : iso.split('-')[2]+'/'+iso.split('-')[1]}</option>`;
+            dateSelect.innerHTML += `<option value="${iso}">${i==0 ? 'DOMINGO HOJE' : 'DOMINGO, '+iso.split('-')[2]+'/'+iso.split('-')[1]}</option>`;
         }
-        selectedDate = dSelect.value;
+        selectedDate = dateSelect.value;
 
-        // AUTH
         window.checkLogin = async () => {
             const u = document.getElementById('login-user').value.toLowerCase().trim();
             const p = document.getElementById('login-pass').value.trim();
@@ -334,6 +313,18 @@
                 localStorage.setItem('user_data', JSON.stringify(d));
                 location.reload();
             } else alert("Usuário ou senha incorretos.");
+        };
+
+        window.processFirstLogin = async () => {
+            const u = document.getElementById('first-user').value.toLowerCase().trim();
+            const p1 = document.getElementById('first-pass').value.trim();
+            const p2 = document.getElementById('first-pass-confirm').value.trim();
+            if(!u || p1 !== p2) return alert("As senhas não coincidem.");
+            const q = query(collection(db, "usuarios"), where("username", "==", u));
+            const snap = await getDocs(q);
+            if(snap.empty) return alert("Autorização não encontrada.");
+            await updateDoc(doc(db, "usuarios", snap.docs[0].id), { password: p1 });
+            alert("Sucesso!"); switchTab('login');
         };
 
         window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
@@ -355,12 +346,15 @@
             if(document.getElementById(`side-${tab}`)) document.getElementById(`side-${tab}`).classList.add('nav-btn-active');
             if(document.getElementById(`nav-${tab}`)) document.getElementById(`nav-${tab}`).classList.add('text-[#002e5d]', 'scale-125');
 
+            const titles = {'dashboard':'Painel Geral','attendance':'Registrar Frequência','analysis':'Resgate','reports':'Relatórios','add':'Novo','members-list':'Gestão de Listas', 'admin-users': 'Gerenciar Logins'};
+            if(document.getElementById('mobile-page-title')) document.getElementById('mobile-page-title').innerText = titles[tab] || 'Ala';
+
             if(tab === 'members-list') renderMembersList();
+            if(tab === 'admin-users') renderAdminUsers();
             if(tab === 'reports' || tab === 'dashboard') renderAll();
             window.scrollTo(0,0);
         };
 
-        // CORE LOGIC
         function listenData() {
             onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => {
                 members = snap.docs.map(d => ({id: d.id, ...d.data()}));
@@ -377,6 +371,10 @@
                     };
                 });
                 renderAll();
+            });
+            onSnapshot(collection(db, "usuarios"), (snap) => {
+                allUsersList = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                if(currentUser && currentUser.role === 'admin') renderAdminUsers();
             });
             document.getElementById('loading-screen').classList.add('hidden');
         }
@@ -417,7 +415,10 @@
             const curP = data.presents || [];
             list.innerHTML = '';
             
-            let pC = 0; let tC = 0; let lastFamily = "";
+            let membrosP = 0; 
+            let visitantesNominaisP = 0; 
+            let totalMembrosAla = 0;
+            let lastFamily = "";
 
             document.getElementById('display-lideres').innerText = data.lideresCount || 0;
             document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
@@ -431,7 +432,14 @@
 
             sorted.forEach(m => {
                 const isP = curP.includes(m.id);
-                if(m.org !== 'Visitante') { tC++; if(isP) pC++; }
+                
+                if(m.org !== 'Visitante') {
+                    totalMembrosAla++; 
+                    if(isP) membrosP++;
+                } else {
+                    if(isP) visitantesNominaisP++;
+                }
+
                 const matchS = m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search));
                 const matchF = currentFilter === 'TODOS' || m.org === currentFilter;
 
@@ -445,21 +453,23 @@
                             <div class="check-box ${isP ? 'check-active' : ''}">${isP ? '<i class="fas fa-check text-[10px]"></i>' : ''}</div>
                             <div class="flex-1 min-w-0">
                                 <h4 class="font-bold text-sm ${isP ? 'text-teal-900' : 'text-slate-800'} truncate">${m.name}</h4>
-                                <p class="text-[9px] font-black text-slate-400 uppercase">${m.org}</p>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${m.org}</p>
                             </div>
                         </div>`;
                 }
             });
 
-            const lC = data.lideresCount || 0; const vC = data.visitantesCount || 0;
-            document.getElementById('stats-present').innerText = pC + lC + vC;
-            document.getElementById('stats-total').innerText = tC;
+            const lC = data.lideresCount || 0; 
+            const vC = data.visitantesCount || 0;
+            document.getElementById('stats-present').innerText = membrosP + visitantesNominaisP + lC + vC;
+            document.getElementById('stats-total').innerText = totalMembrosAla;
 
-            // Dashboard Details
-            let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-xs font-bold text-slate-500">`;
-            det += `<p class="text-green-600">✓ ${pC} Membros</p>`;
-            if(lC > 0) det += `<p class="text-amber-600">★ ${lC} Líderes</p>`;
-            if(vC > 0) det += `<p class="text-blue-500">🚶 ${vC} Visitantes</p>`;
+            let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1">`;
+            det += `<p class="text-green-600 flex justify-between"><span>✓ Membros da Ala</span> <span>${membrosP}</span></p>`;
+            if(visitantesNominaisP > 0) det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes da Unidade</span> <span>${visitantesNominaisP}</span></p>`;
+            if(lC > 0) det += `<p class="text-amber-600 flex justify-between"><span>★ Líderes Estaca</span> <span>${lC}</span></p>`;
+            if(vC > 0) det += `<p class="text-blue-500 flex justify-between"><span>🚶 Visitantes Gerais</span> <span>${vC}</span></p>`;
+            
             const card = document.getElementById('stats-present').parentElement;
             const old = card.querySelector('.detalhes-area'); if(old) old.remove();
             card.insertAdjacentHTML('beforeend', det + `</div>`);
@@ -469,27 +479,39 @@
             const container = document.getElementById('manageMembersContainer');
             container.innerHTML = '';
             members.forEach(m => {
-                container.innerHTML += `<div class="glass-card p-6 flex justify-between items-center border-l-8 border-slate-200"><div><h4 class="font-bold text-sm">${m.name}</h4><p class="text-[9px] font-black uppercase text-slate-400">${m.org}</p><p class="text-[9px] font-bold text-blue-900 uppercase">Família ${m.familia}</p></div>${currentUser.role === 'admin' ? `<button onclick="openMemberEdit('${m.id}')" class="w-10 h-10 bg-slate-50 text-slate-300 rounded-xl flex items-center justify-center hover:bg-blue-900 hover:text-white transition-all"><i class="fas fa-pen-to-square"></i></button>` : ''}</div>`;
+                container.innerHTML += `<div class="glass-card p-6 flex justify-between items-center border-l-8 border-slate-200"><div><h4 class="font-bold text-sm text-slate-800">${m.name}</h4><p class="text-[9px] font-black uppercase text-slate-400">${m.org}</p><p class="text-[9px] font-bold text-blue-900 uppercase mt-1">Família ${m.familia}</p></div>${currentUser.role === 'admin' ? `<button onclick="openMemberEdit('${m.id}')" class="w-10 h-10 bg-slate-50 text-slate-300 rounded-xl flex items-center justify-center hover:bg-blue-900 hover:text-white transition-all"><i class="fas fa-pen-to-square text-xs"></i></button>` : ''}</div>`;
             });
         };
 
-        // HELPERS
+        window.renderAdminUsers = () => {
+            const l = document.getElementById('users-list'); 
+            if(!l) return;
+            l.innerHTML = '';
+            allUsersList.forEach(u => {
+                l.innerHTML += `<div class="bg-white p-5 rounded-[32px] flex justify-between items-center text-xs border border-slate-100 shadow-sm"><div><p class="font-black uppercase text-[#002e5d]">${u.name}</p><p class="opacity-40 font-bold uppercase text-[9px] tracking-wider">${u.username} • ${u.role}</p></div><div class="w-2 h-2 rounded-full ${u.password?'bg-green-400':'bg-yellow-400'}"></div></div>`;
+            });
+        };
+
         window.toggleOptions = () => document.getElementById('attendance-options').classList.toggle('hidden');
         window.formatNameInput = (el) => el.value = el.value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        window.formatPhone = (el) => { let v = el.value.replace(/\D/g,''); v = v.replace(/^(\d{2})(\d)/g,"($1) $2"); v = v.replace(/(\d)(\d{4})$/,"$1-$2"); el.value = v; };
+
         window.handleFamilySearch = (query) => {
             const sug = document.getElementById('familySuggestions');
             if (query.length < 2) { sug.classList.add('hidden'); return; }
             const heads = members.filter(m => m.isHead && m.familia.toLowerCase().includes(query.toLowerCase()));
             if (heads.length > 0) {
                 sug.classList.remove('hidden');
-                sug.innerHTML = heads.map(h => `<div onclick="selectFamily('${h.familia}')" class="p-4 hover:bg-slate-50 border-b cursor-pointer font-bold text-xs uppercase">${h.familia}</div>`).join('');
+                sug.innerHTML = heads.map(h => `<div onclick="selectFamily('${h.familia}')" class="p-4 hover:bg-slate-50 border-b cursor-pointer font-bold text-xs uppercase text-slate-600">${h.familia} <span class="font-normal opacity-50">(Chefe: ${h.name})</span></div>`).join('');
             } else sug.classList.add('hidden');
         };
         window.selectFamily = (f) => { document.getElementById('familySearch').value = f; document.getElementById('familySuggestions').classList.add('hidden'); };
+        
         window.saveNewMember = async () => {
             const n = document.getElementById('newName').value; const f = document.getElementById('familySearch').value.toUpperCase();
-            if(!n || !f) return alert("Nome e Família obrigatórios.");
-            await addDoc(collection(db, "membros"), { name: n, familia: f, org: document.getElementById('newOrg').value, categoria: document.getElementById('newCat').value, isHead: document.getElementById('isHeadOfFamily').checked, lastAttended: "2024-01-01" });
+            if(!n || !f) return alert("Preencha Nome e Família.");
+            await addDoc(collection(db, "membros"), { name: n, familia: f, org: document.getElementById('newOrg').value, categoria: document.getElementById('newCat').value, telefone: document.getElementById('newPhone').value || '', isHead: document.getElementById('isHeadOfFamily').checked, lastAttended: "2024-01-01" });
+            document.getElementById('newName').value = ''; document.getElementById('familySearch').value = '';
             switchTab('attendance');
         };
 
@@ -506,14 +528,24 @@
             await updateDoc(doc(db, "membros", memberIdEditing), { name: document.getElementById('edit-member-name').value.toUpperCase(), familia: document.getElementById('edit-member-family').value.toUpperCase(), org: document.getElementById('edit-member-org').value, isHead: document.getElementById('edit-member-isHead').checked });
             closeMemberEdit();
         };
+        window.deleteMemberAction = async () => { if(confirm("Excluir definitivamente?")) { await deleteDoc(doc(db, "membros", memberIdEditing)); closeMemberEdit(); } };
+
+        window.adminCreateUser = async () => {
+            const n = document.getElementById('admin-new-name').value;
+            const u = document.getElementById('admin-new-user').value.toLowerCase().trim();
+            if(!n || !u) return alert("Preencha!");
+            await addDoc(collection(db, "usuarios"), { name: n, username: u, password: "", role: document.getElementById('admin-new-role').value });
+            alert("Autorizado!"); document.getElementById('admin-new-name').value = ''; document.getElementById('admin-new-user').value = '';
+        };
 
         function renderRescue() {
             const list = document.getElementById('missingList'); list.innerHTML = '';
             members.forEach(m => {
                 if(m.org === 'Visitante') return;
                 const diff = Math.floor((new Date() - new Date(m.lastAttended)) / (1000*60*60*24));
-                if(diff >= 21) list.innerHTML += `<div class="glass-card p-6 border-t-8 border-orange-500"><div><p class="text-[9px] font-black text-orange-500 uppercase">${Math.floor(diff/7)} SEMANAS</p><h4 class="font-black text-slate-800 text-sm">${m.name}</h4></div><a href="https://wa.me/?text=Sentimos sua falta!" class="block mt-4 bg-teal-600 text-white p-3 rounded-xl text-center font-black text-[10px] uppercase shadow-lg">WhatsApp</a></div>`;
+                if(diff >= 21) list.innerHTML += `<div class="glass-card p-6 border-t-8 border-orange-500"><div><p class="text-[9px] font-black text-orange-500 uppercase">${Math.floor(diff/7)} SEMANAS</p><h4 class="font-black text-slate-800 text-sm">${m.name}</h4></div><a href="https://wa.me/?text=Olá, sentimos sua falta!" target="_blank" class="block mt-4 bg-teal-600 text-white p-3 rounded-xl text-center font-black text-[10px] uppercase">WhatsApp</a></div>`;
             });
+            document.getElementById('stats-rescue').innerText = list.children.length;
         }
 
         function renderReports() {
@@ -522,11 +554,11 @@
             members.forEach(m => {
                 if(m.org === 'Visitante') return;
                 let fq = domingosISO.slice(0, 4).filter(d => (attendanceHistory[d]?.presents || []).includes(m.id)).length;
-                if(fq === 1) yl.innerHTML += `<div class="p-3 bg-yellow-50 rounded-xl text-[10px] font-bold">⚠️ ${m.name} (Faltou 3 domingos)</div>`;
+                if(fq === 1) yl.innerHTML += `<div class="p-3 bg-yellow-50 rounded-xl text-[10px] font-bold text-yellow-700">⚠️ ${m.name} (Faltou 3 domingos)</div>`;
                 const f = m.familia || 'S/ FAM'; if(!fams[f]) fams[f] = { t: 0, p: 0 }; fams[f].t++; if((attendanceHistory[selectedDate]?.presents || []).includes(m.id)) fams[f].p++;
                 if(m.categoria && m.categoria !== 'Membro') {
                     const isP = (attendanceHistory[selectedDate]?.presents || []).includes(m.id);
-                    rl.innerHTML += `<div class="p-3 rounded-xl border text-[10px] uppercase font-bold flex justify-between ${isP?'bg-green-50':'bg-red-50'}"><span>${m.name}</span> <i class="fas ${isP?'fa-check text-green-600':'fa-times text-red-400'}"></i></div>`;
+                    rl.innerHTML += `<div class="p-3 rounded-xl border text-[10px] uppercase font-bold flex justify-between ${isP?'bg-green-50 text-green-700':'bg-red-50 text-red-700'}"><span>${m.name}</span> <i class="fas ${isP?'fa-check':'fa-times'}"></i></div>`;
                 }
             });
             Object.keys(fams).forEach(f => { if(fams[f].p === 0) fl.innerHTML += `<div class="p-3 bg-blue-50 rounded-xl text-[10px] font-black uppercase text-blue-700">Família ${f} Ausente</div>`; });
@@ -542,25 +574,35 @@
             });
             if(hChart) hChart.destroy();
             hChart = new Chart(ctx1, { type: 'bar', data: { labels: ['ÉLD', 'SOC', 'MOÇ', 'RAP', 'PRI'], datasets: [{ data: stats, backgroundColor: '#002e5d', borderRadius: 8 }] }, options: { indexAxis: 'y', plugins: { legend: false }, scales: { x: { max: 100 } } } });
-
             const ctx2 = document.getElementById('attendanceChart').getContext('2d');
             const cts = domingosISO.slice(0, 5).reverse().map(d => (attendanceHistory[d]?.presents || []).length);
             if(aChart) aChart.destroy();
             aChart = new Chart(ctx2, { type: 'line', data: { labels: domingosISO.slice(0, 5).reverse().map(d=>d.split('-')[2]), datasets: [{ data: cts, borderColor: '#002e5d', fill: true, tension: 0.5 }] }, options: { plugins: { legend: false } } });
         }
 
-        // INIT
         if(currentUser) {
             document.getElementById('user-name-side').innerText = currentUser.name;
             if(currentUser.role === 'admin') document.getElementById('admin-btn').classList.remove('hidden');
             document.getElementById('app-layout').classList.remove('hidden');
+            
             const fArea = document.getElementById('orgFilters');
             ['TODOS', 'Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária', 'Visitante'].forEach(o => {
-                fArea.innerHTML += `<button onclick="setFilter('${o}')" class="filter-pill ${o=='TODOS' ? 'active' : ''} glass-card px-6 py-3 whitespace-nowrap text-[10px] font-black uppercase tracking-widest border border-slate-100" id="pill-${o.replace(/\s+/g, '')}">${o}</button>`;
+                const id = o.replace(/\s+/g, '');
+                fArea.innerHTML += `<button onclick="setFilter('${o}')" class="filter-pill ${o=='TODOS' ? 'active' : ''} glass-card px-6 py-3 whitespace-nowrap text-[10px] font-black uppercase tracking-widest border border-slate-100" id="pill-${id}">${o}</button>`;
             });
-            window.setFilter = (f) => { currentFilter = f; document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active', 'bg-[#002e5d]', 'text-white')); document.getElementById('pill-'+f.replace(/\s+/g, '')).classList.add('active', 'bg-[#002e5d]', 'text-white'); renderAttendance(); };
+
+            window.setFilter = (f) => {
+                currentFilter = f;
+                document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active', 'bg-[#002e5d]', 'text-white'));
+                const el = document.getElementById('pill-'+f.replace(/\s+/g, ''));
+                if(el) el.classList.add('active', 'bg-[#002e5d]', 'text-white');
+                renderAttendance();
+            };
             listenData(); switchTab('dashboard');
-        } else { document.getElementById('view-login').classList.remove('hidden'); document.getElementById('loading-screen').classList.add('hidden'); }
+        } else { 
+            document.getElementById('view-login').classList.remove('hidden'); 
+            document.getElementById('loading-screen').classList.add('hidden'); 
+        }
     </script>
 </body>
 </html>
