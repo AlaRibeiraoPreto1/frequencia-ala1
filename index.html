@@ -456,7 +456,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy, setDoc, deleteDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+        
         const firebaseConfig = {
           apiKey: "AIzaSyAaEKx9n4N847WW97FhfZxLZYtsa5cTsE0",
           authDomain: "frequencia-da-ala.firebaseapp.com",
@@ -591,6 +591,35 @@ function updateNavigationUI(tab) {
             await setDoc(hRef, { presents: cur });
         };
 
+        // FUNÇÃO DOS BOTÕES + E - (CORRIGIDA)
+window.updateCount = async (tipo, delta) => {
+    // 1. Verifica se o usuário é admin. Se não for, nem tenta clicar.
+    if (!currentUser || currentUser.role !== 'admin') {
+        alert("Apenas administradores podem alterar a contagem.");
+        return;
+    }
+
+    // 2. Tenta pegar o valor que já existe no banco de dados
+    let currentVal = 0;
+    if (attendanceHistory[selectedDate] && attendanceHistory[selectedDate][tipo]) {
+        currentVal = attendanceHistory[selectedDate][tipo];
+    }
+
+    // 3. Calcula o novo valor (não deixa ser menor que zero)
+    let newVal = currentVal + delta;
+    if (newVal < 0) newVal = 0;
+
+    // 4. Salva no banco de dados (Firebase)
+    const hRef = doc(db, "historico", selectedDate);
+    try {
+        await setDoc(hRef, { [tipo]: newVal }, { merge: true });
+        // O sistema vai atualizar a tela sozinho após salvar
+    } catch (error) {
+        console.error("Erro ao salvar contagem:", error);
+        alert("Erro ao conectar com o banco de dados.");
+    }
+};
+
         // Função para aumentar ou diminuir os contadores (SÓ PARA ADMIN)
 window.updateCount = async (tipo, delta) => {
     if (currentUser.role !== 'admin') return;
@@ -626,6 +655,14 @@ function updateCounterDisplays() {
         }
 
         function renderAttendance() {
+            // Atualiza os números dos visores de líderes e visitantes
+    const dadosAtuais = attendanceHistory[selectedDate] || {};
+    const visorLideres = document.getElementById('display-lideres');
+    const visorVisitantes = document.getElementById('display-visitantes');
+    
+    if(visorLideres) visorLideres.innerText = dadosAtuais.lideresCount || 0;
+    if(visorVisitantes) visorVisitantes.innerText = dadosAtuais.visitantesCount || 0;
+            
             const list = document.getElementById('memberList');
             const search = document.getElementById('searchMember').value.toLowerCase();
             const curP = attendanceHistory[selectedDate] || [];
