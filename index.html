@@ -19,28 +19,18 @@
             --bg-soft: #f1f5f9;
         }
 
+       /* Garante que o corpo do site se comporte normalmente */
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-soft);
             color: #1e293b;
-            margin: 0; padding: 0;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
         }
 
-     /* Trava apenas para as telas de login */
-        .trancar-tela { 
-            height: 100vh !important; 
-            overflow: hidden !important; 
-            position: fixed; 
-            width: 100vw;
-        }
-
-        /* CONFIGURAÇÃO PARA O SITE ROLAR LIVREMENTE */
-        html, body {
-            height: auto !important; /* Permite que a altura cresça conforme os membros aparecem */
-            min-height: 100%;
-            overflow-x: hidden;
-            -webkit-overflow-scrolling: touch; /* Deixa a rolagem "macia" no iPhone */
-        }
+        /* Garante que o container escondido não ocupe espaço nenhum */
+        .hidden { display: none !important; }
 
 
 
@@ -78,7 +68,7 @@
         #mobile-menu-panel { transition: transform 0.3s ease-in-out; }
     </style>
 </head>
-<body class="antialiased trancar-tela">
+<body class="antialiased">
 
     <!-- LOADING SCREEN -->
     <div id="loading-screen" class="fixed inset-0 bg-white z-[300] flex items-center justify-center">
@@ -448,26 +438,21 @@
             const view = document.getElementById(`view-${tab}`);
             if(view) view.classList.remove('hidden');
             
-       // GERENCIAMENTO DE ACESSO E ROLAGEM
+       // GERENCIAMENTO DE TELAS (LOGIN VS SITE)
             if (tab === 'login' || tab === 'first-login') {
+                // Se for login, esconde o site todo e mostra só o acesso
                 document.getElementById('app-layout').classList.add('hidden');
                 document.getElementById('access-container').classList.remove('hidden');
-                document.getElementById('mobile-nav').classList.add('hidden');
                 
-                // APLICA O CADEADO
-                document.body.classList.add('trancar-tela');
+                // Esconde também os menus para não "vazarem"
+                if(document.getElementById('mobile-nav')) document.getElementById('mobile-nav').classList.add('hidden');
             } else {
-                document.getElementById('app-layout').classList.remove('hidden');
+                // Se já estiver logado, esconde o acesso e mostra o site
                 document.getElementById('access-container').classList.add('hidden');
-                document.getElementById('mobile-nav').classList.remove('hidden');
+                document.getElementById('app-layout').classList.remove('hidden');
                 
-                // LIBERA A ROLAGEM
-                document.body.classList.remove('trancar-tela');
-                
-                // COMANDO EXTRA: FORÇA O NAVEGADOR A RECALCULAR A ALTURA
-                setTimeout(() => {
-                    window.dispatchEvent(new Event('resize'));
-                }, 100);
+                // Mostra o menu de baixo
+                if(document.getElementById('mobile-nav')) document.getElementById('mobile-nav').classList.remove('hidden');
             }
             
             document.querySelectorAll('aside button, nav button').forEach(b => b.classList.remove('nav-btn-active', 'text-[#002e5d]', 'scale-125'));
