@@ -37,16 +37,20 @@
         .hidden { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
 
+        
+        /* Código para COMPUTADOR (Telas grandes) */
         @media (min-width: 1024px) {
             .app-layout { display: flex !important; height: 100vh; overflow: hidden; }
-            .sidebar { width: 300px !important; display: flex !important; flex-direction: column; background: white; border-right: 1px solid #e2e8f0; flex-shrink: 0; }
+            .sidebar { width: 300px !important; flex-shrink: 0; display: flex !important; background: white; border-right: 1px solid #e2e8f0; flex-direction: column; }
             .main-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
             .content-container { width: 100%; max-width: 1100px; padding: 40px; }
         }
 
+        /* Código para CELULAR (Telas pequenas) */
         @media (max-width: 1023px) {
             .sidebar { display: none !important; }
-            .app-layout { display: block !important; }
+            /* REMOVEMOS O !IMPORTANT ABAIXO PARA O MENU NÃO APARECER NO LOGIN */
+            .app-layout { display: block; } 
             .main-content { width: 100%; }
             .content-container { padding: 20px; padding-bottom: 120px; }
             .sticky-search { position: sticky; top: 0; z-index: 100; background: var(--bg-soft); padding: 10px 0; }
@@ -303,8 +307,7 @@
         </main>
 
         <!-- NAVEGAÇÃO MOBILE INFERIOR -->
-        <nav class="lg:hidden fixed bottom-6 left-6 right-6 h-20 glass-card flex justify-around items-center px-4 z-[100] border-2 border-white shadow-2xl">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-home text-lg"></i></button>
+        <nav id="mobile-nav" class="lg:hidden fixed bottom-6 left-6 right-6 h-20 glass-card flex justify-around items-center px-4 z-[200] border-2 border-white shadow-2xl">            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-home text-lg"></i></button>
             <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-clipboard-check text-lg"></i></button>
             <button onclick="switchTab('analysis')" id="nav-analysis" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-hand-holding-heart text-lg"></i></button>
             <button onclick="switchTab('reports')" id="nav-reports" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-file-invoice text-lg"></i></button>
@@ -438,11 +441,19 @@
          if (tab === 'login' || tab === 'first-login') {
                 document.getElementById('app-layout').classList.add('hidden');
                 document.getElementById('access-container').classList.remove('hidden');
-                document.body.classList.add('not-logged'); // TRANCA A ROLAGEM NO LOGIN
+                
+                // ADICIONE ESTA LINHA ABAIXO:
+                document.getElementById('mobile-nav').classList.add('hidden'); // ESCONDE A BARRA
+                
+                document.body.classList.add('not-logged');
             } else {
                 document.getElementById('app-layout').classList.remove('hidden');
                 document.getElementById('access-container').classList.add('hidden');
-                document.body.classList.remove('not-logged'); // SOLTA A ROLAGEM QUANDO ENTRA
+                
+                // ADICIONE ESTA LINHA ABAIXO:
+                document.getElementById('mobile-nav').classList.remove('hidden'); // MOSTRA A BARRA
+                
+                document.body.classList.remove('not-logged');
             }
 
             document.querySelectorAll('aside button, nav button').forEach(b => b.classList.remove('nav-btn-active', 'text-[#002e5d]', 'scale-125'));
