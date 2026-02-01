@@ -460,7 +460,24 @@
             if(document.getElementById(`side-${tab}`)) document.getElementById(`side-${tab}`).classList.add('nav-btn-active');
             if(document.getElementById(`nav-${tab}`)) document.getElementById(`nav-${tab}`).classList.add('text-[#002e5d]', 'scale-125');
 
-            const titles = {'dashboard':'Painel Geral','attendance':'Registrar Frequência','analysis':'Resgate','reports':'Relatórios','add':'Novo','members-list':'Gestão de Listas', 'admin-users': 'Gerenciar Logins'};
+    
+                // TABELA DE TÍTULOS PARA O CELULAR
+        const titles = {
+        'dashboard': 'Painel Geral',
+        'attendance': 'Registrar Frequência',
+        'analysis': 'Resgate',
+        'reports': 'Relatórios Estratégicos',
+        'add': 'Novo Cadastro',
+        'members-list': 'Gestão de Listas',
+        'admin-users': 'Gerenciar Logins'
+        };
+    
+    // COMANDO QUE TROCA O NOME NO TOPO
+    const headerDoCelular = document.getElementById('mobile-page-title');
+    if (headerDoCelular) {
+        headerDoCelular.innerText = titles[tab] || 'Ala';
+    }
+
             const mobileHeaderTitle = document.getElementById('mobile-page-title');
             if(mobileHeaderTitle) mobileHeaderTitle.innerText = titles[tab] || 'Ala';
 
