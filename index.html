@@ -81,6 +81,35 @@
             display: flex; align-items: center; justify-content: center; transition: 0.2s;
         }
         .check-active { background: var(--healing-teal); border-color: var(--healing-teal); color: white; }
+
+        /* Estilo para o título da Família na lista */
+.family-divider {
+    background-color: #f8fafc;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 800;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Cores de card para facilitar batida de olho */
+.card-presente { background-color: #ecfdf5 !important; border-left-color: #10b981 !important; }
+.card-ausente { background-color: #ffffff !important; border-left-color: #e2e8f0 !important; }
+
+/* Barra de busca fixa ao rolar (apenas no mobile) */
+@media (max-width: 1023px) {
+    .sticky-search {
+        position: sticky;
+        top: 70px;
+        z-index: 100;
+        background: var(--bg-soft);
+        padding-bottom: 10px;
+    }
+}
     </style>
 </head>
 <body class="antialiased">
@@ -200,40 +229,57 @@
 
                 <!-- REGISTRAR FREQUÊNCIA -->
                 <section id="view-attendance" class="hidden space-y-8">
-                    <div class="flex flex-col md:flex-row gap-6 justify-between items-center bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm">
-                        <div class="relative w-full md:max-w-md">
-                            <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-300"></i>
-                            <input type="text" id="searchMember" placeholder="Buscar por nome ou família..." class="w-full pl-14 p-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-[#002e5d] font-bold text-sm">
-                        </div>
-                        <div class="flex items-center gap-4 w-full md:w-auto px-4">
-                            <i class="fas fa-calendar-day text-[#002e5d]"></i>
-                            <select id="dateSelect" class="bg-transparent font-black text-xs uppercase tracking-widest outline-none border-none cursor-pointer"></select>
-                        </div>
-                    </div>
-                    
-                    <div id="orgFilters" class="flex overflow-x-auto gap-2 no-scrollbar py-2"></div>
+                    <!-- Cabeçalho de Busca Fixo -->
+<div class="sticky-search space-y-4">
+    <div class="flex gap-3">
+        <div class="relative flex-1">
+            <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
+            <input type="text" id="searchMember" placeholder="Buscar nome ou família..." class="w-full pl-12 p-4 rounded-2xl bg-white border-none outline-none shadow-sm focus:ring-2 focus:ring-[#002e5d] font-bold text-sm">
+        </div>
+        <button onclick="toggleOptions()" class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#002e5d] shadow-sm border border-slate-100">
+            <i class="fas fa-sliders"></i>
+        </button>
+    </div>
+</div>
 
-                    <!-- CONTADORES ADMIN -->
-                    <div id="admin-counters" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                        <div class="glass-card p-6 flex items-center justify-between border-l-8 border-amber-500">
-                            <div><p class="text-[10px] font-black text-slate-400 uppercase">Líderes Estaca</p></div>
-                            <div class="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl">
-                                <button onclick="updateCount('lideresCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 transition-all"><i class="fas fa-minus"></i></button>
-                                <span id="display-lideres" class="text-xl font-black text-[#002e5d] min-w-[20px] text-center">0</span>
-                                <button onclick="updateCount('lideresCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] shadow-md flex items-center justify-center text-white transition-all"><i class="fas fa-plus"></i></button>
-                            </div>
-                        </div>
-                        <div class="glass-card p-6 flex items-center justify-between border-l-8 border-blue-400">
-                            <div><p class="text-[10px] font-black text-slate-400 uppercase">Visitantes</p></div>
-                            <div class="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl">
-                                <button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 transition-all"><i class="fas fa-minus"></i></button>
-                                <span id="display-visitantes" class="text-xl font-black text-[#002e5d] min-w-[20px] text-center">0</span>
-                                <button onclick="updateCount('visitantesCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] shadow-md flex items-center justify-center text-white transition-all"><i class="fas fa-plus"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="memberList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+<!-- Gaveta de Opções (Filtros e Contadores) - Começa escondida -->
+<div id="attendance-options" class="hidden space-y-6 mt-4 p-6 bg-slate-50 rounded-[32px] border border-slate-200 shadow-inner">
+    <div class="space-y-2">
+        <p class="text-[10px] font-black text-slate-400 uppercase ml-2">Data e Organização</p>
+        <div class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-100">
+            <i class="fas fa-calendar-day text-[#002e5d]"></i>
+            <select id="dateSelect" class="bg-transparent font-black text-xs uppercase tracking-widest outline-none border-none flex-1"></select>
+        </div>
+        <div id="orgFilters" class="flex overflow-x-auto gap-2 no-scrollbar py-2"></div>
+    </div>
+
+    <div class="space-y-2">
+        <p class="text-[10px] font-black text-slate-400 uppercase ml-2">Contadores Adicionais</p>
+        <div id="admin-counters" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <!-- Os contadores (Líderes e Visitantes) que você já tem permanecem aqui -->
+            <!-- Certifique-se de manter os IDs 'display-lideres' e 'display-visitantes' -->
+             <div class="bg-white p-4 rounded-2xl flex justify-between items-center border border-slate-100">
+                <span class="text-[10px] font-bold text-slate-500 uppercase">Líderes</span>
+                <div class="flex items-center gap-3">
+                    <button onclick="updateCount('lideresCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-slate-100 text-slate-400">-</button>
+                    <span id="display-lideres" class="font-black text-sm">0</span>
+                    <button onclick="updateCount('lideresCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white">+</button>
+                </div>
+             </div>
+             <div class="bg-white p-4 rounded-2xl flex justify-between items-center border border-slate-100">
+                <span class="text-[10px] font-bold text-slate-500 uppercase">Visitantes</span>
+                <div class="flex items-center gap-3">
+                    <button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-slate-100 text-slate-400">-</button>
+                    <span id="display-visitantes" class="font-black text-sm">0</span>
+                    <button onclick="updateCount('visitantesCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white">+</button>
+                </div>
+             </div>
+        </div>
+    </div>
+</div>
+
+<!-- LISTA DE MEMBROS AGRUPADA -->
+<div id="memberList" class="space-y-2 mt-6"></div>
                 </section>
 
                 <!-- RELATÓRIOS -->
@@ -517,39 +563,74 @@
         }
 
         function renderAttendance() {
-            const data = attendanceHistory[selectedDate] || {};
-            document.getElementById('display-lideres').innerText = data.lideresCount || 0;
-            document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
-            
-            document.getElementById('admin-counters').classList.remove('hidden');
-            document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
+            window.renderAttendance = () => {
+    const list = document.getElementById('memberList');
+    const search = document.getElementById('searchMember').value.toLowerCase();
+    const data = attendanceHistory[selectedDate] || {};
+    const curP = data.presents || [];
+    list.innerHTML = '';
+    
+    let pC = 0; let tC = 0;
+    let lastFamily = "";
 
-            const list = document.getElementById('memberList');
-            const search = document.getElementById('searchMember').value.toLowerCase();
-            const curP = data.presents || [];
-            list.innerHTML = '';
-            let pC = 0; let tC = 0;
+    // 1. Ordenar membros por Família e depois por Nome
+    const sortedMembers = [...members].sort((a, b) => {
+        const famA = (a.familia || "Z-SEM FAMÍLIA").toUpperCase();
+        const famB = (b.familia || "Z-SEM FAMÍLIA").toUpperCase();
+        if (famA < famB) return -1;
+        if (famA > famB) return 1;
+        return a.name.localeCompare(b.name);
+    });
 
-            members.forEach(m => {
-                const isP = curP.includes(m.id);
-                if(m.org !== 'Visitante') { tC++; if(isP) pC++; }
-                const matchS = m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search));
-                const matchF = currentFilter === 'TODOS' || m.org === currentFilter;
+    sortedMembers.forEach(m => {
+        const isP = curP.includes(m.id);
+        if(m.org !== 'Visitante') { tC++; if(isP) pC++; }
 
-                if(matchS && matchF) {
-                    list.innerHTML += `
-                        <div class="glass-card p-6 flex items-center gap-5 border-l-8 ${isP ? 'border-teal-500 bg-teal-50/10' : 'border-slate-50'}" ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name}')"` : ''}>
-                            <div class="check-box ${isP ? 'check-active' : ''} ${currentUser.role !== 'admin' ? 'opacity-50' : ''}">
-                                ${isP ? '<i class="fas fa-check text-[10px]"></i>' : ''}
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <h4 class="font-bold text-sm text-slate-800 truncate">${m.name}</h4>
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${m.familia || 'S/ FAM'} • ${m.org}</p>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
+        const matchS = m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search));
+        const matchF = currentFilter === 'TODOS' || m.org === currentFilter;
+
+        if(matchS && matchF) {
+            // 2. Inserir cabeçalho de família se mudar a família
+            if (m.familia !== lastFamily && !search) {
+                list.innerHTML += `<div class="family-divider">Família ${m.familia}</div>`;
+                lastFamily = m.familia;
+            }
+
+            // 3. Renderizar o card do membro
+            list.innerHTML += `
+                <div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isP ? 'card-presente' : 'card-ausente'} transition-all active:scale-[0.98]" 
+                     ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name}')"` : ''}>
+                    <div class="check-box ${isP ? 'check-active' : ''} ${currentUser.role !== 'admin' ? 'opacity-30' : ''}">
+                        ${isP ? '<i class="fas fa-check text-[10px]"></i>' : ''}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-bold text-sm ${isP ? 'text-teal-900' : 'text-slate-800'} truncate">${m.name}</h4>
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">${m.org}</p>
+                    </div>
+                </div>
+            `;
+        }
+    });
+
+    // Atualiza os visores numéricos (Líderes/Visitantes)
+    document.getElementById('display-lideres').innerText = data.lideresCount || 0;
+    document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
+
+    // Atualiza o Dashboard (Totalizadores)
+    const totalGeral = pC + (data.lideresCount || 0) + (data.visitantesCount || 0);
+    document.getElementById('stats-present').innerText = totalGeral;
+    document.getElementById('stats-total').innerText = tC;
+
+    // Chama a função de detalhamento do Dashboard que você já tem
+    updateDashboardDetails(pC, data.lideresCount || 0, data.visitantesCount || 0);
+};
+
+// Função para abrir/fechar as opções de filtros
+window.toggleOptions = () => {
+    const area = document.getElementById('attendance-options');
+    area.classList.toggle('hidden');
+};
+            };
 
             // DASHBOARD UPDATE
             const lC = data.lideresCount || 0;
