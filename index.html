@@ -26,12 +26,10 @@
             margin: 0; padding: 0;
         }
 
-        /* Cadeado para a tela de login */
-        body.not-logged { 
+       /* Classe que tranca a tela - aplicada apenas no login */
+        .trancar-tela { 
             overflow: hidden !important; 
             height: 100vh !important; 
-            width: 100vw;
-            position: fixed; /* Mantém a tela de login fixa */
         }
 
         /* Garante que o corpo do site possa rolar depois de logado */
@@ -74,7 +72,7 @@
         #mobile-menu-panel { transition: transform 0.3s ease-in-out; }
     </style>
 </head>
-<body class="antialiased not-logged">
+<body class="antialiased trancar-tela">
 
     <!-- LOADING SCREEN -->
     <div id="loading-screen" class="fixed inset-0 bg-white z-[300] flex items-center justify-center">
@@ -444,23 +442,21 @@
             const view = document.getElementById(`view-${tab}`);
             if(view) view.classList.remove('hidden');
             
-         // PARTE QUE CONTROLA O ACESSO E A ROLAGEM
+       // GERENCIAMENTO DE ACESSO E ROLAGEM
             if (tab === 'login' || tab === 'first-login') {
                 document.getElementById('app-layout').classList.add('hidden');
                 document.getElementById('access-container').classList.remove('hidden');
                 document.getElementById('mobile-nav').classList.add('hidden');
                 
-                // TRANCA A ROLAGEM
-                document.body.classList.add('not-logged');
-                document.body.style.overflow = 'hidden'; 
+                // APLICA O CADEADO
+                document.body.classList.add('trancar-tela');
             } else {
                 document.getElementById('app-layout').classList.remove('hidden');
                 document.getElementById('access-container').classList.add('hidden');
                 document.getElementById('mobile-nav').classList.remove('hidden');
                 
-                // DESTRANCA A ROLAGEM (IMPORTANTE)
-                document.body.classList.remove('not-logged');
-                document.body.style.overflow = 'auto'; 
+                // REMOVE O CADEADO (LIBERA A ROLAGEM)
+                document.body.classList.remove('trancar-tela');
             }
 
             document.querySelectorAll('aside button, nav button').forEach(b => b.classList.remove('nav-btn-active', 'text-[#002e5d]', 'scale-125'));
