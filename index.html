@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Frequência Sacramental</title>
 
-    <!-- Ícone da Aba (Favicon) idêntico ao menu lateral -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%23002e5d'/><path d='M50 15 L20 45 V85 H80 V45 L50 15 M40 85 V65 H60 V85 M50 55 A5 5 0 1 1 50 45 A5 5 0 1 1 50 55' fill='white'/></svg>">
     
-    <!-- Frameworks -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -19,6 +16,7 @@
         :root {
             --sacramental-blue: #002e5d;
             --healing-teal: #0d9488;
+            --rescue-orange: #ea580c;
             --bg-soft: #f1f5f9;
         }
 
@@ -33,25 +31,37 @@
         .hidden { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
 
-        /* --- ESTRUTURA DE RESPONSIVIDADE --- */
+        /* --- CORREÇÃO DE RESPONSIVIDADE --- */
         
-        /* Desktop (Telas grandes) */
+        /* Desktop */
         @media (min-width: 1024px) {
-            .app-layout { display: flex; height: 100vh; overflow: hidden; }
-            .sidebar { width: 300px; flex-shrink: 0; display: flex !important; background: white; border-right: 1px solid #e2e8f0; }
-            .main-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
+            .app-layout { display: flex !important; height: 100vh; overflow: hidden; }
+            .sidebar { 
+                width: 280px !important; 
+                display: flex !important; 
+                flex-direction: column;
+                background: white; 
+                border-right: 1px solid #e2e8f0; 
+                flex-shrink: 0;
+            }
+            .main-content { 
+                flex: 1; 
+                overflow-y: auto; 
+                display: flex; 
+                flex-direction: column; 
+                align-items: center; 
+            }
             .content-container { width: 100%; max-width: 1000px; padding: 40px; }
         }
 
-        /* Mobile (Telas pequenas) */
+        /* Mobile */
         @media (max-width: 1023px) {
-            .sidebar { display: none !important; }
-            .app-layout { display: block; }
+            .sidebar { display: none !important; } /* GARANTE QUE DOA SUMIR NO CELULAR */
+            .app-layout { display: block !important; }
             .main-content { width: 100%; }
             .content-container { padding: 20px; padding-bottom: 120px; }
         }
 
-        /* Cards Estilizados */
         .glass-card {
             background: white;
             border-radius: 28px;
@@ -63,6 +73,7 @@
             background-color: #f0f7ff;
             color: var(--sacramental-blue) !important;
             font-weight: 800;
+            border-right: 4px solid var(--sacramental-blue);
         }
         
         .check-box {
@@ -82,70 +93,67 @@
         </div>
     </div>
 
-    <!-- VIEW LOGIN (Centralizada) -->
+    <!-- VIEW LOGIN -->
     <section id="view-login" class="hidden min-h-screen flex items-center justify-center p-6 bg-slate-50">
         <div class="glass-card p-10 w-full max-w-sm text-center space-y-8 shadow-2xl">
             <div class="flex justify-center mb-6">
-    <img src="https://images-us-prod.cms.commerce.dynamics.com/cms/api/fswvqbgntk/imageFileData/MA2bhk?ver=9757" 
-         alt="Logo Cristo" 
-         class="h-32 w-auto object-contain">
-</div>
-            <div>
-                <h2 class="text-2xl font-black text-slate-800">Frequência Sacramental</h2>
-                <p class="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-widest">Acesso Restrito</p>
+                <img src="https://images-us-prod.cms.commerce.dynamics.com/cms/api/fswvqbgntk/imageFileData/MA2bhk?ver=9757" alt="Cristo" class="h-32 w-auto object-contain">
             </div>
+            <h2 class="text-2xl font-black text-slate-800 tracking-tighter">Frequência Sacramental</h2>
             <div class="space-y-3">
                 <input type="text" id="login-user" placeholder="Usuário" class="w-full p-4 rounded-2xl bg-slate-100 outline-none text-sm border-none">
                 <input type="password" id="login-pass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-100 outline-none text-sm border-none">
             </div>
-            <button onclick="checkLogin()" class="w-full bg-[#002e5d] text-white py-4 rounded-2xl font-bold shadow-xl active:scale-95 transition-all uppercase text-xs tracking-widest">Entrar</button>
+            <button onclick="checkLogin()" class="w-full bg-[#002e5d] text-white py-4 rounded-2xl font-bold shadow-xl active:scale-95 transition-all">ENTRAR</button>
             <button onclick="switchTab('first-login')" class="text-xs font-bold text-slate-400 underline">Ativar Primeiro Acesso</button>
         </div>
     </section>
 
-            <!-- PRIMEIRO ACESSO -->
-                <section id="view-first-login" class="hidden flex flex-col items-center py-10">
-                    <div class="glass-card p-10 w-full max-w-sm text-center space-y-6 shadow-xl">
-                        <h2 class="font-black text-xl italic uppercase">Primeiro Acesso</h2>
-                        <input type="text" id="first-user" placeholder="Login Autorizado" class="w-full p-4 rounded-2xl bg-slate-50 border text-sm">
-                        <input type="password" id="first-pass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-50 border text-sm">
-                        <input type="password" id="first-pass-confirm" placeholder="Confirme Senha" class="w-full p-4 rounded-2xl bg-slate-50 border text-sm">
-                        <button onclick="processFirstLogin()" class="w-full bg-green-600 text-white p-5 rounded-2xl font-black uppercase text-xs">Ativar Conta</button>
-                        <button onclick="switchTab('login')" class="text-xs text-slate-400 underline">Voltar</button>
-                    </div>
-                </section>
+    <!-- VIEW PRIMEIRO ACESSO -->
+    <section id="view-first-login" class="hidden min-h-screen flex items-center justify-center p-6 bg-slate-50">
+        <div class="glass-card p-10 w-full max-w-sm text-center space-y-6 shadow-xl">
+            <h2 class="font-black text-xl italic uppercase text-[#002e5d]">Primeiro Acesso</h2>
+            <div class="space-y-3">
+                <input type="text" id="first-user" placeholder="Login Autorizado" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm font-bold">
+                <input type="password" id="first-pass" placeholder="Crie uma Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm">
+                <input type="password" id="first-pass-confirm" placeholder="Confirme a Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm">
+            </div>
+            <button onclick="processFirstLogin()" class="w-full bg-green-600 text-white p-5 rounded-2xl font-black uppercase text-xs shadow-lg active:scale-95">Ativar Conta</button>
+            <button onclick="switchTab('login')" class="text-xs text-slate-400 underline font-bold">Voltar</button>
+        </div>
+    </section>
 
     <!-- LAYOUT PRINCIPAL -->
     <div id="app-layout" class="hidden app-layout">
         
-        <!-- SIDEBAR (DESKTOP) -->
-        <aside class="sidebar flex-col p-8">
-            <div class="flex items-center gap-3 mb-12 px-2">
+        <!-- SIDEBAR (SÓ DESKTOP) -->
+        <aside class="sidebar p-8">
+            <div class="flex items-center gap-3 mb-12">
                 <div class="w-10 h-10 bg-[#002e5d] rounded-2xl flex items-center justify-center text-white shadow-lg">
                     <i class="fas fa-church"></i>
                 </div>
                 <h1 class="font-black text-xs uppercase text-[#002e5d] leading-none tracking-tighter">Frequência<br>Sacramental</h1>
             </div>
 
-            <nav class="flex-1 space-y-2">
+            <nav class="flex-1 space-y-1">
                 <button onclick="switchTab('dashboard')" id="side-dashboard" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left">
-                    <i class="fas fa-grid-2 w-5"></i> Dashboard
+                    <i class="fas fa-grid-2 w-5 text-center"></i> Dashboard
                 </button>
                 <button onclick="switchTab('attendance')" id="side-attendance" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left">
-                    <i class="fas fa-list-check w-5"></i> Registrar Frequência
+                    <i class="fas fa-list-check w-5 text-center"></i> Registrar Frequência
                 </button>
                 <button onclick="switchTab('analysis')" id="side-analysis" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left">
-                    <i class="fas fa-heart-pulse w-5"></i> Resgate
+                    <i class="fas fa-heart-pulse w-5 text-center"></i> Resgate
                 </button>
                 <button onclick="switchTab('reports')" id="side-reports" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left">
-                    <i class="fas fa-file-invoice w-5"></i> Relatórios
+                    <i class="fas fa-file-invoice w-5 text-center"></i> Relatórios
                 </button>
                 <button onclick="switchTab('add')" id="side-add" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left">
-                    <i class="fas fa-user-plus w-5"></i> Novo Membro
+                    <i class="fas fa-user-plus w-5 text-center"></i> Novo Membro
                 </button>
                 <hr class="border-slate-50 my-6">
                 <button id="admin-btn" onclick="switchTab('admin-users')" class="hidden w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left">
-                    <i class="fas fa-users-cog w-5"></i> Gerenciar Logins
+                    <i class="fas fa-users-cog w-5 text-center"></i> Gerenciar Logins
                 </button>
             </nav>
 
@@ -158,7 +166,7 @@
         <!-- MAIN CONTENT -->
         <main class="main-content">
             
-            <!-- HEADER MOBILE (Visível apenas no Celular) -->
+            <!-- HEADER MOBILE -->
             <header class="lg:hidden p-6 flex justify-between items-center bg-white border-b border-slate-100 sticky top-0 z-[150]">
                 <h2 id="mobile-page-title" class="font-black text-[#002e5d] text-lg italic uppercase tracking-tighter">Dashboard</h2>
                 <button onclick="logout()" class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center">
@@ -166,23 +174,22 @@
                 </button>
             </header>
 
-            <!-- CONTAINER CENTRAL -->
-            <div class="content-container w-full">
+            <div class="content-container">
                 
                 <!-- DASHBOARD -->
                 <section id="view-dashboard" class="hidden space-y-8">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="glass-card p-8 border-l-[12px] border-green-500">
+                        <div class="glass-card p-8 border-l-[12px] border-green-500" id="card-presentes-container">
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Presentes Hoje</p>
-                            <p id="stats-present" class="text-5xl font-black text-slate-800">0</p>
+                            <p id="stats-present" class="text-5xl font-black text-slate-800 leading-tight">0</p>
                         </div>
                         <div class="glass-card p-8 border-l-[12px] border-[#002e5d]">
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Ala</p>
-                            <p id="stats-total" class="text-5xl font-black text-slate-800">0</p>
+                            <p id="stats-total" class="text-5xl font-black text-slate-800 leading-tight">0</p>
                         </div>
                         <div class="glass-card p-8 border-l-[12px] border-orange-500">
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resgate</p>
-                            <p id="stats-rescue" class="text-5xl font-black text-slate-800">0</p>
+                            <p id="stats-rescue" class="text-5xl font-black text-slate-800 leading-tight">0</p>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -193,56 +200,83 @@
 
                 <!-- REGISTRAR FREQUÊNCIA -->
                 <section id="view-attendance" class="hidden space-y-8">
-                    <div class="flex flex-col md:flex-row gap-6 justify-between items-center bg-white p-6 rounded-[32px] border border-slate-100">
+                    <div class="flex flex-col md:flex-row gap-6 justify-between items-center bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm">
                         <div class="relative w-full md:max-w-md">
                             <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-300"></i>
-                            <input type="text" id="searchMember" placeholder="Buscar por nome ou família..." class="w-full pl-14 p-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-[#002e5d]">
+                            <input type="text" id="searchMember" placeholder="Buscar por nome ou família..." class="w-full pl-14 p-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-[#002e5d] font-bold text-sm">
                         </div>
                         <div class="flex items-center gap-4 w-full md:w-auto px-4">
                             <i class="fas fa-calendar-day text-[#002e5d]"></i>
                             <select id="dateSelect" class="bg-transparent font-black text-xs uppercase tracking-widest outline-none border-none cursor-pointer"></select>
                         </div>
                     </div>
+                    
                     <div id="orgFilters" class="flex overflow-x-auto gap-2 no-scrollbar py-2"></div>
 
-                    <!-- BLOCO DE CONTADORES (LÍDERES E VISITANTES) -->
-<div id="admin-counters" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-    <!-- Contador Líderes -->
-    <div class="glass-card p-6 flex items-center justify-between border-l-8 border-amber-500 shadow-sm">
-        <div>
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Líderes da Estaca</p>
-            <p class="text-xs font-bold text-slate-600">Presentes na reunião</p>
-        </div>
-        <div class="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl">
-            <button onclick="updateCount('lideresCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 transition-all">
-                <i class="fas fa-minus text-xs"></i>
-            </button>
-            <span id="display-lideres" class="text-xl font-black text-[#002e5d] min-w-[20px] text-center">0</span>
-            <button onclick="updateCount('lideresCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] shadow-md flex items-center justify-center text-white transition-all">
-                <i class="fas fa-plus text-xs"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Contador Visitantes -->
-    <div class="glass-card p-6 flex items-center justify-between border-l-8 border-blue-400 shadow-sm">
-        <div>
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Visitantes Gerais</p>
-            <p class="text-xs font-bold text-slate-600">Não registrados na ala</p>
-        </div>
-        <div class="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl">
-            <button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 transition-all">
-                <i class="fas fa-minus text-xs"></i>
-            </button>
-            <span id="display-visitantes" class="text-xl font-black text-[#002e5d] min-w-[20px] text-center">0</span>
-            <button onclick="updateCount('visitantesCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] shadow-md flex items-center justify-center text-white transition-all">
-                <i class="fas fa-plus text-xs"></i>
-            </button>
-        </div>
-    </div>
-</div>
+                    <!-- CONTADORES ADMIN -->
+                    <div id="admin-counters" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        <div class="glass-card p-6 flex items-center justify-between border-l-8 border-amber-500">
+                            <div><p class="text-[10px] font-black text-slate-400 uppercase">Líderes Estaca</p></div>
+                            <div class="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl">
+                                <button onclick="updateCount('lideresCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 transition-all"><i class="fas fa-minus"></i></button>
+                                <span id="display-lideres" class="text-xl font-black text-[#002e5d] min-w-[20px] text-center">0</span>
+                                <button onclick="updateCount('lideresCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] shadow-md flex items-center justify-center text-white transition-all"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div class="glass-card p-6 flex items-center justify-between border-l-8 border-blue-400">
+                            <div><p class="text-[10px] font-black text-slate-400 uppercase">Visitantes</p></div>
+                            <div class="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl">
+                                <button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-400 hover:text-red-500 transition-all"><i class="fas fa-minus"></i></button>
+                                <span id="display-visitantes" class="text-xl font-black text-[#002e5d] min-w-[20px] text-center">0</span>
+                                <button onclick="updateCount('visitantesCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] shadow-md flex items-center justify-center text-white transition-all"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                    </div>
                     
                     <div id="memberList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+                </section>
+
+                <!-- RELATÓRIOS -->
+                <section id="view-reports" class="hidden space-y-8">
+                    <!-- BOTÃO LISTA DE MEMBROS DENTRO DE RELATÓRIOS -->
+                    <div class="glass-card p-6 border-l-[12px] border-slate-800 cursor-pointer hover:bg-slate-50 transition-all mb-8" onclick="switchTab('members-list')">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-black text-slate-800 uppercase text-[10px] tracking-widest mb-1">Base de Dados</h3>
+                                <p class="text-lg font-black text-[#002e5d] italic leading-tight">Gestão de Membros</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase mt-1 italic">Editar nomes, famílias e cargos</p>
+                            </div>
+                            <i class="fas fa-users-rectangle text-3xl text-slate-200"></i>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="glass-card p-8"><h3 class="font-black text-yellow-600 uppercase text-[10px] mb-4">Sinal Amarelo</h3><div id="report-yellow" class="space-y-3"></div></div>
+                        <div class="glass-card p-8"><h3 class="font-black text-blue-600 uppercase text-[10px] mb-4">Famílias Ausentes</h3><div id="report-family" class="space-y-3"></div></div>
+                        <div class="glass-card p-8 md:col-span-2"><h3 class="font-black text-green-600 uppercase text-[10px] mb-4">Novos Membros</h3><div id="report-retention" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div>
+                    </div>
+                </section>
+
+                <!-- LISTA GESTÃO DE MEMBROS -->
+                <section id="view-members-list" class="hidden space-y-6">
+                    <div class="flex items-center gap-4 mb-2">
+                        <button onclick="switchTab('reports')" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-[#002e5d]"><i class="fas fa-arrow-left text-xs"></i></button>
+                        <h2 class="font-black text-[#002e5d] uppercase text-xs tracking-widest italic">Voltar para Relatórios</h2>
+                    </div>
+                    <div class="flex flex-col md:flex-row gap-4 bg-white p-6 rounded-[32px] border border-slate-100">
+                        <input type="text" id="searchManageMembers" oninput="renderMembersList()" placeholder="Buscar para editar..." class="flex-1 p-4 rounded-2xl bg-slate-50 outline-none text-sm font-bold border-none focus:ring-2 focus:ring-[#002e5d]">
+                        <div class="flex gap-2">
+                            <select id="filterOrgList" onchange="renderMembersList()" class="p-3 bg-slate-50 rounded-xl text-[10px] font-bold uppercase outline-none border-none text-slate-500">
+                                <option value="TODOS">TODAS ORGS</option>
+                                <option value="Quórum de Élderes">ÉLDERES</option>
+                                <option value="Sociedade de Socorro">SOCORRO</option>
+                                <option value="Moças">MOÇAS</option>
+                                <option value="Rapazes">RAPAZES</option>
+                                <option value="Primária">PRIMÁRIA</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="manageMembersContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-10"></div>
                 </section>
 
                 <!-- RESGATE -->
@@ -250,189 +284,65 @@
                     <div id="missingList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
                 </section>
 
-                <!-- RELATÓRIOS -->
-                <section id="view-reports" class="hidden space-y-8">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="glass-card p-8 space-y-4">
-                            <h3 class="font-black text-yellow-600 uppercase text-[10px] tracking-widest border-b pb-2">Sinal Amarelo</h3>
-                            <div id="report-yellow" class="space-y-3"></div>
-                        </div>
-                        <div class="glass-card p-8 space-y-4">
-                            <h3 class="font-black text-blue-600 uppercase text-[10px] tracking-widest border-b pb-2">Famílias Ausentes</h3>
-                            <div id="report-family" class="space-y-3"></div>
-                        </div>
-                        <div class="glass-card p-8 md:col-span-2">
-                            <h3 class="font-black text-green-600 uppercase text-[10px] tracking-widest border-b pb-4 mb-4">Retenção de Novos Membros</h3>
-                            <div id="report-retention" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-                        </div>
-
-                        <!-- Procure a grade dentro de view-reports e adicione este card no topo -->
-                        <div class="glass-card p-6 border-l-[12px] border-slate-800 cursor-pointer hover:bg-slate-50 transition-all mb-6" onclick="switchTab('members-list')">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <h3 class="font-black text-slate-800 uppercase text-[10px] tracking-widest mb-1">Base de Dados</h3>
-                                    <p class="text-lg font-black text-[#002e5d] italic">Listas e Gestão de Membros</p>
-                                    <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Editar nomes, famílias e organizações</p>
-                                </div>
-                                    <i class="fas fa-users-rectangle text-3xl text-slate-200"></i>
+                <!-- NOVO CADASTRO -->
+                <section id="view-add" class="hidden flex justify-center">
+                    <div class="glass-card p-10 w-full max-w-xl space-y-6 shadow-xl">
+                        <h3 class="text-xl font-black text-[#002e5d] uppercase tracking-tighter text-center italic">Novo Cadastro</h3>
+                        <div class="space-y-4">
+                            <input type="text" id="newName" oninput="formatNameInput(this)" placeholder="Nome Completo" class="w-full p-4 bg-slate-50 border-none rounded-[20px] font-bold text-sm outline-none">
+                            <div class="relative">
+                                <input type="text" id="familySearch" oninput="handleFamilySearch(this.value)" placeholder="Sobrenome da Família" class="w-full p-4 bg-slate-50 border-none rounded-[20px] font-bold text-sm outline-none">
+                                <div id="familySuggestions" class="hidden absolute left-0 right-0 top-[105%] bg-white rounded-2xl shadow-2xl z-[150] max-h-48 overflow-y-auto no-scrollbar border"></div>
+                                <div id="headOfFamilyContainer" class="flex items-center gap-3 px-4 mt-2">
+                                    <input type="checkbox" id="isHeadOfFamily" class="w-4 h-4 accent-[#002e5d]">
+                                    <label class="text-xs font-bold text-slate-500 italic">Chefe desta família</label>
                                 </div>
                             </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <select id="newOrg" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black uppercase"><option value="Quórum de Élderes">ÉLDERES</option><option value="Sociedade de Socorro">SOCORRO</option><option value="Moças">MOÇAS</option><option value="Rapazes">RAPAZES</option><option value="Primária">PRIMÁRIA</option></select>
+                                <select id="newCat" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black uppercase"><option value="Membro">MEMBRO</option><option value="Recém-Converso">RECÉM-CONVERSO</option><option value="Novo Morador">NOVO MORADOR</option><option value="Visitante">VISITANTE</option></select>
+                            </div>
+                            <button onclick="saveNewMember()" class="w-full bg-[#002e5d] text-white p-6 rounded-[32px] font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all">CONCLUIR CADASTRO</button>
                         </div>
+                    </div>
                 </section>
-
-                
-
-        <!-- SEÇÃO DE GESTÃO DE MEMBROS (ACESSADA POR RELATÓRIOS) -->
-<section id="view-members-list" class="hidden space-y-6">
-    <div class="flex items-center gap-4 mb-2">
-        <button onclick="switchTab('reports')" class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-[#002e5d]">
-            <i class="fas fa-arrow-left text-xs"></i>
-        </button>
-        <h2 class="font-black text-[#002e5d] uppercase text-xs tracking-widest">Gestão de Listas</h2>
-    </div>
-
-    <div class="flex flex-col md:flex-row gap-4 justify-between items-center bg-white p-6 rounded-[32px] border border-slate-100">
-        <div class="relative w-full md:max-w-md">
-            <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-300"></i>
-            <input type="text" id="searchManageMembers" oninput="renderMembersList()" placeholder="Buscar para editar..." class="w-full pl-14 p-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-[#002e5d]">
-        </div>
-        <div class="flex gap-2 w-full md:w-auto overflow-x-auto no-scrollbar">
-            <select id="filterOrgList" onchange="renderMembersList()" class="p-3 bg-slate-50 rounded-xl text-[10px] font-bold uppercase border-none outline-none text-slate-500">
-                <option value="TODOS">Todas Organizações</option>
-                <option value="Quórum de Élderes">Quórum de Élderes</option>
-                <option value="Sociedade de Socorro">Sociedade de Socorro</option>
-                <option value="Moças">Moças</option>
-                <option value="Rapazes">Rapazes</option>
-                <option value="Primária">Primária</option>
-            </select>
-            <select id="filterCatList" onchange="renderMembersList()" class="p-3 bg-slate-50 rounded-xl text-[10px] font-bold uppercase border-none outline-none text-slate-500">
-                <option value="TODOS">Todos Status</option>
-                <option value="Membro">Membro</option>
-                <option value="Recém-Converso">Recém-Converso</option>
-                <option value="Novo Morador">Novo Morador</option>
-                <option value="Visitante">Visitante</option>
-            </select>
-        </div>
-    </div>
-
-    <div id="manageMembersContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-10">
-        <!-- Injetado via JS -->
-    </div>
-</section>
-
-
-                
-
-               <!-- NOVO FORMULÁRIO DE CADASTRO -->
-<section id="view-add" class="hidden flex justify-center">
-    <div class="glass-card p-8 w-full max-w-xl space-y-6 shadow-xl">
-        <h3 class="text-xl font-black text-[#002e5d] uppercase tracking-tighter text-center italic">Novo Cadastro</h3>
-        
-        <div class="space-y-4">
-            <!-- Nome -->
-            <div class="space-y-1">
-                <label class="text-[10px] font-black text-slate-400 uppercase px-4">Nome Completo</label>
-                <input type="text" id="newName" oninput="formatNameInput(this)" placeholder="Ex: João Silva Santos" class="w-full p-4 bg-slate-50 border-none rounded-[20px] font-bold text-sm outline-none focus:ring-2 focus:ring-[#002e5d]">
-            </div>
-
-            <!-- Família com Busca Dinâmica -->
-            <div class="space-y-1 relative">
-                <label class="text-[10px] font-black text-slate-400 uppercase px-4">Família (Sobrenome)</label>
-                <input type="text" id="familySearch" oninput="handleFamilySearch(this.value)" placeholder="Digite o sobrenome da família..." class="w-full p-4 bg-slate-50 border-none rounded-[20px] font-bold text-sm outline-none focus:ring-2 focus:ring-[#002e5d]">
-                
-                <!-- Lista de Sugestões de Família -->
-                <div id="familySuggestions" class="hidden absolute left-0 right-0 top-[100%] mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl z-[150] max-h-48 overflow-y-auto no-scrollbar"></div>
-                
-                <!-- Checkbox Chefe de Família -->
-                <div id="headOfFamilyContainer" class="flex items-center gap-3 px-4 mt-2">
-                    <input type="checkbox" id="isHeadOfFamily" class="w-4 h-4 accent-[#002e5d]">
-                    <label for="isHeadOfFamily" class="text-xs font-bold text-slate-500 italic">Chefe desta família</label>
-                </div>
-            </div>
-
-            <!-- Organização -->
-            <div class="space-y-1">
-                <label class="text-[10px] font-black text-slate-400 uppercase px-4">Organização</label>
-                <select id="newOrg" class="w-full p-4 bg-slate-50 border-none rounded-[20px] text-xs font-bold uppercase cursor-pointer">
-                    <option value="Quórum de Élderes">Quórum de Élderes</option>
-                    <option value="Sociedade de Socorro">Sociedade de Socorro</option>
-                    <option value="Moças">Moças</option>
-                    <option value="Rapazes">Rapazes</option>
-                    <option value="Primária">Primária</option>
-                </select>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- Tipo de Membro -->
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black text-slate-400 uppercase px-4">Tipo de Membro</label>
-                    <select id="newCat" class="w-full p-4 bg-slate-50 border-none rounded-[20px] text-xs font-bold uppercase cursor-pointer">
-                        <option value="Membro">Membro da Ala</option>
-                        <option value="Recém-Converso">Recém-Converso</option>
-                        <option value="Novo Morador">Novo Morador</option>
-                        <option value="Visitante">Visitante</option>
-                    </select>
-                </div>
-                <!-- Celular -->
-                <div class="space-y-1">
-                    <label class="text-[10px] font-black text-slate-400 uppercase px-4">Celular (WhatsApp)</label>
-                    <input type="tel" id="newPhone" oninput="formatPhone(this)" placeholder="(00) 00000-0000" class="w-full p-4 bg-slate-50 border-none rounded-[20px] font-bold text-sm outline-none">
-                </div>
-            </div>
-
-            <button onclick="saveNewMember()" class="w-full bg-[#002e5d] text-white p-6 rounded-[32px] font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all mt-4">Concluir Cadastro</button>
-        </div>
-    </div>
-</section>
 
                 <!-- ADMIN USUÁRIOS -->
                 <section id="view-admin-users" class="hidden space-y-8">
-                    <div class="glass-card p-8 max-w-md mx-auto space-y-4">
+                    <div class="glass-card p-10 max-w-md mx-auto space-y-4">
                         <h4 class="font-black text-xs text-center uppercase tracking-widest text-slate-400">Autorizar Login</h4>
                         <input type="text" id="admin-new-name" placeholder="Nome" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none">
                         <input type="text" id="admin-new-user" placeholder="Usuário" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none">
-                        <select id="admin-new-role" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none font-bold">
-                            <option value="user">SECRETÁRIO</option>
-                            <option value="admin">ADMINISTRADOR</option>
+                        <select id="admin-new-role" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none font-bold uppercase text-xs">
+                            <option value="user">Secretário</option>
+                            <option value="admin">Administrador</option>
                         </select>
-                        <button onclick="adminCreateUser()" class="w-full bg-[#002e5d] text-white p-4 rounded-2xl font-black uppercase text-[10px]">Autorizar</button>
+                        <button onclick="adminCreateUser()" class="w-full bg-[#002e5d] text-white p-4 rounded-2xl font-black uppercase text-[10px] tracking-widest">Autorizar</button>
                     </div>
                     <div id="users-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </section>
 
-        
-
             </div>
         </main>
 
-        <!-- FLOATING NAVBAR (APENAS MOBILE) -->
+        <!-- NAVIGATION MOBILE -->
         <nav class="lg:hidden fixed bottom-6 left-6 right-6 h-20 glass-card flex justify-around items-center px-4 z-[200] border-2 border-white shadow-2xl">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-slate-300">
-                <i class="fas fa-house text-lg"></i>
-            </button>
-            <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center gap-1 text-slate-300">
-                <i class="fas fa-clipboard-check text-lg"></i>
-            </button>
-            <button onclick="switchTab('analysis')" id="nav-analysis" class="flex flex-col items-center gap-1 text-slate-300">
-                <i class="fas fa-hand-holding-heart text-lg"></i>
-            </button>
-            <button onclick="switchTab('reports')" id="nav-reports" class="flex flex-col items-center gap-1 text-slate-300">
-                <i class="fas fa-file-invoice text-lg"></i>
-            </button>
-            <button onclick="switchTab('add')" id="nav-add" class="flex flex-col items-center gap-1 text-slate-300">
-                <i class="fas fa-plus-circle text-lg"></i>
-            </button>
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-home text-lg"></i></button>
+            <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-clipboard-check text-lg"></i></button>
+            <button onclick="switchTab('analysis')" id="nav-analysis" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-hand-holding-heart text-lg"></i></button>
+            <button onclick="switchTab('reports')" id="nav-reports" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-file-invoice text-lg"></i></button>
+            <button onclick="switchTab('add')" id="nav-add" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-plus-circle text-lg"></i></button>
         </nav>
 
-        <!-- MODAL EDITAR MEMBRO -->
+        <!-- MODAL EDITAR MEMBRO (COMPLETO) -->
         <div id="memberEditModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
             <div class="glass-card w-full max-w-sm p-10 space-y-6">
                 <div class="flex justify-between items-center border-b pb-4">
-                    <h3 class="font-black uppercase text-xs text-slate-400 tracking-widest">Editar Perfil</h3>
-                    <button onclick="closeMemberEdit()" class="text-slate-300"><i class="fas fa-times"></i></button>
+                    <h3 class="font-black uppercase text-xs text-slate-400 tracking-widest">Editar Registro</h3>
+                    <button onclick="closeMemberEdit()" class="text-slate-300 hover:text-red-500"><i class="fas fa-times text-xl"></i></button>
                 </div>
                 <div class="space-y-4">
-                    <input type="text" id="edit-member-name" class="w-full p-4 bg-slate-50 rounded-2xl uppercase text-sm font-bold border-none">
+                    <input type="text" id="edit-member-name" oninput="formatNameInput(this)" class="w-full p-4 bg-slate-50 rounded-2xl uppercase text-sm font-bold border-none">
                     <input type="text" id="edit-member-family" class="w-full p-4 bg-slate-50 rounded-2xl uppercase text-sm font-bold border-none">
                     <select id="edit-member-org" class="w-full p-4 bg-slate-50 rounded-2xl text-xs font-bold border-none">
                         <option value="Quórum de Élderes">Quórum de Élderes</option>
@@ -442,10 +352,17 @@
                         <option value="Primária">Primária</option>
                         <option value="Visitante">Visitante</option>
                     </select>
+                    <select id="edit-member-cat" class="w-full p-4 bg-slate-50 rounded-2xl text-xs font-bold border-none">
+                        <option value="Membro">Membro</option><option value="Recém-Converso">Recém-Converso</option><option value="Novo Morador">Novo Morador</option><option value="Visitante">Visitante</option>
+                    </select>
+                    <div class="flex items-center gap-3 px-4">
+                        <input type="checkbox" id="edit-member-isHead" class="w-4 h-4 accent-[#002e5d]">
+                        <label class="text-xs font-bold text-slate-500 italic">Chefe da Família</label>
+                    </div>
                 </div>
-                <div class="flex gap-4 pt-4">
+                <div class="flex gap-4 pt-4 border-t">
                     <button onclick="deleteMemberAction()" class="flex-1 text-red-400 font-bold text-[10px] uppercase underline">Excluir</button>
-                    <button onclick="saveMemberAction()" class="flex-[2] py-4 bg-[#002e5d] text-white rounded-2xl font-black text-xs">Salvar</button>
+                    <button onclick="saveMemberAction()" class="flex-[2] py-4 bg-[#002e5d] text-white rounded-2xl font-black text-xs shadow-lg">Gravar</button>
                 </div>
             </div>
         </div>
@@ -456,7 +373,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy, setDoc, deleteDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        
+
         const firebaseConfig = {
           apiKey: "AIzaSyAaEKx9n4N847WW97FhfZxLZYtsa5cTsE0",
           authDomain: "frequencia-da-ala.firebaseapp.com",
@@ -469,6 +386,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // State
         let members = []; let attendanceHistory = {}; let allUsersList = [];
         let currentUser = JSON.parse(localStorage.getItem('user_data')) || null;
         let selectedDate = new Date().toISOString().split('T')[0];
@@ -476,16 +394,18 @@
         let hChart = null; let aChart = null;
         let memberIdEditing = null;
 
+        // Init Dates
         const dateSelect = document.getElementById('dateSelect');
         const domingosISO = [];
         for(let i=0; i<12; i++) {
             let d = new Date(); d.setDate(d.getDate() - (d.getDay() + (7 * i)) % 84);
             let iso = d.toISOString().split('T')[0];
             domingosISO.push(iso);
-            dateSelect.innerHTML += `<option value="${iso}">${i==0 ? 'HOJE' : iso.split('-')[2]+'/'+iso.split('-')[1]}</option>`;
+            dateSelect.innerHTML += `<option value="${iso}">${i==0 ? 'DOMINGO HOJE' : 'DOMINGO, '+iso.split('-')[2]+'/'+iso.split('-')[1]}</option>`;
         }
         selectedDate = dateSelect.value;
 
+        // --- AUTH ---
         window.checkLogin = async () => {
             const u = document.getElementById('login-user').value.toLowerCase().trim();
             const p = document.getElementById('login-pass').value.trim();
@@ -495,80 +415,69 @@
                 const d = snap.docs[0].data(); d.id = snap.docs[0].id;
                 localStorage.setItem('user_data', JSON.stringify(d));
                 location.reload();
-            } else alert("Erro no login.");
+            } else alert("Usuário ou senha incorretos.");
         };
 
         window.processFirstLogin = async () => {
             const u = document.getElementById('first-user').value.toLowerCase().trim();
             const p1 = document.getElementById('first-pass').value.trim();
             const p2 = document.getElementById('first-pass-confirm').value.trim();
-            if(!u || p1 !== p2) return alert("Erro nos dados!");
+            if(!u || p1 !== p2) return alert("As senhas não coincidem.");
             const q = query(collection(db, "usuarios"), where("username", "==", u));
             const snap = await getDocs(q);
-            if(snap.empty) return alert("Usuário não autorizado.");
+            if(snap.empty) return alert("Autorização não encontrada.");
             await updateDoc(doc(db, "usuarios", snap.docs[0].id), { password: p1 });
-            alert("Ativado!"); switchTab('login');
+            alert("Sucesso! Faça seu login."); switchTab('login');
         };
 
         window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
 
+        // --- NAVIGATION ---
         window.switchTab = (tab) => {
-    // 1. Esconde TODAS as seções do site
-    document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-    
-    // 2. Tenta encontrar a seção solicitada
-    const view = document.getElementById(`view-${tab}`);
-    
-    if (view) {
-        // 3. Mostra a seção
-        view.classList.remove('hidden');
-        
-        // 4. Lógica específica para telas fora do login
-        if (tab === 'login' || tab === 'first-login') {
-            document.getElementById('app-layout').classList.add('hidden');
-            document.getElementById('view-login').classList.toggle('hidden', tab !== 'login');
-            document.getElementById('view-first-login').classList.toggle('hidden', tab !== 'first-login');
-        } else {
-            // Se não for login, garante que o layout principal apareça
-            document.getElementById('app-layout').classList.remove('hidden');
-        }
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            const view = document.getElementById(`view-${tab}`);
+            if(view) view.classList.remove('hidden');
+            
+            if (tab === 'login' || tab === 'first-login') {
+                document.getElementById('app-layout').classList.add('hidden');
+                document.getElementById('view-login').classList.toggle('hidden', tab !== 'login');
+                document.getElementById('view-first-login').classList.toggle('hidden', tab !== 'first-login');
+            } else {
+                document.getElementById('app-layout').classList.remove('hidden');
+            }
 
-        // 5. Atualiza os menus (Sidebar e Mobile)
-        updateNavigationUI(tab);
-    }
-    
-    // 6. Carrega dados se necessário
-    if(tab === 'members-list') renderMembersList();
-    if(tab === 'reports') renderReports(); // ou sua função de relatórios
-    
-    window.scrollTo(0,0);
-};
+            // Update UI
+            document.querySelectorAll('aside button').forEach(b => b.classList.remove('nav-btn-active', 'text-slate-800'));
+            if(document.getElementById(`side-${tab}`)) document.getElementById(`side-${tab}`).classList.add('nav-btn-active', 'text-slate-800');
+            
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('text-[#002e5d]', 'scale-125'));
+            if(document.getElementById(`nav-${tab}`)) document.getElementById(`nav-${tab}`).classList.add('text-[#002e5d]', 'scale-125');
 
-// Função auxiliar para limpar e marcar os botões dos menus
-function updateNavigationUI(tab) {
-    // Sidebar Desktop
-    document.querySelectorAll('aside button').forEach(b => b.classList.remove('nav-btn-active', 'text-slate-800'));
-    const sideBtn = document.getElementById(`side-${tab}`);
-    if(sideBtn) sideBtn.classList.add('nav-btn-active', 'text-slate-800');
-    
-    // Menu Mobile
-    document.querySelectorAll('nav button').forEach(b => b.classList.remove('text-[#002e5d]', 'scale-125'));
-    const navBtn = document.getElementById(`nav-${tab}`);
-    if(navBtn) navBtn.classList.add('text-[#002e5d]', 'scale-125');
+            const titles = {'dashboard':'Painel Geral','attendance':'Registrar Frequência','analysis':'Resgate','reports':'Relatórios','add':'Novo','members-list':'Gestão de Listas'};
+            if(document.getElementById('mobile-page-title')) document.getElementById('mobile-page-title').innerText = titles[tab] || 'Ala';
 
-    // Título Mobile
-    const titles = {'dashboard':'Painel Geral','attendance':'Registrar Frequência','analysis':'Resgate','reports':'Relatórios','add':'Novo','members-list':'Gestão de Listas'};
-    const mobileTitle = document.getElementById('mobile-page-title');
-    if(mobileTitle) mobileTitle.innerText = titles[tab] || 'Ala';
-}
+            if(tab === 'members-list') renderMembersList();
+            if(tab === 'reports') renderAll();
+            
+            window.scrollTo(0,0);
+        };
 
+        // --- LOGIC ---
         function listenData() {
             onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => {
                 members = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 renderAll();
             });
             onSnapshot(collection(db, "historico"), (snap) => {
-                attendanceHistory = {}; snap.docs.forEach(d => attendanceHistory[d.id] = d.data().presents || []);
+                attendanceHistory = {}; 
+                snap.docs.forEach(d => {
+                    const data = d.data();
+                    attendanceHistory[d.id] = {
+                        presents: data.presents || [],
+                        lideresCount: data.lideresCount || 0,
+                        visitantesCount: data.visitantesCount || 0
+                    };
+                });
                 renderAll();
             });
             onSnapshot(collection(db, "usuarios"), (snap) => {
@@ -578,75 +487,28 @@ function updateNavigationUI(tab) {
             document.getElementById('loading-screen').classList.add('hidden');
         }
 
+        window.updateCount = async (tipo, delta) => {
+            if (!currentUser || currentUser.role !== 'admin') return alert("Apenas Administrador pode registrar.");
+            let current = attendanceHistory[selectedDate]?.[tipo] || 0;
+            let newVal = current + delta;
+            if (newVal < 0) newVal = 0;
+            await setDoc(doc(db, "historico", selectedDate), { [tipo]: newVal }, { merge: true });
+        };
+
         window.togglePresence = async (memberId, memberName) => {
+            if(currentUser.role !== 'admin') return;
             const hRef = doc(db, "historico", selectedDate);
-            let cur = attendanceHistory[selectedDate] || [];
+            let cur = attendanceHistory[selectedDate]?.presents || [];
             if(cur.includes(memberId)) {
-                if(!confirm(`Deseja remover a presença de ${memberName}?`)) return;
+                if(!confirm(`Remover presença de ${memberName}?`)) return;
                 cur = cur.filter(i => i !== memberId);
             } else {
                 cur.push(memberId);
                 await updateDoc(doc(db, "membros", memberId), { lastAttended: selectedDate });
             }
-            await setDoc(hRef, { presents: cur });
+            await setDoc(hRef, { presents: cur }, { merge: true });
         };
 
-        // FUNÇÃO DOS BOTÕES + E - (CORRIGIDA)
-window.updateCount = async (tipo, delta) => {
-    // 1. Verifica se o usuário é admin. Se não for, nem tenta clicar.
-    if (!currentUser || currentUser.role !== 'admin') {
-        alert("Apenas administradores podem alterar a contagem.");
-        return;
-    }
-
-    // 2. Tenta pegar o valor que já existe no banco de dados
-    let currentVal = 0;
-    if (attendanceHistory[selectedDate] && attendanceHistory[selectedDate][tipo]) {
-        currentVal = attendanceHistory[selectedDate][tipo];
-    }
-
-    // 3. Calcula o novo valor (não deixa ser menor que zero)
-    let newVal = currentVal + delta;
-    if (newVal < 0) newVal = 0;
-
-    // 4. Salva no banco de dados (Firebase)
-    const hRef = doc(db, "historico", selectedDate);
-    try {
-        await setDoc(hRef, { [tipo]: newVal }, { merge: true });
-        // O sistema vai atualizar a tela sozinho após salvar
-    } catch (error) {
-        console.error("Erro ao salvar contagem:", error);
-        alert("Erro ao conectar com o banco de dados.");
-    }
-};
-
-        // Função para aumentar ou diminuir os contadores (SÓ PARA ADMIN)
-window.updateCount = async (tipo, delta) => {
-    if (currentUser.role !== 'admin') return;
-
-    let currentVal = attendanceHistory[selectedDate]?.[tipo] || 0;
-    let newVal = currentVal + delta;
-    if (newVal < 0) newVal = 0;
-
-    const hRef = doc(db, "historico", selectedDate);
-    // Salva no Firebase sem apagar o que já existe (merge)
-    await setDoc(hRef, { [tipo]: newVal }, { merge: true });
-};
-
-// Função para atualizar os números que aparecem na tela de registro
-function updateCounterDisplays() {
-    const data = attendanceHistory[selectedDate] || {};
-    document.getElementById('display-lideres').innerText = data.lideresCount || 0;
-    document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
-    
-    // Mostra os contadores na tela de registro, mas esconde os botões se não for admin
-    document.getElementById('admin-counters').classList.remove('hidden');
-    const buttons = document.querySelectorAll('.admin-only');
-    buttons.forEach(btn => {
-        btn.classList.toggle('hidden', currentUser.role !== 'admin');
-    });
-}
-        
         function renderAll() {
             renderAttendance();
             renderRescue();
@@ -655,103 +517,125 @@ function updateCounterDisplays() {
         }
 
         function renderAttendance() {
-            // Atualiza os números dos visores de líderes e visitantes
-    const dadosAtuais = attendanceHistory[selectedDate] || {};
-    const visorLideres = document.getElementById('display-lideres');
-    const visorVisitantes = document.getElementById('display-visitantes');
-    
-    if(visorLideres) visorLideres.innerText = dadosAtuais.lideresCount || 0;
-    if(visorVisitantes) visorVisitantes.innerText = dadosAtuais.visitantesCount || 0;
+            const data = attendanceHistory[selectedDate] || {};
+            document.getElementById('display-lideres').innerText = data.lideresCount || 0;
+            document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
             
+            document.getElementById('admin-counters').classList.remove('hidden');
+            document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
+
             const list = document.getElementById('memberList');
             const search = document.getElementById('searchMember').value.toLowerCase();
-            const curP = attendanceHistory[selectedDate] || [];
+            const curP = data.presents || [];
             list.innerHTML = '';
             let pC = 0; let tC = 0;
 
             members.forEach(m => {
                 const isP = curP.includes(m.id);
                 if(m.org !== 'Visitante') { tC++; if(isP) pC++; }
-
                 const matchS = m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search));
                 const matchF = currentFilter === 'TODOS' || m.org === currentFilter;
 
                 if(matchS && matchF) {
                     list.innerHTML += `
-                        <div class="glass-card p-6 flex items-center gap-5 border-l-8 ${isP ? 'border-teal-500 bg-teal-50/10' : 'border-slate-50'}">
-                            <div onclick="togglePresence('${m.id}', '${m.name}')" class="check-box ${isP ? 'check-active' : ''}">
+                        <div class="glass-card p-6 flex items-center gap-5 border-l-8 ${isP ? 'border-teal-500 bg-teal-50/10' : 'border-slate-50'}" ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name}')"` : ''}>
+                            <div class="check-box ${isP ? 'check-active' : ''} ${currentUser.role !== 'admin' ? 'opacity-50' : ''}">
                                 ${isP ? '<i class="fas fa-check text-[10px]"></i>' : ''}
                             </div>
-                            <div onclick="togglePresence('${m.id}', '${m.name}')" class="flex-1 min-w-0">
+                            <div class="flex-1 min-w-0">
                                 <h4 class="font-bold text-sm text-slate-800 truncate">${m.name}</h4>
                                 <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${m.familia || 'S/ FAM'} • ${m.org}</p>
                             </div>
-                            <button onclick="openMemberEdit('${m.id}')" class="text-slate-200 hover:text-[#002e5d]"><i class="fas fa-pen-to-square"></i></button>
                         </div>
                     `;
                 }
             });
-            // CÁLCULO DO DASHBOARD DETALHADO
-    const histData = attendanceHistory[selectedDate] || {};
-    const countLideres = histData.lideresCount || 0;
-    const countVisitantes = histData.visitantesCount || 0;
-    const totalGeral = pC + countLideres + countVisitantes;
 
-    // 1. Atualiza o Total Grande
-    document.getElementById('stats-present').innerText = totalGeral;
-    document.getElementById('stats-total').innerText = tC;
+            // DASHBOARD UPDATE
+            const lC = data.lideresCount || 0;
+            const vC = data.visitantesCount || 0;
+            const totalGeral = pC + lC + vC;
+            document.getElementById('stats-present').innerText = totalGeral;
+            document.getElementById('stats-total').innerText = tC;
 
-    // 2. Cria o detalhamento dinâmico
-    let detalhesHtml = `<p class="text-[10px] font-bold text-slate-400 uppercase mt-2">Detalhamento:</p>`;
-    detalhesHtml += `<p class="text-xs font-bold text-green-600">${pC} Membros</p>`;
-    
-    if(countLideres > 0) detalhesHtml += `<p class="text-xs font-bold text-amber-600">${countLideres} Líderes Estaca</p>`;
-    if(countVisitantes > 0) detalhesHtml += `<p class="text-xs font-bold text-blue-500">${countVisitantes} Visitantes</p>`;
+            let detalhesHtml = `<div class="detalhes-area mt-2 pt-2 border-t border-slate-100 text-left">`;
+            detalhesHtml += `<p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Detalhamento:</p>`;
+            detalhesHtml += `<p class="text-xs font-bold text-green-600"><i class="fas fa-check-circle mr-1"></i> ${pC} Membros</p>`;
+            if(lC > 0) detalhesHtml += `<p class="text-xs font-bold text-amber-600"><i class="fas fa-star mr-1"></i> ${lC} Líderes</p>`;
+            if(vC > 0) detalhesHtml += `<p class="text-xs font-bold text-blue-500"><i class="fas fa-walking mr-1"></i> ${vC} Visitantes</p>`;
+            detalhesHtml += `</div>`;
 
-    // Procura o card de presentes no dashboard para injetar os detalhes
-    const presentCard = document.getElementById('stats-present').parentElement;
-    // Remove detalhes antigos se existirem para não duplicar
-    const oldDetail = presentCard.querySelector('.detalhes-area');
-    if(oldDetail) oldDetail.remove();
-    
-    // Cria uma nova div para os detalhes
-    const detailDiv = document.createElement('div');
-    detailDiv.className = 'detalhes-area mt-2 pt-2 border-t border-slate-50';
-    detailDiv.innerHTML = detalhesHtml;
-    presentCard.appendChild(detailDiv);
-
-    // Atualiza os contadores da tela de registro
-    updateCounterDisplays();
-
-    // BLOQUEIO DOS CHECKBOXES PARA NÃO-ADMIN
-    const allCheckboxes = document.querySelectorAll('#memberList input[type="checkbox"]');
-    allCheckboxes.forEach(cb => {
-        if(currentUser.role !== 'admin') {
-            cb.disabled = true;
-            cb.style.opacity = "0.5";
-            cb.parentElement.onclick = null; // Remove o clique de marcar
+            const card = document.getElementById('stats-present').parentElement;
+            const old = card.querySelector('.detalhes-area'); if(old) old.remove();
+            card.insertAdjacentHTML('beforeend', detalhesHtml);
         }
-    });
-        }
+
+        // --- RESTO DO CÓDIGO (GESTÃO, BUSCA FAMÍLIA, etc.) ---
+        window.formatNameInput = (el) => {
+            el.value = el.value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        };
+
+        window.handleFamilySearch = (query) => {
+            const sug = document.getElementById('familySuggestions');
+            const headBox = document.getElementById('headOfFamilyContainer');
+            if (query.length < 2) { sug.classList.add('hidden'); headBox.classList.remove('hidden'); return; }
+            const heads = members.filter(m => m.isHead && m.familia.toLowerCase().includes(query.toLowerCase()));
+            if (heads.length > 0) {
+                sug.classList.remove('hidden');
+                sug.innerHTML = heads.map(h => `<div onclick="selectFamily('${h.familia}')" class="p-4 hover:bg-slate-50 border-b cursor-pointer"><p class="text-sm font-bold uppercase">${h.familia}</p><p class="text-[9px] text-slate-400">Chefe: ${h.name}</p></div>`).join('');
+            } else { sug.classList.add('hidden'); headBox.classList.remove('hidden'); }
+        };
+
+        window.selectFamily = (f) => {
+            document.getElementById('familySearch').value = f;
+            document.getElementById('familySuggestions').classList.add('hidden');
+            document.getElementById('headOfFamilyContainer').classList.add('hidden');
+        };
+
+        window.saveNewMember = async () => {
+            const n = document.getElementById('newName').value;
+            const f = document.getElementById('familySearch').value.toUpperCase();
+            if(!n || !f) return alert("Nome e Família obrigatórios.");
+            await addDoc(collection(db, "membros"), { name: n, familia: f, org: document.getElementById('newOrg').value, categoria: document.getElementById('newCat').value, isHead: document.getElementById('isHeadOfFamily').checked, lastAttended: "2024-01-01" });
+            document.getElementById('newName').value = ''; document.getElementById('familySearch').value = ''; switchTab('attendance');
+        };
+
+        window.renderMembersList = () => {
+            const container = document.getElementById('manageMembersContainer');
+            const search = document.getElementById('searchManageMembers').value.toLowerCase();
+            const orgFilter = document.getElementById('filterOrgList').value;
+            container.innerHTML = '';
+            members.forEach(m => {
+                if((m.name.toLowerCase().includes(search) || m.familia.toLowerCase().includes(search)) && (orgFilter === 'TODOS' || m.org === orgFilter)) {
+                    container.innerHTML += `<div class="glass-card p-6 flex justify-between items-center border-l-8 border-slate-200"><div><h4 class="font-bold text-sm">${m.name}</h4><p class="text-[9px] font-black uppercase text-slate-400">${m.org}</p><p class="text-[9px] font-bold text-blue-900 uppercase">Família ${m.familia} ${m.isHead ? '(CHEFE)' : ''}</p></div>${currentUser.role === 'admin' ? `<button onclick="openMemberEdit('${m.id}')" class="w-10 h-10 bg-slate-50 text-slate-300 rounded-xl flex items-center justify-center hover:bg-blue-900 hover:text-white"><i class="fas fa-pen-to-square"></i></button>` : ''}</div>`;
+                }
+            });
+        };
+
+        window.openMemberEdit = (id) => {
+            const m = members.find(x => x.id === id); memberIdEditing = id;
+            document.getElementById('edit-member-name').value = m.name;
+            document.getElementById('edit-member-family').value = m.familia;
+            document.getElementById('edit-member-org').value = m.org;
+            document.getElementById('edit-member-cat').value = m.categoria || 'Membro';
+            document.getElementById('edit-member-isHead').checked = m.isHead || false;
+            document.getElementById('memberEditModal').classList.remove('hidden');
+        };
+        window.closeMemberEdit = () => document.getElementById('memberEditModal').classList.add('hidden');
+        window.saveMemberAction = async () => {
+            await updateDoc(doc(db, "membros", memberIdEditing), { name: document.getElementById('edit-member-name').value.toUpperCase(), familia: document.getElementById('edit-member-family').value.toUpperCase(), org: document.getElementById('edit-member-org').value, categoria: document.getElementById('edit-member-cat').value, isHead: document.getElementById('edit-member-isHead').checked });
+            closeMemberEdit();
+        };
+        window.deleteMemberAction = async () => { if(confirm("Excluir?")) { await deleteDoc(doc(db, "membros", memberIdEditing)); closeMemberEdit(); } };
 
         function renderRescue() {
-            const list = document.getElementById('missingList');
-            list.innerHTML = ''; let resC = 0;
+            const list = document.getElementById('missingList'); list.innerHTML = ''; let resC = 0;
             members.forEach(m => {
                 if(m.org === 'Visitante') return;
                 const diff = Math.floor((new Date() - new Date(m.lastAttended)) / (1000*60*60*24));
                 if(diff >= 21) {
                     resC++;
-                    list.innerHTML += `
-                        <div class="glass-card p-8 border-t-8 border-orange-500 space-y-4">
-                            <div>
-                                <p class="text-[9px] font-black text-orange-500 uppercase tracking-[3px] mb-1">${Math.floor(diff/7)} Semanas Ausente</p>
-                                <h4 class="font-black text-lg text-slate-800 uppercase">${m.name}</h4>
-                                <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Família ${m.familia}</p>
-                            </div>
-                            <a href="https://wa.me/?text=Olá ${m.name.split(' ')[0]}, sentimos sua falta!" class="block w-full bg-teal-600 text-white p-4 rounded-2xl text-center font-black text-[10px] uppercase shadow-lg">Contatar</a>
-                        </div>
-                    `;
+                    list.innerHTML += `<div class="glass-card p-6 border-t-8 border-orange-500"><div><p class="text-[9px] font-black text-orange-500 uppercase tracking-widest">${Math.floor(diff/7)} SEMANAS</p><h4 class="font-black text-slate-800 uppercase text-sm">${m.name}</h4><p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Família ${m.familia}</p></div><a href="https://wa.me/?text=Olá, sentimos sua falta!" class="block mt-4 bg-teal-600 text-white p-3 rounded-xl text-center font-black text-[10px] uppercase">Contatar</a></div>`;
                 }
             });
             document.getElementById('stats-rescue').innerText = resC;
@@ -763,19 +647,16 @@ function updateCounterDisplays() {
             const families = {};
             members.forEach(m => {
                 if(m.org === 'Visitante') return;
-                let fq = domingosISO.slice(0, 4).filter(d => (attendanceHistory[d] || []).includes(m.id)).length;
-                if(fq === 1) yl.innerHTML += `<div class="p-4 bg-yellow-50 border border-yellow-100 rounded-[20px] text-[11px] font-bold"><i class="fas fa-circle-info mr-2"></i>${m.name}</div>`;
-                const fam = m.familia || 'SEM FAMÍLIA';
-                if(!families[fam]) families[fam] = { t: 0, p: 0 };
-                families[fam].t++; if((attendanceHistory[selectedDate] || []).includes(m.id)) families[fam].p++;
+                let fq = domingosISO.slice(0, 4).filter(d => (attendanceHistory[d]?.presents || []).includes(m.id)).length;
+                if(fq === 1) yl.innerHTML += `<div class="p-3 bg-yellow-50 rounded-xl text-[10px] font-bold">⚠️ ${m.name} (Faltou 3 domingos)</div>`;
+                const fam = m.familia || 'S/ FAM'; if(!families[fam]) families[fam] = { t: 0, p: 0 };
+                families[fam].t++; if((attendanceHistory[selectedDate]?.presents || []).includes(m.id)) families[fam].p++;
                 if(m.categoria && m.categoria !== 'Membro') {
-                    const isP = (attendanceHistory[selectedDate] || []).includes(m.id);
-                    rl.innerHTML += `<div class="p-4 rounded-[20px] border flex justify-between items-center ${isP?'bg-green-50 border-green-100':'bg-red-50 border-red-100'}"><span class="text-[11px] font-black uppercase text-slate-700">${m.name}</span> <i class="fas ${isP?'fa-circle-check text-green-600':'fa-circle-xmark text-red-400'}"></i></div>`;
+                    const isP = (attendanceHistory[selectedDate]?.presents || []).includes(m.id);
+                    rl.innerHTML += `<div class="p-3 rounded-xl border text-[10px] uppercase font-bold flex justify-between ${isP?'bg-green-50':'bg-red-50'}"><span>${m.name}</span> <i class="fas ${isP?'fa-check text-green-600':'fa-times text-red-400'}"></i></div>`;
                 }
             });
-            Object.keys(families).forEach(f => {
-                if(families[f].p === 0) fl.innerHTML += `<div class="p-4 bg-blue-50 text-blue-700 rounded-[20px] text-[11px] font-black uppercase border border-blue-100">Família ${f}</div>`;
-            });
+            Object.keys(families).forEach(f => { if(families[f].p === 0) fl.innerHTML += `<div class="p-3 bg-blue-50 rounded-xl text-[10px] font-black uppercase text-blue-700">Família ${f} Ausente</div>`; });
         }
 
         function updateCharts() {
@@ -783,58 +664,35 @@ function updateCounterDisplays() {
             const orgs = ['Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária'];
             const stats = orgs.map(o => {
                 const tot = members.filter(m => m.org === o).length;
-                const prs = members.filter(m => m.org === o && (attendanceHistory[selectedDate] || []).includes(m.id)).length;
+                const prs = members.filter(m => m.org === o && (attendanceHistory[selectedDate]?.presents || []).includes(m.id)).length;
                 return tot > 0 ? Math.round((prs/tot)*100) : 0;
             });
             if(hChart) hChart.destroy();
-            hChart = new Chart(ctx1, { type: 'bar', data: { labels: ['ÉLD', 'SOC', 'MOÇ', 'RAP', 'PRI'], datasets: [{ data: stats, backgroundColor: '#002e5d', borderRadius: 12 }] }, options: { indexAxis: 'y', plugins: { legend: false }, scales: { x: { max: 100 } } } });
+            hChart = new Chart(ctx1, { type: 'bar', data: { labels: ['ÉLD', 'SOC', 'MOÇ', 'RAP', 'PRI'], datasets: [{ data: stats, backgroundColor: '#002e5d', borderRadius: 8 }] }, options: { indexAxis: 'y', plugins: { legend: false }, scales: { x: { max: 100 } } } });
 
             const ctx2 = document.getElementById('attendanceChart').getContext('2d');
             const dts = domingosISO.slice(0, 5).reverse();
-            const cts = dts.map(d => (attendanceHistory[d] || []).length);
+            const cts = dts.map(d => (attendanceHistory[d]?.presents || []).length);
             if(aChart) aChart.destroy();
             aChart = new Chart(ctx2, { type: 'line', data: { labels: dts.map(d=>d.split('-')[2]+'/'+d.split('-')[1]), datasets: [{ data: cts, borderColor: '#002e5d', backgroundColor: 'rgba(0,46,93,0.05)', fill: true, tension: 0.5 }] }, options: { plugins: { legend: false }, scales: { y: { beginAtZero: true } } } });
         }
 
-        window.openMemberEdit = (id) => {
-            const m = members.find(x => x.id === id); memberIdEditing = id;
-            document.getElementById('edit-member-name').value = m.name;
-            document.getElementById('edit-member-family').value = m.familia || '';
-            document.getElementById('edit-member-org').value = m.org;
-            document.getElementById('memberEditModal').classList.remove('hidden');
-        };
-        window.closeMemberEdit = () => { document.getElementById('memberEditModal').classList.add('hidden'); memberIdEditing = null; };
-        window.saveMemberAction = async () => {
-            await updateDoc(doc(db, "membros", memberIdEditing), { name: document.getElementById('edit-member-name').value.toUpperCase(), familia: document.getElementById('edit-member-family').value.toUpperCase(), org: document.getElementById('edit-member-org').value });
-            closeMemberEdit();
-        };
-        window.deleteMemberAction = async () => { if(confirm("Excluir?")) { await deleteDoc(doc(db, "membros", memberIdEditing)); closeMemberEdit(); } };
-
-        window.addMember = async () => {
-            const n = document.getElementById('newName').value.toUpperCase().trim();
-            const f = document.getElementById('newFamily').value.toUpperCase().trim();
-            if(!n) return alert("Informe o nome!");
-            await addDoc(collection(db, "membros"), { name: n, familia: f || 'S/ FAM', org: document.getElementById('newOrg').value, categoria: document.getElementById('newCat').value, lastAttended: "2024-01-01" });
-            document.getElementById('newName').value = ''; document.getElementById('newFamily').value = '';
-            switchTab('attendance');
-        };
-
         window.adminCreateUser = async () => {
             const n = document.getElementById('admin-new-name').value;
             const u = document.getElementById('admin-new-user').value.toLowerCase().trim();
-            if(!n || !u) return;
+            if(!n || !u) return alert("Preencha Nome e Login.");
             await addDoc(collection(db, "usuarios"), { name: n, username: u, password: "", role: document.getElementById('admin-new-role').value });
-            alert("Autorizado!");
+            alert("Autorizado!"); document.getElementById('admin-new-name').value = ''; document.getElementById('admin-new-user').value = '';
         };
 
         function renderAdminUsers() {
             const l = document.getElementById('users-list'); l.innerHTML = '';
             allUsersList.forEach(u => {
-                l.innerHTML += `<div class="bg-white p-5 rounded-[24px] flex justify-between items-center text-xs border border-slate-50"><div><p class="font-black uppercase text-[#002e5d]">${u.name}</p><p class="opacity-40 font-bold uppercase text-[9px]">${u.username} • ${u.role}</p></div><div class="w-2 h-2 rounded-full ${u.password?'bg-green-400':'bg-yellow-400'}"></div></div>`;
+                l.innerHTML += `<div class="bg-white p-5 rounded-3xl flex justify-between items-center text-xs border"><div><p class="font-black uppercase text-[#002e5d]">${u.name}</p><p class="opacity-40 font-bold uppercase text-[9px]">${u.username} • ${u.role}</p></div><div class="w-2 h-2 rounded-full ${u.password?'bg-green-400':'bg-yellow-400'}"></div></div>`;
             });
         }
 
-        // INIT
+        // --- INIT ---
         if(currentUser) {
             document.getElementById('user-name-side').innerText = currentUser.name;
             if(currentUser.role === 'admin') document.getElementById('admin-btn').classList.remove('hidden');
@@ -845,6 +703,7 @@ function updateCounterDisplays() {
                 const id = o.replace(/\s+/g, '');
                 fArea.innerHTML += `<button onclick="setFilter('${o}')" class="filter-pill ${o=='TODOS' ? 'active' : ''} glass-card px-6 py-3 whitespace-nowrap text-[10px] font-black uppercase tracking-widest border border-slate-100" id="pill-${id}">${o}</button>`;
             });
+
             window.setFilter = (f) => {
                 currentFilter = f;
                 document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active', 'bg-[#002e5d]', 'text-white'));
@@ -861,129 +720,6 @@ function updateCounterDisplays() {
             document.getElementById('view-login').classList.remove('hidden');
             document.getElementById('loading-screen').classList.add('hidden');
         }
-
-        // Função para Capitalizar o nome (Primeiras letras em Maiúsculo)
-window.formatNameInput = (el) => {
-    let words = el.value.split(' ');
-    for (let i = 0; i < words.length; i++) {
-        if (words[i].length > 0) {
-            words[i] = words[i][0].toUpperCase() + words[i].substr(1).toLowerCase();
-        }
-    }
-    el.value = words.join(' ');
-};
-
-// Formatação básica de telefone
-window.formatPhone = (el) => {
-    let v = el.value.replace(/\D/g,'');
-    v = v.replace(/^(\d{2})(\d)/g,"($1) $2");
-    v = v.replace(/(\d)(\d{4})$/,"$1-$2");
-    el.value = v;
-};
-
-// Busca Dinâmica de Famílias
-window.handleFamilySearch = (query) => {
-    const suggestions = document.getElementById('familySuggestions');
-    const headCheckbox = document.getElementById('headOfFamilyContainer');
-    
-    if (query.length < 2) {
-        suggestions.classList.add('hidden');
-        headCheckbox.classList.remove('hidden');
-        return;
-    }
-
-    // Filtra membros que são chefes de família (isHead: true)
-    const heads = members.filter(m => m.isHead && m.familia.toLowerCase().includes(query.toLowerCase()));
-
-    if (heads.length > 0) {
-        suggestions.classList.remove('hidden');
-        suggestions.innerHTML = heads.map(h => `
-            <div onclick="selectFamily('${h.familia}', '${h.name}')" class="p-4 hover:bg-slate-50 border-b border-slate-50 cursor-pointer transition-all">
-                <p class="text-sm font-bold text-[#002e5d] uppercase">${h.familia}</p>
-                <p class="text-[10px] text-slate-400 font-bold uppercase">Chefe: ${h.name}</p>
-            </div>
-        `).join('');
-    } else {
-        suggestions.classList.add('hidden');
-        headCheckbox.classList.remove('hidden');
-    }
-};
-
-window.selectFamily = (family, headName) => {
-    document.getElementById('familySearch').value = family;
-    document.getElementById('familySuggestions').classList.add('hidden');
-    document.getElementById('headOfFamilyContainer').classList.add('hidden'); // Esconde checkbox pois família já existe
-};
-
-// Lógica de Salvar o Novo Membro
-window.saveNewMember = async () => {
-    const name = document.getElementById('newName').value;
-    const familia = document.getElementById('familySearch').value.toUpperCase();
-    const org = document.getElementById('newOrg').value;
-    const cat = document.getElementById('newCat').value;
-    const phone = document.getElementById('newPhone').value;
-    const isHead = document.getElementById('isHeadOfFamily').checked;
-
-    if (!name || !familia) {
-        alert("Nome e Família são obrigatórios!");
-        return;
-    }
-
-    try {
-        await addDoc(collection(db, "membros"), {
-            name: name,
-            familia: familia,
-            org: org,
-            categoria: cat,
-            telefone: phone,
-            isHead: isHead, // Salva se ele é o chefe
-            lastAttended: "2024-01-01"
-        });
-
-        alert("Membro cadastrado com sucesso!");
-        // Limpar campos
-        document.getElementById('newName').value = '';
-        document.getElementById('familySearch').value = '';
-        document.getElementById('newPhone').value = '';
-        document.getElementById('isHeadOfFamily').checked = false;
-        switchTab('attendance');
-    } catch (e) {
-        console.error("Erro ao salvar: ", e);
-        alert("Erro ao cadastrar.");
-    }
-};
-
-        window.renderMembersList = () => {
-    const container = document.getElementById('manageMembersContainer');
-    const search = document.getElementById('searchManageMembers').value.toLowerCase();
-    const orgFilter = document.getElementById('filterOrgList').value;
-    const catFilter = document.getElementById('filterCatList').value;
-    container.innerHTML = '';
-
-    members.forEach(m => {
-        const matchS = m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search));
-        const matchO = orgFilter === 'TODOS' || m.org === orgFilter;
-        const matchC = catFilter === 'TODOS' || m.categoria === catFilter;
-
-        if(matchS && matchO && matchC) {
-            container.innerHTML += `
-                <div class="glass-card p-6 flex justify-between items-center border-l-8 border-slate-200">
-                    <div class="min-w-0">
-                        <h4 class="font-bold text-sm text-slate-800 truncate">${m.name}</h4>
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">${m.org} • ${m.categoria || 'Membro'}</p>
-                        <p class="text-[9px] font-bold text-blue-900 uppercase mt-1">Família ${m.familia} ${m.isHead ? '<b>(CHEFE)</b>' : ''}</p>
-                    </div>
-                    ${currentUser.role === 'admin' ? `
-    <button onclick="openMemberEdit('${m.id}')" class="w-12 h-12 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center hover:bg-[#002e5d] hover:text-white transition-all shadow-sm">
-        <i class="fas fa-pen-to-square"></i>
-    </button>
-` : ''}
-                </div>
-            `;
-        }
-    });
-};
-
     </script>
 </body>
 </html>
