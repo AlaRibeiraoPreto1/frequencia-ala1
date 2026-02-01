@@ -19,20 +19,28 @@
             --bg-soft: #f1f5f9;
         }
 
-       /* Garante que o corpo do site se comporte normalmente */
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-soft);
-            color: #1e293b;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            overflow-y: auto !important;
-            height: auto !important;
+       /* REGRA 1: Quando estiver na tela de LOGIN (Tranca tudo) */
+        body.status-login {
+            height: 100vh !important;
+            overflow: hidden !important;
+            position: fixed;
+            width: 100%;
         }
 
-        /* Garante que o container escondido não ocupe espaço nenhum */
-        .hidden { display: none !important; }
+        /* REGRA 2: Quando estiver DENTRO do sistema (Libera rolagem) */
+        body.status-app {
+            height: auto !important;
+            overflow-y: auto !important;
+            position: relative;
+        }
+
+        /* Ajuste para o container do App no Mobile */
+        @media (max-width: 1023px) {
+            .app-layout { 
+                height: auto !important; 
+                display: block !important;
+            }
+        }
 
 
 
@@ -91,7 +99,7 @@
         #mobile-menu-panel { transition: transform 0.3s ease-in-out; }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased status-login">
 
     <!-- LOADING SCREEN -->
     <div id="loading-screen" class="fixed inset-0 bg-white z-[300] flex items-center justify-center">
@@ -461,21 +469,23 @@
             const view = document.getElementById(`view-${tab}`);
             if(view) view.classList.remove('hidden');
             
-       // GERENCIAMENTO DE TELAS (LOGIN VS SITE)
+      // GERENCIAMENTO DE ESTADO (LOGIN VS APP)
             if (tab === 'login' || tab === 'first-login') {
-                // Se for login, esconde o site todo e mostra só o acesso
                 document.getElementById('app-layout').classList.add('hidden');
                 document.getElementById('access-container').classList.remove('hidden');
-                
-                // Esconde também os menus para não "vazarem"
                 if(document.getElementById('mobile-nav')) document.getElementById('mobile-nav').classList.add('hidden');
+                
+                // Ativa o comportamento de LOGIN (Trancado)
+                document.body.classList.add('status-login');
+                document.body.classList.remove('status-app');
             } else {
-                // Se já estiver logado, esconde o acesso e mostra o site
                 document.getElementById('access-container').classList.add('hidden');
                 document.getElementById('app-layout').classList.remove('hidden');
-                
-                // Mostra o menu de baixo
                 if(document.getElementById('mobile-nav')) document.getElementById('mobile-nav').classList.remove('hidden');
+                
+                // Ativa o comportamento de APP (Liberado)
+                document.body.classList.add('status-app');
+                document.body.classList.remove('status-login');
             }
             
             document.querySelectorAll('aside button, nav button').forEach(b => b.classList.remove('nav-btn-active', 'text-[#002e5d]', 'scale-125'));
