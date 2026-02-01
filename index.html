@@ -258,7 +258,7 @@
                 </section>
             </div>
         </main>
-
+   
         <!-- O MENU AGORA FICA AQUI DENTRO -->
         <nav id="mobile-nav" class="lg:hidden fixed bottom-6 left-6 right-6 h-20 glass-card flex justify-around items-center px-4 z-[200] border-2 border-white shadow-2xl">
             <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-home text-lg"></i></button>
@@ -458,64 +458,71 @@
         }
 
         window.renderAttendance = () => {
-            const list = document.getElementById('memberList');
-            const search = document.getElementById('searchMember').value.toLowerCase();
-            const data = attendanceHistory[selectedDate] || { presents: [], lideresCount: 0, visitantesCount: 0 };
-            const curP = data.presents || [];
-            list.innerHTML = '';
-            
-            let mP = 0; let vNomP = 0; let totMembros = 0; let lastFamily = "";
+    const list = document.getElementById('memberList');
+    const search = document.getElementById('searchMember').value.toLowerCase();
+    const data = attendanceHistory[selectedDate] || { presents: [], lideresCount: 0, visitantesCount: 0 };
+    const curP = data.presents || [];
+    list.innerHTML = '';
+    
+    let mP = 0; let vNomP = 0; let totMembros = 0; let lastFamily = "";
 
-            if(document.getElementById('display-lideres')) document.getElementById('display-lideres').innerText = data.lideresCount || 0;
-            if(document.getElementById('display-visitantes')) document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
-            document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
+    // Atualiza os números dos visores de líderes e visitantes
+    if(document.getElementById('display-lideres')) document.getElementById('display-lideres').innerText = data.lideresCount || 0;
+    if(document.getElementById('display-visitantes')) document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
+    
+    // Esconde os botões de + e - se não for admin
+    document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
 
-            const sorted = [...members].sort((a, b) => {
-                const famA = (a.familia || "Z-SEM").toUpperCase();
-                const famB = (b.familia || "Z-SEM").toUpperCase();
-                return famA === famB ? a.name.localeCompare(b.name) : famA.localeCompare(famB);
-            });
+    const sorted = [...members].sort((a, b) => {
+        const famA = (a.familia || "Z-SEM").toUpperCase();
+        const famB = (b.familia || "Z-SEM").toUpperCase();
+        return famA === famB ? a.name.localeCompare(b.name) : famA.localeCompare(famB);
+    });
 
-            sorted.forEach(m => {
-                const isP = curP.includes(m.id);
-                const isVisitante = (m.org === 'Visitante');
+    sorted.forEach(m => {
+        const isP = curP.includes(m.id);
+        const isVisitante = (m.org === 'Visitante');
 
-                if(!isVisitante) { totMembros++; if(isP) mP++; } 
-                else { if(isP) vNomP++; }
+        if(!isVisitante) { totMembros++; if(isP) mP++; } 
+        else { if(isP) vNomP++; }
 
-                const matchS = m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search));
-                const matchF = currentFilter === 'TODOS' || m.org === currentFilter;
+        const matchS = m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search));
+        const matchF = currentFilter === 'TODOS' || m.org === currentFilter;
 
-                if(matchS && matchF) {
-                    if (m.familia !== lastFamily && !search) {
-                        list.innerHTML += `<div class="family-divider">Família ${m.familia}</div>`;
-                        lastFamily = m.familia;
-                    }
-                    list.innerHTML += `
-                        <div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isP ? 'card-presente' : 'card-ausente'}" ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name}')"` : ''}>
-                            <div class="check-box ${isP ? 'check-active' : ''}">${isP ? '<i class="fas fa-check text-[10px]"></i>' : ''}</div>
-                            <div class="flex-1 min-w-0 text-left">
-                                <h4 class="font-bold text-sm ${isP ? 'text-teal-900' : 'text-slate-800'} truncate">${m.name}</h4>
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${m.org}</p>
-                            </div>
-                        </div>`;
-                }
-            });
+        if(matchS && matchF) {
+            if (m.familia !== lastFamily && !search) {
+                list.innerHTML += `<div class="family-divider">Família ${m.familia}</div>`;
+                lastFamily = m.familia;
+            }
+            list.innerHTML += `
+                <div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isP ? 'card-presente' : 'card-ausente'}" ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name}')"` : ''}>
+                    <div class="check-box ${isP ? 'check-active' : ''}">${isP ? '<i class="fas fa-check text-[10px]"></i>' : ''}</div>
+                    <div class="flex-1 min-w-0 text-left">
+                        <h4 class="font-bold text-sm ${isP ? 'text-teal-900' : 'text-slate-800'} truncate">${m.name}</h4>
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${m.org}</p>
+                    </div>
+                </div>`;
+        }
+    });
 
-            const lC = data.lideresCount || 0; const vC = data.visitantesCount || 0;
-            document.getElementById('stats-present').innerText = mP + vNomP + lC + vC;
-            document.getElementById('stats-total').innerText = totMembros;
+    // Atualiza os totais no Dashboard
+    const lC = data.lideresCount || 0; const vC = data.visitantesCount || 0;
+    document.getElementById('stats-present').innerText = mP + vNomP + lC + vC;
+    document.getElementById('stats-total').innerText = totMembros;
 
-            let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1">`;
-            det += `<p class="text-green-600 flex justify-between"><span>✓ Membros Ala</span> <span>${mP}</span></p>`;
-            if(vNomP > 0) det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Unidade</span> <span>${vNomP}</span></p>`;
-            if(lC > 0) det += `<p class="text-amber-600 flex justify-between"><span>★ Líderes Estaca</span> <span>${lC}</span></p>`;
-            if(vC > 0) det += `<p class="text-blue-500 flex justify-between"><span>🚶 Visitantes Gerais</span> <span>${vC}</span></p>`;
-            const card = document.getElementById('stats-present').parentElement;
-            const old = card.querySelector('.detalhes-area'); if(old) old.remove();
-            card.insertAdjacentHTML('beforeend', det + `</div>`);
-        };
+    // Atualiza o detalhamento (Membros, Líderes, Visitantes)
+    let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1">
+        <p class="text-green-600 flex justify-between"><span>✓ Membros Ala</span> <span>${mP}</span></p>`;
+    if(vNomP > 0) det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Unidade</span> <span>${vNomP}</span></p>`;
+    if(lC > 0) det += `<p class="text-amber-600 flex justify-between"><span>★ Líderes Estaca</span> <span>${lC}</span></p>`;
+    if(vC > 0) det += `<p class="text-blue-500 flex justify-between"><span>🚶 Visitantes Gerais</span> <span>${vC}</span></p>`;
+    
+    const card = document.getElementById('stats-present').parentElement;
+    const old = card.querySelector('.detalhes-area'); if(old) old.remove();
+    card.insertAdjacentHTML('beforeend', det + `</div>`);
+};
 
+        
         window.renderMembersList = () => {
             const container = document.getElementById('manageMembersContainer');
             const search = document.getElementById('searchManageMembers').value.toLowerCase();
