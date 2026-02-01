@@ -26,17 +26,23 @@
             margin: 0; padding: 0;
         }
 
-       /* Classe que tranca a tela - aplicada apenas no login */
+     /* Trava apenas para as telas de login */
         .trancar-tela { 
-            overflow: hidden !important; 
             height: 100vh !important; 
+            overflow: hidden !important; 
+            position: fixed; 
+            width: 100vw;
         }
 
-        /* Garante que o corpo do site possa rolar depois de logado */
-        body {
-            overflow-y: auto !important;
-            height: auto !important;
+        /* CONFIGURAÇÃO PARA O SITE ROLAR LIVREMENTE */
+        html, body {
+            height: auto !important; /* Permite que a altura cresça conforme os membros aparecem */
+            min-height: 100%;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch; /* Deixa a rolagem "macia" no iPhone */
         }
+
+
 
         .hidden { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -455,10 +461,15 @@
                 document.getElementById('access-container').classList.add('hidden');
                 document.getElementById('mobile-nav').classList.remove('hidden');
                 
-                // REMOVE O CADEADO (LIBERA A ROLAGEM)
+                // LIBERA A ROLAGEM
                 document.body.classList.remove('trancar-tela');
+                
+                // COMANDO EXTRA: FORÇA O NAVEGADOR A RECALCULAR A ALTURA
+                setTimeout(() => {
+                    window.dispatchEvent(new Event('resize'));
+                }, 100);
             }
-
+            
             document.querySelectorAll('aside button, nav button').forEach(b => b.classList.remove('nav-btn-active', 'text-[#002e5d]', 'scale-125'));
             if(document.getElementById(`side-${tab}`)) document.getElementById(`side-${tab}`).classList.add('nav-btn-active');
             if(document.getElementById(`nav-${tab}`)) document.getElementById(`nav-${tab}`).classList.add('text-[#002e5d]', 'scale-125');
