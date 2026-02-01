@@ -259,6 +259,7 @@
             </div>
         </main>
 
+        <!-- O MENU AGORA FICA AQUI DENTRO -->
         <nav id="mobile-nav" class="lg:hidden fixed bottom-6 left-6 right-6 h-20 glass-card flex justify-around items-center px-4 z-[200] border-2 border-white shadow-2xl">
             <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-home text-lg"></i></button>
             <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-clipboard-check text-lg"></i></button>
@@ -266,6 +267,7 @@
             <button onclick="switchTab('reports')" id="nav-reports" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-file-invoice text-lg"></i></button>
             <button onclick="switchTab('add')" id="nav-add" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-plus-circle text-lg"></i></button>
         </nav>
+       
     </div>
 
     <!-- MODAIS -->
@@ -359,19 +361,20 @@
 
         window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
 
+        // NAVIGATION (VERSÃO SIMPLIFICADA E ROBUSTA)
         window.switchTab = (tab) => {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             const view = document.getElementById(`view-${tab}`);
             
             if (tab === 'login' || tab === 'first-login') {
+                // Se for login, esconde o aplicativo inteiro (o menu some junto)
                 document.getElementById('app-layout').classList.add('hidden');
                 document.getElementById('access-container').classList.remove('hidden');
-                document.getElementById('mobile-nav').classList.add('hidden');
                 document.body.className = "antialiased status-login";
             } else {
+                // Se entrar no site, mostra o aplicativo (o menu aparece junto)
                 document.getElementById('app-layout').classList.remove('hidden');
                 document.getElementById('access-container').classList.add('hidden');
-                document.getElementById('mobile-nav').classList.remove('hidden');
                 document.body.className = "antialiased status-app";
             }
 
