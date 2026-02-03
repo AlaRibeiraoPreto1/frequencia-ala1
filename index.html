@@ -4,709 +4,485 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Frequência Sacramental</title>
-
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%23002e5d'/><path d='M50 15 L20 45 V85 H80 V45 L50 15 M40 85 V65 H60 V85 M50 55 A5 5 0 1 1 50 45 A5 5 0 1 1 50 55' fill='white'/></svg>">
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
+    <!-- Babel Standalone para compilar JSX no navegador -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        :root { --sacramental-blue: #002e5d; --healing-teal: #0d9488; --bg-soft: #f1f5f9; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-soft); color: #1e293b; margin: 0; padding: 0; transition: all 0.3s; }
-        
-        /* Gestão de Estados de Rolagem */
-        body.status-login { height: 100vh !important; overflow: hidden !important; position: fixed; width: 100%; }
-        body.status-app { height: auto !important; overflow-y: auto !important; position: relative; }
-
-        .hidden { display: none !important; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; }
+        /* Custom scrollbar hiding */
         .no-scrollbar::-webkit-scrollbar { display: none; }
-
-        /* Estrutura Desktop */
-        @media (min-width: 1024px) {
-            .app-layout { display: flex !important; height: 100vh; overflow: hidden; }
-            .sidebar { width: 300px !important; flex-shrink: 0; display: flex !important; background: white; border-right: 1px solid #e2e8f0; flex-direction: column; }
-            .main-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
-            .content-container { width: 100%; max-width: 1100px; padding: 40px; }
-        }
-
-        /* Estrutura Mobile */
-        @media (max-width: 1023px) {
-            .sidebar { display: none !important; }
-            .app-layout { display: block !important; }
-            .content-container { padding: 20px; padding-bottom: 120px; }
-            .sticky-search { position: sticky; top: 0; z-index: 100; background: var(--bg-soft); padding: 10px 0; }
-        }
-
-        .glass-card { background: white; border-radius: 28px; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.04); border: 1px solid #f1f5f9; }
-        .nav-btn-active { background-color: #f0f7ff; color: var(--sacramental-blue) !important; font-weight: 800; border-right: 4px solid var(--sacramental-blue); }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        .check-box { width: 28px; height: 28px; border-radius: 10px; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .check-active { background: var(--healing-teal); border-color: var(--healing-teal); color: white; }
-
-        .family-divider { background-color: #f8fafc; padding: 8px 16px; border-radius: 12px; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-top: 10px; border: 1px solid #e2e8f0; display: block; width: 100%; }
-        .card-presente { background-color: #ecfdf5 !important; border-left: 8px solid #10b981 !important; }
-        .card-ausente { background-color: #ffffff !important; border-left: 8px solid #f1f5f9 !important; }
-        
-        #mobile-menu-panel { transition: transform 0.3s ease-in-out; }
+        /* Animações simples */
+        .animate-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
+    
+    <!-- Import Map para carregar bibliotecas via ESM -->
+    <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.2.0",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+    "recharts": "https://esm.sh/recharts@2.12.0?external=react,react-dom",
+    "lucide-react": "https://esm.sh/lucide-react@0.330.0?external=react",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/"
+  }
+}
+</script>
 </head>
-<body class="antialiased status-login">
+<body>
+    <div id="root"></div>
 
-    <!-- LOADING SCREEN -->
-    <div id="loading-screen" class="fixed inset-0 bg-white z-[300] flex items-center justify-center">
-        <div class="text-center space-y-4">
-            <div class="w-12 h-12 border-4 border-slate-100 border-t-[#002e5d] rounded-full animate-spin mx-auto"></div>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sincronizando Dados...</p>
-        </div>
-    </div>
+    <!-- Script Principal com Lógica React -->
+    <script type="text/babel" data-type="module">
+        import React, { useState, useEffect, useMemo } from 'react';
+        import ReactDOM from 'react-dom/client';
+        import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+        import { 
+            Search, SlidersHorizontal, Check, UserPlus, UserMinus, 
+            LayoutDashboard, ClipboardList, HeartHandshake, FileText, 
+            PlusCircle, Menu, LogOut, Church 
+        } from 'lucide-react';
 
-    <!-- ACESSO (LOGIN / PRIMEIRO ACESSO) -->
-    <div id="access-container" class="min-h-screen flex items-center justify-center bg-slate-50 p-6">
-        <!-- LOGIN -->
-        <section id="view-login" class="hidden glass-card p-10 w-full max-w-sm text-center space-y-8 shadow-2xl">
-            <img src="https://images-us-prod.cms.commerce.dynamics.com/cms/api/fswvqbgntk/imageFileData/MA2bhk?ver=9757" alt="Cristo" class="h-32 mx-auto object-contain mb-2">
-            <h2 class="text-2xl font-black text-slate-800 tracking-tighter uppercase italic leading-tight">Ala <br>Ribeirão Preto 1</h2>
-            <div class="space-y-3">
-                <input type="text" id="login-user" placeholder="Usuário" class="w-full p-4 rounded-2xl bg-slate-100 border-none outline-none text-sm font-bold">
-                <input type="password" id="login-pass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none outline-none text-sm">
-            </div>
-            <button onclick="checkLogin()" class="w-full bg-[#002e5d] text-white py-4 rounded-2xl font-bold shadow-xl active:scale-95 uppercase text-xs tracking-widest transition-all">Entrar</button>
-            <button onclick="switchTab('first-login')" class="text-xs font-bold text-slate-400 underline">Ativar Primeiro Acesso</button>
-        </section>
+        // --- MOCK DATA (Simulando banco de dados) ---
+        const MOCK_MEMBERS = [
+            { id: '1', name: 'JOSE SILVA', familia: 'SILVA', org: 'Quórum de Élderes', categoria: 'Membro', telefone: '1199999999', isHead: true, lastAttended: '2024-01-01' },
+            { id: '2', name: 'MARIA SILVA', familia: 'SILVA', org: 'Sociedade de Socorro', categoria: 'Membro', telefone: '1199999999', isHead: false, lastAttended: '2024-01-01' },
+            { id: '3', name: 'JOAO SOUZA', familia: 'SOUZA', org: 'Rapazes', categoria: 'Membro', telefone: '', isHead: true, lastAttended: '2023-12-01' },
+            { id: '4', name: 'ANA SOUZA', familia: 'SOUZA', org: 'Moças', categoria: 'Membro', telefone: '', isHead: false, lastAttended: '2024-01-01' },
+            { id: '5', name: 'PEDRO SANTOS', familia: 'SANTOS', org: 'Primária', categoria: 'Membro', telefone: '', isHead: true, lastAttended: '2023-10-01' },
+        ];
 
-        <!-- PRIMEIRO ACESSO -->
-        <section id="view-first-login" class="hidden glass-card p-10 w-full max-w-sm text-center space-y-6 shadow-xl">
-            <h2 class="font-black text-xl italic uppercase text-[#002e5d]">Primeiro Acesso</h2>
-            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Crie sua senha pessoal</p>
-            <div class="space-y-3">
-                <input type="text" id="first-user" placeholder="Login Autorizado" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm font-bold">
-                <input type="password" id="first-pass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm">
-                <input type="password" id="first-pass-confirm" placeholder="Confirme a Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm">
-            </div>
-            <button onclick="processFirstLogin()" class="w-full bg-green-600 text-white p-5 rounded-2xl font-black uppercase text-xs shadow-lg active:scale-95 transition-all">Ativar Minha Conta</button>
-            <button onclick="switchTab('login')" class="text-xs text-slate-400 underline font-bold">Voltar</button>
-        </section>
-    </div>
+        const MOCK_USERS = [
+            { id: '1', username: 'admin', name: 'Bispo Ala', role: 'admin', password: '123' },
+            { id: '2', username: 'sec', name: 'Secretário', role: 'user', password: '123' },
+        ];
 
-    <!-- MENU MOBILE (DRAWER) -->
-    <div id="mobile-menu-overlay" onclick="toggleMobileMenu()" class="hidden fixed inset-0 bg-black/50 z-[200] backdrop-blur-sm"></div>
-    <div id="mobile-menu-panel" class="fixed top-0 right-0 h-full w-64 bg-white z-[210] shadow-2xl translate-x-full flex flex-col">
-        <div class="p-6 bg-[#002e5d] text-white">
-            <p id="user-mobile-name" class="font-bold truncate text-sm">...</p>
-            <p id="user-mobile-role" class="text-[9px] opacity-70 uppercase tracking-widest font-black"></p>
-        </div>
-        <div class="flex-1 p-4 space-y-2">
-            <button id="admin-mobile-btn" onclick="switchTab('admin-users'); toggleMobileMenu();" class="hidden w-full flex items-center gap-3 p-4 rounded-2xl text-slate-600 hover:bg-slate-50 font-bold text-xs uppercase">
-                <i class="fas fa-users-cog text-[#002e5d]"></i> Gerenciar Logins
-            </button>
-            <hr class="border-slate-50">
-            <button onclick="logout()" class="w-full flex items-center gap-3 p-4 rounded-2xl text-red-500 hover:bg-red-50 font-bold text-xs uppercase">
-                <i class="fas fa-power-off"></i> Sair do Sistema
-            </button>
-        </div>
-    </div>
+        // --- COMPONENTES ---
 
-    <!-- APP LAYOUT (DENTRO DO SISTEMA) -->
-    <div id="app-layout" class="hidden app-layout">
-        
-        <!-- SIDEBAR DESKTOP -->
-        <aside class="sidebar p-8">
-            <div class="flex items-center gap-3 mb-12 px-2">
-                <div class="w-10 h-10 bg-[#002e5d] rounded-2xl flex items-center justify-center text-white shadow-lg"><i class="fas fa-church text-lg"></i></div>
-                <h1 class="font-black text-xs uppercase text-[#002e5d] leading-none tracking-tighter">Ala<br>Ribeirão Preto 1</h1>
-            </div>
-            <nav class="flex-1 space-y-1">
-                <button onclick="switchTab('dashboard')" id="side-dashboard" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left">
-                    <i class="fas fa-grid-2 w-5 text-center"></i> Dashboard
-                </button>
-                <button onclick="switchTab('attendance')" id="side-attendance" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left">
-                    <i class="fas fa-list-check w-5 text-center"></i> Registrar Frequência
-                </button>
-                <button onclick="switchTab('analysis')" id="side-analysis" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left">
-                    <i class="fas fa-heart-pulse w-5 text-center"></i> Resgate
-                </button>
-                <button onclick="switchTab('reports')" id="side-reports" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left">
-                    <i class="fas fa-file-invoice w-5 text-center"></i> Relatórios
-                </button>
-                <button onclick="switchTab('add')" id="side-add" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left">
-                    <i class="fas fa-user-plus w-5 text-center"></i> Novo Membro
-                </button>
-                <hr class="border-slate-50 my-6">
-                <button id="admin-btn" onclick="switchTab('admin-users')" class="hidden w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left">
-                    <i class="fas fa-users-cog w-5 text-center"></i> Gerenciar Logins
-                </button>
-            </nav>
-            <div class="bg-slate-50 p-6 rounded-[32px] mt-auto">
-                <p id="user-name-side" class="font-black text-[10px] uppercase text-slate-700 truncate tracking-tighter italic">...</p>
-                <button onclick="logout()" class="text-[9px] font-black text-red-400 mt-2 hover:underline uppercase tracking-widest text-left">Sair</button>
-            </div>
-        </aside>
+        // 1. Componente de Login
+        const Login = ({ onLogin }) => {
+            const [username, setUsername] = useState('');
+            const [password, setPassword] = useState('');
+            const [isFirstAccess, setIsFirstAccess] = useState(false);
+            const [error, setError] = useState('');
 
-        <!-- MAIN CONTENT AREA -->
-        <main class="main-content">
-            <!-- HEADER MOBILE -->
-            <header class="lg:hidden p-6 flex justify-between items-center bg-white border-b border-slate-100 sticky top-0 z-[150]">
-                <h2 id="mobile-page-title" class="font-black text-[#002e5d] text-lg italic uppercase tracking-tighter">Dashboard</h2>
-                <button onclick="toggleMobileMenu()" class="w-10 h-10 rounded-xl bg-slate-50 text-[#002e5d] flex items-center justify-center shadow-sm">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </header>
+            const handleLogin = () => {
+                const user = MOCK_USERS.find(u => u.username === username && u.password === password);
+                if (user) onLogin(user);
+                else setError('Usuário ou senha incorretos.');
+            };
 
-            <div class="content-container w-full">
-                
-                <!-- DASHBOARD -->
-                <section id="view-dashboard" class="hidden space-y-8">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="glass-card p-8 border-l-[12px] border-green-500">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Presentes Hoje</p>
-                            <p id="stats-present" class="text-5xl font-black text-slate-800 leading-tight">0</p>
+            return (
+                <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+                    <div className="bg-white/80 backdrop-blur-md border border-white/20 p-10 w-full max-w-sm text-center space-y-8 shadow-2xl rounded-[28px]">
+                        <div className="flex justify-center mb-4">
+                             <div className="w-16 h-16 bg-[#002e5d] rounded-2xl flex items-center justify-center text-white shadow-lg">
+                                <Church size={32} />
+                             </div>
                         </div>
-                        <div class="glass-card p-8 border-l-[12px] border-[#002e5d]">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Membros Ala</p>
-                            <p id="stats-total" class="text-5xl font-black text-slate-800 leading-tight">0</p>
-                        </div>
-                        <div class="glass-card p-8 border-l-[12px] border-orange-500">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resgate</p>
-                            <p id="stats-rescue" class="text-5xl font-black text-slate-800 leading-tight">0</p>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="glass-card p-8"><canvas id="heatmapChart" height="220"></canvas></div>
-                        <div class="glass-card p-8"><canvas id="attendanceChart" height="220"></canvas></div>
-                    </div>
-                </section>
+                        <h2 className="text-2xl font-black text-slate-800 tracking-tighter uppercase italic leading-tight">
+                            Ala <br />Ribeirão Preto 1
+                        </h2>
 
-                <!-- REGISTRAR FREQUÊNCIA -->
-                <section id="view-attendance" class="hidden space-y-6">
-                    <div class="sticky-search flex gap-3">
-                        <div class="relative flex-1">
-                            <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
-                            <input type="text" id="searchMember" oninput="renderAttendance()" placeholder="Buscar nome ou família..." class="w-full pl-12 p-4 rounded-2xl bg-white border-none outline-none shadow-sm font-bold text-sm">
-                        </div>
-                        <button onclick="toggleOptions()" class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#002e5d] shadow-sm border border-slate-100">
-                            <i class="fas fa-sliders"></i>
-                        </button>
-                    </div>
-                    <div id="attendance-options" class="hidden space-y-6 p-6 bg-white rounded-[32px] border shadow-sm">
-                        <div class="space-y-2">
-                            <p class="text-[10px] font-black text-slate-400 uppercase ml-2">Data e Filtros</p>
-                            <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl">
-                                <i class="fas fa-calendar-day text-[#002e5d]"></i>
-                                <select id="dateSelect" onchange="renderAll()" class="bg-transparent font-black text-xs uppercase tracking-widest outline-none border-none flex-1 cursor-pointer"></select>
+                        {!isFirstAccess ? (
+                            <div className="space-y-3">
+                                <input 
+                                    type="text" 
+                                    placeholder="Usuário" 
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value.toLowerCase())}
+                                    className="w-full p-4 rounded-2xl bg-slate-100 border-none outline-none text-sm font-bold focus:ring-2 focus:ring-[#002e5d]"
+                                />
+                                <input 
+                                    type="password" 
+                                    placeholder="Senha" 
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full p-4 rounded-2xl bg-slate-100 border-none outline-none text-sm focus:ring-2 focus:ring-[#002e5d]"
+                                />
+                                {error && <p className="text-xs text-red-500 font-bold">{error}</p>}
+                                <button 
+                                    onClick={handleLogin} 
+                                    className="w-full bg-[#002e5d] text-white py-4 rounded-2xl font-bold shadow-xl active:scale-95 uppercase text-xs tracking-widest transition-all hover:bg-[#003d7a]"
+                                >
+                                    Entrar
+                                </button>
+                                <button onClick={() => {setIsFirstAccess(true); setError('')}} className="text-xs font-bold text-slate-400 underline mt-4 block mx-auto">
+                                    Ativar Primeiro Acesso
+                                </button>
                             </div>
-                            <div id="orgFilters" class="flex overflow-x-auto gap-2 no-scrollbar py-2"></div>
-                        </div>
-                        <div id="admin-counters" class="hidden grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center shadow-sm">
-                                <span class="text-[10px] font-bold text-slate-500 uppercase">Líderes Estaca</span>
-                                <div class="flex items-center gap-4">
-                                    <button onclick="updateCount('lideresCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm">-</button>
-                                    <span id="display-lideres" class="font-black text-[#002e5d]">0</span>
-                                    <button onclick="updateCount('lideresCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button>
-                                </div>
+                        ) : (
+                            <div className="space-y-3">
+                                <h3 className="text-[#002e5d] font-bold uppercase text-xs">Primeiro Acesso</h3>
+                                 <input 
+                                    type="text" 
+                                    placeholder="Login Autorizado" 
+                                    className="w-full p-4 rounded-2xl bg-slate-100 border-none outline-none text-sm font-bold"
+                                />
+                                 <button 
+                                    onClick={() => setError('Simulação: Contate o administrador.')}
+                                    className="w-full bg-green-600 text-white py-4 rounded-2xl font-bold shadow-xl active:scale-95 uppercase text-xs tracking-widest transition-all"
+                                >
+                                    Ativar Conta
+                                </button>
+                                {error && <p className="text-xs text-red-500 font-bold">{error}</p>}
+                                <button onClick={() => {setIsFirstAccess(false); setError('')}} className="text-xs font-bold text-slate-400 underline mt-4 block mx-auto">
+                                    Voltar
+                                </button>
                             </div>
-                            <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center shadow-sm">
-                                <span class="text-[10px] font-bold text-slate-500 uppercase">Visitantes Gerais</span>
-                                <div class="flex items-center gap-4">
-                                    <button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm">-</button>
-                                    <span id="display-visitantes" class="font-black text-[#002e5d]">0</span>
-                                    <button onclick="updateCount('visitantesCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button>
-                                </div>
-                            </div>
-                        </div>
+                        )}
                     </div>
-                    <div id="memberList" class="space-y-2"></div>
-                </section>
-
-                <!-- RELATÓRIOS -->
-                <section id="view-reports" class="hidden space-y-8 text-left">
-                    <div class="glass-card p-6 border-l-[12px] border-slate-800 cursor-pointer hover:bg-slate-50 mb-8" onclick="switchTab('members-list')">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="font-black text-slate-800 uppercase text-[10px] mb-1">Base de Dados</h3>
-                                <p class="text-lg font-black text-[#002e5d] italic">Gestão de Membros</p>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase mt-1 italic">Editar nomes, famílias e cargos</p>
-                            </div>
-                            <i class="fas fa-users-rectangle text-3xl text-slate-200"></i>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="glass-card p-8"><h3 class="font-black text-yellow-600 uppercase text-[10px] mb-4 tracking-widest border-b pb-2">Sinal Amarelo</h3><div id="report-yellow" class="space-y-3"></div></div>
-                        <div class="glass-card p-8"><h3 class="font-black text-blue-600 uppercase text-[10px] mb-4 tracking-widest border-b pb-2">Famílias Ausentes</h3><div id="report-family" class="space-y-3"></div></div>
-                        <div class="glass-card p-8 md:col-span-2"><h3 class="font-black text-green-600 uppercase text-[10px] mb-4 tracking-widest border-b pb-4">Acompanhamento Retenção</h3><div id="report-retention" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div>
-                    </div>
-                </section>
-
-                <!-- GESTÃO DE LISTAS -->
-                <section id="view-members-list" class="hidden space-y-6 text-left">
-                    <button onclick="switchTab('reports')" class="flex items-center gap-2 text-[#002e5d] font-bold text-xs uppercase mb-4"><i class="fas fa-arrow-left"></i> Voltar</button>
-                    <div class="flex flex-col md:flex-row gap-4 bg-white p-6 rounded-[32px] border">
-                        <input type="text" id="searchManageMembers" oninput="renderMembersList()" placeholder="Buscar para editar..." class="flex-1 p-4 rounded-2xl bg-slate-50 outline-none text-sm font-bold border-none focus:ring-2 focus:ring-[#002e5d]">
-                        <select id="filterOrgList" onchange="renderMembersList()" class="p-3 bg-slate-50 rounded-xl text-[10px] font-bold uppercase border-none outline-none text-slate-500">
-                            <option value="TODOS">Todas Orgs</option><option value="Quórum de Élderes">Élderes</option><option value="Sociedade de Socorro">Socorro</option><option value="Moças">Moças</option><option value="Rapazes">Rapazes</option><option value="Primária">Primária</option>
-                        </select>
-                    </div>
-                    <div id="manageMembersContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-10"></div>
-                </section>
-
-                <!-- RESGATE -->
-                <section id="view-analysis" class="hidden space-y-6">
-                    <div id="missingList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-                </section>
-
-                <!-- NOVO CADASTRO -->
-                <section id="view-add" class="hidden flex justify-center">
-                    <div class="glass-card p-10 w-full max-w-xl space-y-6 shadow-xl text-left">
-                        <h3 class="text-xl font-black text-[#002e5d] uppercase text-center italic">Novo Cadastro</h3>
-                        <div class="space-y-4">
-                            <input type="text" id="newName" oninput="formatNameInput(this)" placeholder="Nome Completo" class="w-full p-4 bg-slate-50 border-none rounded-[20px] font-bold text-sm outline-none">
-                            <div class="relative">
-                                <input type="text" id="familySearch" oninput="handleFamilySearch(this.value)" placeholder="Sobrenome da Família" class="w-full p-4 bg-slate-50 border-none rounded-[20px] font-bold text-sm outline-none">
-                                <div id="familySuggestions" class="hidden absolute left-0 right-0 top-[105%] bg-white rounded-2xl shadow-2xl z-[150] max-h-48 overflow-y-auto border"></div>
-                                <div id="headOfFamilyContainer" class="flex items-center gap-3 px-4 mt-2"><input type="checkbox" id="isHeadOfFamily" class="w-4 h-4 accent-[#002e5d]"><label class="text-xs font-bold text-slate-500 italic uppercase">Sou Chefe da família</label></div>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <select id="newOrg" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none"><option value="Quórum de Élderes">ÉLDERES</option><option value="Sociedade de Socorro">SOCORRO</option><option value="Moças">MOÇAS</option><option value="Rapazes">RAPAZES</option><option value="Primária">PRIMÁRIA</option><option value="Visitante">VISITANTE</option></select>
-                                <select id="newCat" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none"><option value="Membro">MEMBRO</option><option value="Recém-Converso">RECÉM-CONVERSO</option><option value="Novo Morador">NOVO MORADOR</option><option value="Visitante">VISITANTE</option></select>
-                            </div>
-                            <input type="tel" id="newPhone" oninput="formatPhone(this)" placeholder="WhatsApp (DDD)" class="w-full p-4 bg-slate-50 rounded-2xl font-bold text-sm border-none outline-none">
-                            <button onclick="saveNewMember()" class="w-full bg-[#002e5d] text-white p-6 rounded-[32px] font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all">Cadastrar</button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- GERENCIAR LOGINS (ADMIN) -->
-                <section id="view-admin-users" class="hidden space-y-8 text-left">
-                    <div class="glass-card p-10 max-w-md mx-auto space-y-4 shadow-xl">
-                        <h4 class="font-black text-xs text-center uppercase tracking-widest text-slate-400">Autorizar Login</h4>
-                        <input type="text" id="admin-new-name" placeholder="Nome" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none font-bold">
-                        <input type="text" id="admin-new-user" placeholder="Login (Usuário)" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none font-bold">
-                        <select id="admin-new-role" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none font-bold uppercase text-xs outline-none"><option value="user">Secretário</option><option value="admin">Administrador</option></select>
-                        <button onclick="adminCreateUser()" class="w-full bg-[#002e5d] text-white p-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg">Autorizar</button>
-                    </div>
-                    <div id="users-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-                </section>
-
-            </div>
-
-            <!-- NAVEGAÇÃO MOBILE (DENTRO DO MAIN PARA ISOLAR) -->
-            <nav id="mobile-nav" class="lg:hidden fixed bottom-6 left-6 right-6 h-20 glass-card flex justify-around items-center px-4 z-[200] border-2 border-white shadow-2xl">
-                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-home text-lg"></i></button>
-                <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-clipboard-check text-lg"></i></button>
-                <button onclick="switchTab('analysis')" id="nav-analysis" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-hand-holding-heart text-lg"></i></button>
-                <button onclick="switchTab('reports')" id="nav-reports" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-file-invoice text-lg"></i></button>
-                <button onclick="switchTab('add')" id="nav-add" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-plus-circle text-lg"></i></button>
-            </nav>
-        </main>
-    </div>
-
-    <!-- MODAIS DE EDIÇÃO -->
-    <div id="memberEditModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
-        <div class="glass-card w-full max-w-sm p-10 space-y-6">
-            <h3 class="font-black uppercase text-xs text-slate-400 border-b pb-2">Editar Registro</h3>
-            <div class="space-y-4">
-                <input type="text" id="edit-member-name" oninput="formatNameInput(this)" class="w-full p-4 bg-slate-50 rounded-2xl uppercase text-sm font-bold border-none outline-none">
-                <input type="text" id="edit-member-family" class="w-full p-4 bg-slate-50 rounded-2xl uppercase text-sm font-bold border-none outline-none">
-                <select id="edit-member-org" class="w-full p-4 bg-slate-50 rounded-2xl text-xs font-bold border-none outline-none">
-                    <option value="Quórum de Élderes">Quórum de Élderes</option><option value="Sociedade de Socorro">Sociedade de Socorro</option><option value="Moças">Moças</option><option value="Rapazes">Rapazes</option><option value="Primária">Primária</option><option value="Visitante">Visitante</option>
-                </select>
-                <select id="edit-member-cat" class="w-full p-4 bg-slate-50 rounded-2xl text-xs font-bold border-none outline-none"><option value="Membro">Membro</option><option value="Recém-Converso">Recém-Converso</option><option value="Novo Morador">Novo Morador</option><option value="Visitante">Visitante</option></select>
-                <input type="tel" id="edit-member-phone" oninput="formatPhone(this)" class="w-full p-4 bg-slate-50 rounded-2xl text-sm font-bold border-none outline-none" placeholder="Celular">
-                <div class="flex items-center gap-3 px-4"><input type="checkbox" id="edit-member-isHead" class="w-4 h-4 accent-[#002e5d]"><label class="text-xs font-bold text-slate-500 italic">Chefe da Família</label></div>
-            </div>
-            <div class="flex gap-4 pt-4 border-t"><button onclick="deleteMemberAction()" class="flex-1 text-red-400 font-bold text-[10px] uppercase underline">Excluir</button><button onclick="saveMemberAction()" class="flex-[2] py-4 bg-[#002e5d] text-white rounded-2xl font-black text-xs shadow-lg">Gravar</button></div>
-            <button onclick="closeMemberEdit()" class="w-full text-[10px] text-slate-300 font-bold uppercase">Cancelar</button>
-        </div>
-    </div>
-
-    <div id="userEditModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
-        <div class="glass-card w-full max-w-sm p-10 space-y-6 text-center">
-            <h3 class="font-black uppercase text-xs text-slate-400 border-b pb-2">Editar Acesso</h3>
-            <input type="text" id="edit-user-name" class="w-full p-4 bg-slate-50 rounded-2xl text-sm font-bold border-none outline-none" placeholder="Nome">
-            <input type="password" id="edit-user-pass" class="w-full p-4 bg-slate-50 rounded-2xl text-sm outline-none" placeholder="Nova Senha (opcional)">
-            <select id="edit-user-role" class="w-full p-4 bg-slate-50 rounded-2xl text-xs font-bold border-none uppercase outline-none"><option value="user">Secretário</option><option value="admin">Administrador</option></select>
-            <div class="flex gap-4"><button onclick="deleteUserAction()" class="text-red-400 font-bold text-[10px] uppercase underline">Excluir</button><button onclick="saveUserUpdate()" class="flex-1 py-4 bg-[#002e5d] text-white rounded-2xl font-black text-xs shadow-lg uppercase">Salvar</button></div>
-            <button onclick="document.getElementById('userEditModal').classList.add('hidden')" class="w-full text-xs text-slate-300 font-bold">CANCELAR</button>
-        </div>
-    </div>
-
-    <!-- FIREBASE & LOGIC -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy, setDoc, deleteDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyAaEKx9n4N847WW97FhfZxLZYtsa5cTsE0",
-          authDomain: "frequencia-da-ala.firebaseapp.com",
-          projectId: "frequencia-da-ala",
-          storageBucket: "frequencia-da-ala.firebasestorage.app",
-          messagingSenderId: "823110082594",
-          appId: "1:823110082594:web:525d38b65a5ab74ec9ea7b"
+                </div>
+            );
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        // 2. Componente de Dashboard
+        const Dashboard = ({ members, attendance }) => {
+            const orgData = [
+                { name: 'ÉLD', total: 10, present: 5 },
+                { name: 'SOC', total: 15, present: 8 },
+                { name: 'RAP', total: 5, present: 2 },
+                { name: 'MOÇ', total: 8, present: 4 },
+                { name: 'PRI', total: 12, present: 9 },
+            ];
 
-        let members = []; let attendanceHistory = {}; let allUsersList = [];
-        let currentUser = JSON.parse(localStorage.getItem('user_data')) || null;
-        let selectedDate = new Date().toISOString().split('T')[0];
-        let currentFilter = 'TODOS';
-        let hChart = null; let aChart = null;
-        let memberIdEditing = null; let userIdEditing = null;
+            const historyData = [
+                { date: '01', count: 45 },
+                { date: '08', count: 52 },
+                { date: '15', count: 48 },
+                { date: '22', count: 60 },
+            ];
 
-        const dSelect = document.getElementById('dateSelect');
-        const domingosISO = [];
-        for(let i=0; i<12; i++) {
-            let d = new Date(); d.setDate(d.getDate() - (d.getDay() + (7 * i)) % 84);
-            let iso = d.toISOString().split('T')[0];
-            domingosISO.push(iso);
-            dSelect.innerHTML += `<option value="${iso}">${i==0 ? 'HOJE ('+d.toLocaleDateString('pt-BR')+')' : d.toLocaleDateString('pt-BR')}</option>`;
-        }
-        selectedDate = dSelect.value;
-
-        window.checkLogin = async () => {
-            const u = document.getElementById('login-user').value.toLowerCase().trim();
-            const p = document.getElementById('login-pass').value.trim();
-            if(!u || !p) return;
-            const q = query(collection(db, "usuarios"), where("username", "==", u), where("password", "==", p));
-            const snap = await getDocs(q);
-            if (!snap.empty) {
-                const d = snap.docs[0].data(); d.id = snap.docs[0].id;
-                localStorage.setItem('user_data', JSON.stringify(d));
-                location.reload();
-            } else alert("Usuário ou senha incorretos.");
-        };
-
-        window.processFirstLogin = async () => {
-            const u = document.getElementById('first-user').value.toLowerCase().trim();
-            const p1 = document.getElementById('first-pass').value.trim();
-            const p2 = document.getElementById('first-pass-confirm').value.trim();
-            if(!u || p1 !== p2) return alert("As senhas não coincidem.");
-            const q = query(collection(db, "usuarios"), where("username", "==", u));
-            const snap = await getDocs(q);
-            if(snap.empty) return alert("Acesso não autorizado.");
-            if(snap.docs[0].data().password) return alert("Conta já ativada.");
-            await updateDoc(doc(db, "usuarios", snap.docs[0].id), { password: p1 });
-            alert("Sucesso!"); switchTab('login');
-        };
-
-        window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
-
-        window.switchTab = (tab) => {
-            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-            const view = document.getElementById(`view-${tab}`);
+            const totalPresent = (attendance.presents?.length || 0) + attendance.lideresCount + attendance.visitantesCount;
+            const totalMembers = members.length;
             
-            if (tab === 'login' || tab === 'first-login') {
-                document.getElementById('app-layout').classList.add('hidden');
-                document.getElementById('access-container').classList.remove('hidden');
-                document.body.className = "antialiased status-login";
-            } else {
-                document.getElementById('app-layout').classList.remove('hidden');
-                document.getElementById('access-container').classList.add('hidden');
-                document.body.className = "antialiased status-app";
-            }
+            return (
+                <div className="space-y-8 animate-in">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-white/90 backdrop-blur rounded-[28px] p-8 border-l-[12px] border-green-500 shadow-sm">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Presentes Hoje</p>
+                            <p className="text-5xl font-black text-slate-800 leading-tight">{totalPresent}</p>
+                        </div>
+                        <div className="bg-white/90 backdrop-blur rounded-[28px] p-8 border-l-[12px] border-[#002e5d] shadow-sm">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Membros Ala</p>
+                            <p className="text-5xl font-black text-slate-800 leading-tight">{totalMembers}</p>
+                        </div>
+                        <div className="bg-white/90 backdrop-blur rounded-[28px] p-8 border-l-[12px] border-orange-500 shadow-sm">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resgate</p>
+                            <p className="text-5xl font-black text-slate-800 leading-tight">{2}</p>
+                        </div>
+                    </div>
 
-            if(view) view.classList.remove('hidden');
-
-            document.querySelectorAll('aside button, nav button').forEach(b => b.classList.remove('nav-btn-active', 'text-[#002e5d]', 'scale-125'));
-            if(document.getElementById(`side-${tab}`)) document.getElementById(`side-${tab}`).classList.add('nav-btn-active');
-            if(document.getElementById(`nav-${tab}`)) document.getElementById(`nav-${tab}`).classList.add('text-[#002e5d]', 'scale-125');
-
-            const titles = {'dashboard':'Painel Geral','attendance':'Registrar Frequência','analysis':'Resgate','reports':'Relatórios Estratégicos','add':'Novo','members-list':'Gestão de Listas', 'admin-users': 'Gerenciar Logins'};
-            const headerTitle = document.getElementById('mobile-page-title');
-            if(headerTitle) headerTitle.innerText = titles[tab] || 'Ala';
-
-            if(tab === 'members-list') renderMembersList();
-            if(tab === 'admin-users') renderAdminUsers();
-            if(tab === 'reports' || tab === 'dashboard') renderAll();
-            window.scrollTo(0,0);
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div className="bg-white/90 backdrop-blur rounded-[28px] p-8 shadow-sm">
+                             <h3 className="text-xs font-bold uppercase text-slate-400 mb-4">Frequência por Org</h3>
+                            <div className="h-[220px] w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={orgData} layout="vertical">
+                                        <XAxis type="number" hide />
+                                        <YAxis dataKey="name" type="category" width={40} tick={{fontSize: 10, fontWeight: 800}} />
+                                        <Tooltip cursor={{fill: '#f1f5f9'}} />
+                                        <Bar dataKey="present" fill="#002e5d" radius={[0, 8, 8, 0]} barSize={20} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                        <div className="bg-white/90 backdrop-blur rounded-[28px] p-8 shadow-sm">
+                             <h3 className="text-xs font-bold uppercase text-slate-400 mb-4">Histórico Mensal</h3>
+                            <div className="h-[220px] w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={historyData}>
+                                        <XAxis dataKey="date" tick={{fontSize: 10}} />
+                                        <Tooltip />
+                                        <Line type="monotone" dataKey="count" stroke="#002e5d" strokeWidth={3} dot={{r: 4}} />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
         };
 
-        window.toggleMobileMenu = () => {
-            const overlay = document.getElementById('mobile-menu-overlay');
-            const panel = document.getElementById('mobile-menu-panel');
-            if (overlay.classList.contains('hidden')) {
-                overlay.classList.remove('hidden');
-                panel.classList.remove('translate-x-full');
-            } else {
-                panel.classList.add('translate-x-full');
-                setTimeout(() => overlay.classList.add('hidden'), 300);
-            }
+        // 3. Componente de Frequência (Attendance)
+        const Attendance = ({ members, attendance, user, onTogglePresence }) => {
+            const [search, setSearch] = useState('');
+            const [filterOrg, setFilterOrg] = useState('TODOS');
+            const [showOptions, setShowOptions] = useState(false);
+
+            const filteredMembers = useMemo(() => {
+                return members.filter(m => {
+                    const matchSearch = m.name.toLowerCase().includes(search.toLowerCase()) || m.familia.toLowerCase().includes(search.toLowerCase());
+                    const matchOrg = filterOrg === 'TODOS' || m.org === filterOrg;
+                    return matchSearch && matchOrg;
+                }).sort((a, b) => {
+                     if (a.familia === b.familia) return a.name.localeCompare(b.name);
+                     return a.familia.localeCompare(b.familia);
+                });
+            }, [members, search, filterOrg]);
+
+            let lastFamily = "";
+
+            return (
+                <div className="space-y-6 pb-20">
+                    <div className="sticky top-0 z-10 bg-[#f1f5f9] pt-2 pb-4">
+                        <div className="flex gap-3">
+                            <div className="relative flex-1">
+                                <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 w-5 h-5" />
+                                <input 
+                                    type="text" 
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    placeholder="Buscar nome ou família..." 
+                                    className="w-full pl-12 p-4 rounded-2xl bg-white border-none outline-none shadow-sm font-bold text-sm focus:ring-2 focus:ring-[#002e5d]"
+                                />
+                            </div>
+                            <button 
+                                onClick={() => setShowOptions(!showOptions)}
+                                className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm border border-slate-100 transition-colors ${showOptions ? 'bg-[#002e5d] text-white' : 'bg-white text-[#002e5d]'}`}
+                            >
+                                <SlidersHorizontal className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {showOptions && (
+                            <div className="mt-4 space-y-4 p-6 bg-white rounded-[32px] border shadow-sm animate-in slide-in-from-top-4">
+                                <div className="space-y-2">
+                                     <p className="text-[10px] font-black text-slate-400 uppercase ml-2">Filtros de Organização</p>
+                                     <div className="flex overflow-x-auto gap-2 no-scrollbar py-2">
+                                        {['TODOS', 'Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária'].map(org => (
+                                            <button 
+                                                key={org}
+                                                onClick={() => setFilterOrg(org)}
+                                                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap transition-all border ${filterOrg === org ? 'bg-[#002e5d] text-white border-[#002e5d]' : 'bg-slate-50 text-slate-500 border-slate-100'}`}
+                                            >
+                                                {org}
+                                            </button>
+                                        ))}
+                                     </div>
+                                </div>
+                                {user.role === 'admin' && (
+                                     <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-50">
+                                        <div className="bg-slate-50 p-3 rounded-2xl flex justify-between items-center">
+                                            <span className="text-[10px] font-bold text-slate-500 uppercase">Líderes</span>
+                                            <span className="font-black text-[#002e5d]">{attendance.lideresCount}</span>
+                                        </div>
+                                        <div className="bg-slate-50 p-3 rounded-2xl flex justify-between items-center">
+                                            <span className="text-[10px] font-bold text-slate-500 uppercase">Visitantes</span>
+                                            <span className="font-black text-[#002e5d]">{attendance.visitantesCount}</span>
+                                        </div>
+                                     </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        {filteredMembers.map(m => {
+                            const isPresent = attendance.presents.includes(m.id);
+                            const showHeader = m.familia !== lastFamily && !search;
+                            if(showHeader) lastFamily = m.familia;
+
+                            return (
+                                <div key={m.id}>
+                                    {showHeader && (
+                                        <div className="bg-[#f8fafc] px-4 py-2 rounded-xl text-[10px] font-black text-slate-500 uppercase border border-slate-200 mb-2 mt-4">
+                                            Família {m.familia}
+                                        </div>
+                                    )}
+                                    <div 
+                                        onClick={() => user.role === 'admin' && onTogglePresence(m.id)}
+                                        className={`group p-5 flex items-center gap-4 rounded-[28px] border border-white/50 shadow-sm transition-all cursor-pointer ${isPresent ? 'bg-[#ecfdf5] border-l-[8px] border-l-teal-500' : 'bg-white border-l-[8px] border-l-slate-100 hover:bg-slate-50'}`}
+                                    >
+                                        <div className={`w-7 h-7 rounded-[10px] border-[2px] flex items-center justify-center transition-all ${isPresent ? 'bg-teal-600 border-teal-600 text-white' : 'border-slate-300 group-hover:border-slate-400'}`}>
+                                            {isPresent && <Check size={14} strokeWidth={4} />}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className={`font-bold text-sm truncate ${isPresent ? 'text-teal-900' : 'text-slate-800'}`}>{m.name}</h4>
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{m.org}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        {filteredMembers.length === 0 && (
+                            <div className="text-center py-10 opacity-50">
+                                <p className="text-sm font-bold">Nenhum membro encontrado.</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
         };
 
-        function listenData() {
-            onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => {
-                members = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderAll();
+        // 4. Componente Principal (App) e Lógica de Layout
+        const App = () => {
+            const [user, setUser] = useState(null);
+            const [view, setView] = useState('dashboard');
+            const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+            
+            // Estados de Dados
+            const [members] = useState(MOCK_MEMBERS);
+            const [attendance, setAttendance] = useState({
+                presents: [],
+                lideresCount: 0,
+                visitantesCount: 0
             });
-            onSnapshot(collection(db, "historico"), (snap) => {
-                attendanceHistory = {}; 
-                snap.docs.forEach(d => {
-                    const data = d.data();
-                    attendanceHistory[d.id] = {
-                        presents: data.presents || [],
-                        lideresCount: data.lideresCount || 0,
-                        visitantesCount: data.visitantesCount || 0
+
+            useEffect(() => {
+                const stored = localStorage.getItem('user_data');
+                if (stored) {
+                    setUser(JSON.parse(stored));
+                }
+            }, []);
+
+            const handleLogin = (userData) => {
+                localStorage.setItem('user_data', JSON.stringify(userData));
+                setUser(userData);
+            };
+
+            const handleLogout = () => {
+                localStorage.removeItem('user_data');
+                setUser(null);
+                setView('dashboard');
+            };
+
+            const togglePresence = (id) => {
+                setAttendance(prev => {
+                    const isPresent = prev.presents.includes(id);
+                    return {
+                        ...prev,
+                        presents: isPresent 
+                            ? prev.presents.filter(pid => pid !== id)
+                            : [...prev.presents, id]
                     };
                 });
-                renderAll();
-            });
-            onSnapshot(collection(db, "usuarios"), (snap) => {
-                allUsersList = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                if(currentUser && currentUser.role === 'admin') renderAdminUsers();
-            });
-            document.getElementById('loading-screen').classList.add('hidden');
-        }
-
-        window.updateCount = async (tipo, delta) => {
-            if (!currentUser || currentUser.role !== 'admin') return alert("Acesso negado.");
-            let cur = attendanceHistory[selectedDate]?.[tipo] || 0;
-            let val = cur + delta; if (val < 0) val = 0;
-            await setDoc(doc(db, "historico", selectedDate), { [tipo]: val }, { merge: true });
-        };
-
-        window.togglePresence = async (memberId, memberName) => {
-            if(currentUser.role !== 'admin') return;
-            const hRef = doc(db, "historico", selectedDate);
-            let cur = attendanceHistory[selectedDate]?.presents || [];
-            if(cur.includes(memberId)) {
-                if(!confirm(`Deseja remover a presença de ${memberName}?`)) return;
-                cur = cur.filter(i => i !== memberId);
-            } else {
-                cur.push(memberId);
-                await updateDoc(doc(db, "membros", memberId), { lastAttended: selectedDate });
-            }
-            await setDoc(hRef, { presents: cur }, { merge: true });
-        };
-
-        function renderAll() {
-            renderAttendance();
-            renderRescue();
-            renderReports();
-            updateCharts();
-        }
-
-        function renderAttendance() {
-            const list = document.getElementById('memberList');
-            const search = document.getElementById('searchMember').value.toLowerCase();
-            const data = attendanceHistory[selectedDate] || { presents: [], lideresCount: 0, visitantesCount: 0 };
-            const curP = data.presents || [];
-            list.innerHTML = '';
-            
-            let mP = 0; let vNomP = 0; let totAla = 0; let lastFamily = "";
-
-            if(document.getElementById('display-lideres')) document.getElementById('display-lideres').innerText = data.lideresCount || 0;
-            if(document.getElementById('display-visitantes')) document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
-            
-            document.getElementById('admin-counters').classList.remove('hidden');
-            document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
-
-            const sorted = [...members].sort((a, b) => {
-                const famA = (a.familia || "Z-SEM").toUpperCase();
-                const famB = (b.familia || "Z-SEM").toUpperCase();
-                return famA === famB ? a.name.localeCompare(b.name) : famA.localeCompare(famB);
-            });
-
-            sorted.forEach(m => {
-                const isP = curP.includes(m.id);
-                const isVisitante = (m.org === 'Visitante');
-
-                if(!isVisitante) { totAla++; if(isP) mP++; } 
-                else { if(isP) vNomP++; }
-
-                const matchS = m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search));
-                const matchF = currentFilter === 'TODOS' || m.org === currentFilter;
-
-                if(matchS && matchF) {
-                    if (m.familia !== lastFamily && !search) {
-                        list.innerHTML += `<div class="family-divider">Família ${m.familia}</div>`;
-                        lastFamily = m.familia;
-                    }
-                    list.innerHTML += `
-                        <div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isP ? 'card-presente' : 'card-ausente'}" ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name}')"` : ''}>
-                            <div class="check-box ${isP ? 'check-active' : ''} ${currentUser.role !== 'admin' ? 'opacity-30' : ''}">
-                                ${isP ? '<i class="fas fa-check text-[10px]"></i>' : ''}
-                            </div>
-                            <div class="flex-1 min-w-0 text-left">
-                                <h4 class="font-bold text-sm ${isP ? 'text-teal-900' : 'text-slate-800'} truncate">${m.name}</h4>
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${m.org}</p>
-                            </div>
-                        </div>`;
-                }
-            });
-
-            const lC = data.lideresCount || 0; const vC = data.visitantesCount || 0;
-            document.getElementById('stats-present').innerText = mP + vNomP + lC + vC;
-            document.getElementById('stats-total').innerText = totAla;
-
-            let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1">
-                <p class="text-green-600 flex justify-between"><span>✓ Membros Ala</span> <span>${mP}</span></p>`;
-            if(vNomP > 0) det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Unidade</span> <span>${vNomP}</span></p>`;
-            if(lC > 0) det += `<p class="text-amber-600 flex justify-between"><span>★ Líderes Estaca</span> <span>${lC}</span></p>`;
-            if(vC > 0) det += `<p class="text-blue-500 flex justify-between"><span>🚶 Visitantes Gerais</span> <span>${vC}</span></p>`;
-            const card = document.getElementById('stats-present').parentElement;
-            const old = card.querySelector('.detalhes-area'); if(old) old.remove();
-            card.insertAdjacentHTML('beforeend', det + `</div>`);
-        }
-
-        window.renderMembersList = () => {
-            const container = document.getElementById('manageMembersContainer');
-            const search = document.getElementById('searchManageMembers').value.toLowerCase();
-            const orgFilter = document.getElementById('filterOrgList').value;
-            container.innerHTML = '';
-            members.forEach(m => {
-                if((m.name.toLowerCase().includes(search) || m.familia.toLowerCase().includes(search)) && (orgFilter === 'TODOS' || m.org === orgFilter)) {
-                    container.innerHTML += `<div class="glass-card p-6 flex justify-between items-center border-l-8 border-slate-200">
-                        <div class="text-left">
-                            <h4 class="font-bold text-sm text-slate-800">${m.name}</h4>
-                            <p class="text-[9px] font-black uppercase text-slate-400">${m.org}</p>
-                            <p class="text-[9px] font-bold text-blue-900 uppercase mt-1">Família ${m.familia} ${m.isHead ? '<b>(CHEFE)</b>' : ''}</p>
-                        </div>
-                        ${currentUser.role === 'admin' ? `<button onclick="openMemberEdit('${m.id}')" class="w-10 h-10 bg-slate-50 text-slate-300 rounded-xl flex items-center justify-center border shadow-sm hover:bg-[#002e5d] hover:text-white transition-all"><i class="fas fa-pen-to-square text-xs"></i></button>` : ''}
-                    </div>`;
-                }
-            });
-        };
-
-        window.renderAdminUsers = () => {
-            const l = document.getElementById('users-list'); if(!l) return;
-            l.innerHTML = '';
-            allUsersList.forEach(u => {
-                l.innerHTML += `<div class="bg-white p-5 rounded-3xl flex justify-between items-center text-xs border shadow-sm transition-all hover:bg-slate-50 text-left">
-                    <div><p class="font-black uppercase text-[#002e5d]">${u.name}</p><p class="opacity-40 font-bold uppercase text-[9px] tracking-wider">${u.username} • ${u.role}</p></div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="openEditUser({id:'${u.id}', name:'${u.name}', role:'${u.role}'})" class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-[#002e5d] hover:text-white transition-all"><i class="fas fa-cog text-xs"></i></button>
-                        <div class="w-2 h-2 rounded-full ${u.password?'bg-green-400':'bg-yellow-400'}"></div>
-                    </div>
-                </div>`;
-            });
-        };
-
-        window.openEditUser = (u) => { userIdEditing = u.id; document.getElementById('edit-user-name').value = u.name; document.getElementById('edit-user-role').value = u.role; document.getElementById('edit-user-pass').value = ''; document.getElementById('userEditModal').classList.remove('hidden'); };
-        window.saveUserUpdate = async () => { const up = { name: document.getElementById('edit-user-name').value, role: document.getElementById('edit-user-role').value }; if(document.getElementById('edit-user-pass').value) up.password = document.getElementById('edit-user-pass').value; await updateDoc(doc(db, "usuarios", userIdEditing), up); document.getElementById('userEditModal').classList.add('hidden'); };
-        window.deleteUserAction = async () => { if(confirm("Excluir login?")) { await deleteDoc(doc(db, "usuarios", userIdEditing)); document.getElementById('userEditModal').classList.add('hidden'); } };
-
-        window.toggleOptions = () => document.getElementById('attendance-options').classList.toggle('hidden');
-        window.formatNameInput = (el) => el.value = el.value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-        window.formatPhone = (el) => { let v = el.value.replace(/\D/g,''); v = v.replace(/^(\d{2})(\d)/g,"($1) $2"); v = v.replace(/(\d)(\d{4})$/,"$1-$2"); el.value = v; };
-        window.handleFamilySearch = (query) => {
-            const sug = document.getElementById('familySuggestions');
-            if (query.length < 2) { sug.classList.add('hidden'); return; }
-            const heads = members.filter(m => m.isHead && m.familia.toLowerCase().includes(query.toLowerCase()));
-            if (heads.length > 0) {
-                sug.classList.remove('hidden');
-                sug.innerHTML = heads.map(h => `<div onclick="selectFamily('${h.familia}')" class="p-4 hover:bg-slate-50 border-b cursor-pointer font-bold text-xs uppercase text-slate-600 text-left">${h.familia} <span class="font-normal opacity-50">(Chefe: ${h.name})</span></div>`).join('');
-            } else sug.classList.add('hidden');
-        };
-        window.selectFamily = (f) => { document.getElementById('familySearch').value = f; document.getElementById('familySuggestions').classList.add('hidden'); };
-        
-        window.saveNewMember = async () => {
-            const n = document.getElementById('newName').value; const f = document.getElementById('familySearch').value.toUpperCase();
-            if(!n || !f) return alert("Preencha Nome e Família.");
-            await addDoc(collection(db, "membros"), { name: n, familia: f, org: document.getElementById('newOrg').value, categoria: document.getElementById('newCat').value, telefone: document.getElementById('newPhone').value || '', isHead: document.getElementById('isHeadOfFamily').checked, lastAttended: "2024-01-01" });
-            alert("Sucesso!"); document.getElementById('newName').value = ''; document.getElementById('familySearch').value = '';
-            switchTab('attendance');
-        };
-
-        window.openMemberEdit = (id) => {
-            const m = members.find(x => x.id === id); memberIdEditing = id;
-            document.getElementById('edit-member-name').value = m.name;
-            document.getElementById('edit-member-family').value = m.familia;
-            document.getElementById('edit-member-org').value = m.org;
-            document.getElementById('edit-member-cat').value = m.categoria || 'Membro';
-            document.getElementById('edit-member-phone').value = m.telefone || '';
-            document.getElementById('edit-member-isHead').checked = m.isHead || false;
-            document.getElementById('memberEditModal').classList.remove('hidden');
-        };
-        window.closeMemberEdit = () => document.getElementById('memberEditModal').classList.add('hidden');
-        window.saveMemberAction = async () => {
-            await updateDoc(doc(db, "membros", memberIdEditing), { name: document.getElementById('edit-member-name').value.toUpperCase(), familia: document.getElementById('edit-member-family').value.toUpperCase(), org: document.getElementById('edit-member-org').value, categoria: document.getElementById('edit-member-cat').value, telefone: document.getElementById('edit-member-phone').value, isHead: document.getElementById('edit-member-isHead').checked });
-            closeMemberEdit();
-        };
-        window.deleteMemberAction = async () => { if(confirm("Excluir?")) { await deleteDoc(doc(db, "membros", memberIdEditing)); closeMemberEdit(); } };
-
-        window.adminCreateUser = async () => {
-            const n = document.getElementById('admin-new-name').value;
-            const u = document.getElementById('admin-new-user').value.toLowerCase().trim();
-            if(!n || !u) return alert("Preencha!");
-            await addDoc(collection(db, "usuarios"), { name: n, username: u, password: "", role: document.getElementById('admin-new-role').value });
-            alert("Autorizado!"); document.getElementById('admin-new-name').value = ''; document.getElementById('admin-new-user').value = '';
-        };
-
-        function renderRescue() {
-            const list = document.getElementById('missingList'); list.innerHTML = '';
-            members.forEach(m => {
-                if(m.org === 'Visitante') return;
-                const diff = Math.floor((new Date() - new Date(m.lastAttended)) / (1000*60*60*24));
-                if(diff >= 21) list.innerHTML += `<div class="glass-card p-6 border-t-8 border-orange-500 text-left"><div><p class="text-[9px] font-black text-orange-500 uppercase tracking-widest">${Math.floor(diff/7)} SEMANAS</p><h4 class="font-black text-slate-800 text-sm uppercase">${m.name}</h4></div><a href="https://wa.me/${m.telefone || ''}?text=Olá, sentimos sua falta!" target="_blank" class="block mt-4 bg-teal-600 text-white p-3 rounded-xl text-center font-black text-[10px] uppercase">WhatsApp</a></div>`;
-            });
-            document.getElementById('stats-rescue').innerText = list.children.length;
-        }
-
-        function renderReports() {
-            const yl = document.getElementById('report-yellow'); const fl = document.getElementById('report-family'); const rl = document.getElementById('report-retention');
-            yl.innerHTML = ''; fl.innerHTML = ''; rl.innerHTML = ''; const fams = {};
-            members.forEach(m => {
-                if(m.org === 'Visitante') return;
-                let fq = domingosISO.slice(0, 4).filter(d => (attendanceHistory[d]?.presents || []).includes(m.id)).length;
-                if(fq === 1) yl.innerHTML += `<div class="p-3 bg-yellow-50 rounded-xl text-[10px] font-bold text-yellow-700 uppercase text-left"><i class="fas fa-triangle-exclamation mr-2"></i>${m.name}</div>`;
-                const f = m.familia || 'S/ FAM'; if(!fams[f]) fams[f] = { t: 0, p: 0 }; fams[f].t++; if((attendanceHistory[selectedDate]?.presents || []).includes(m.id)) fams[f].p++;
-                if(m.categoria && m.categoria !== 'Membro') {
-                    const isP = (attendanceHistory[selectedDate]?.presents || []).includes(m.id);
-                    rl.innerHTML += `<div class="p-3 rounded-xl border text-[10px] uppercase font-bold flex justify-between text-left ${isP?'bg-green-50 text-green-700':'bg-red-50 text-red-700'}"><span>${m.name}</span> <i class="fas ${isP?'fa-check':'fa-times'}"></i></div>`;
-                }
-            });
-            Object.keys(fams).forEach(f => { if(fams[f].p === 0) fl.innerHTML += `<div class="p-3 bg-blue-50 rounded-xl text-[10px] font-black uppercase text-blue-700 text-left">Família ${f} Ausente</div>`; });
-        }
-
-        function updateCharts() {
-            const ctx1 = document.getElementById('heatmapChart'); if(!ctx1) return;
-            const orgs = ['Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária'];
-            const stats = orgs.map(o => {
-                const tot = members.filter(m => m.org === o).length;
-                const prs = members.filter(m => m.org === o && (attendanceHistory[selectedDate]?.presents || []).includes(m.id)).length;
-                return tot > 0 ? Math.round((prs/tot)*100) : 0;
-            });
-            if(hChart) hChart.destroy();
-            hChart = new Chart(ctx1.getContext('2d'), { type: 'bar', data: { labels: ['ÉLD', 'SOC', 'MOÇ', 'RAP', 'PRI'], datasets: [{ data: stats, backgroundColor: '#002e5d', borderRadius: 8 }] }, options: { indexAxis: 'y', plugins: { legend: false }, scales: { x: { max: 100 } } } });
-            
-            const ctx2 = document.getElementById('attendanceChart'); if(!ctx2) return;
-            const cts = domingosISO.slice(0, 5).reverse().map(d => (attendanceHistory[d]?.presents || []).length);
-            if(aChart) aChart.destroy();
-            aChart = new Chart(ctx2.getContext('2d'), { type: 'line', data: { labels: domingosISO.slice(0, 5).reverse().map(d=>d.split('-')[2]), datasets: [{ data: cts, borderColor: '#002e5d', fill: true, tension: 0.5 }] }, options: { plugins: { legend: false } } });
-        }
-
-        if(currentUser) {
-            document.getElementById('user-name-side').innerText = currentUser.name;
-            document.getElementById('user-mobile-name').innerText = currentUser.name;
-            document.getElementById('user-mobile-role').innerText = currentUser.role === 'admin' ? 'Administrador' : 'Secretário';
-            
-            if(currentUser.role === 'admin') {
-                document.getElementById('admin-btn').classList.remove('hidden');
-                document.getElementById('admin-mobile-btn').classList.remove('hidden');
-            }
-            
-            const fArea = document.getElementById('orgFilters');
-            ['TODOS', 'Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária', 'Visitante'].forEach(o => {
-                const id = o.replace(/\s+/g, '');
-                fArea.innerHTML += `<button onclick="setFilter('${o}')" class="filter-pill ${o=='TODOS' ? 'active' : ''} glass-card px-6 py-3 whitespace-nowrap text-[10px] font-black uppercase tracking-widest border border-slate-100 shadow-sm" id="pill-${id}">${o}</button>`;
-            });
-
-            window.setFilter = (f) => {
-                currentFilter = f;
-                document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active', 'bg-[#002e5d]', 'text-white'));
-                const el = document.getElementById('pill-'+f.replace(/\s+/g, ''));
-                if(el) el.classList.add('active', 'bg-[#002e5d]', 'text-white');
-                renderAttendance();
             };
-            
-            listenData(); switchTab('dashboard');
-        } else { 
-            switchTab('login');
-            document.getElementById('loading-screen').classList.add('hidden'); 
-        }
+
+            // --- CORREÇÃO DO BUG ---
+            // Se não houver usuário logado, retorna o componente de Login.
+            // Isso impede que qualquer parte do layout (navbar, menu) seja renderizada.
+            if (!user) {
+                return <Login onLogin={handleLogin} />;
+            }
+
+            // Componentes auxiliares de navegação
+            const NavItem = ({ id, icon: Icon, label, mobile = false }) => (
+                <button 
+                    onClick={() => { setView(id); if(mobile) setIsMobileMenuOpen(false); }}
+                    className={`
+                        flex items-center gap-4 p-4 rounded-2xl text-sm font-bold transition-all w-full
+                        ${view === id 
+                            ? 'bg-slate-50 text-[#002e5d] border-r-4 border-[#002e5d]' 
+                            : 'text-slate-400 hover:bg-slate-50'}
+                        ${mobile ? 'justify-start' : ''}
+                    `}
+                >
+                    <Icon className={`w-5 h-5 ${mobile ? '' : 'text-center'}`} />
+                    <span>{label}</span>
+                </button>
+            );
+
+            const MobileNavItem = ({ id, icon: Icon }) => (
+                <button 
+                    onClick={() => setView(id)}
+                    className={`flex flex-col items-center gap-1 transition-all ${view === id ? 'text-[#002e5d] scale-110' : 'text-slate-300'}`}
+                >
+                    <Icon className="w-6 h-6" />
+                </button>
+            );
+
+            return (
+                <div className="flex h-screen overflow-hidden bg-[#f1f5f9]">
+                    
+                    {/* Desktop Sidebar */}
+                    <aside className="hidden lg:flex w-[300px] bg-white flex-col border-r border-slate-200 p-8">
+                        <div className="flex items-center gap-3 mb-12 px-2">
+                            <div className="w-10 h-10 bg-[#002e5d] rounded-2xl flex items-center justify-center text-white shadow-lg">
+                                <Church size={20} />
+                            </div>
+                            <h1 className="font-black text-xs uppercase text-[#002e5d] leading-none tracking-tighter">Ala<br/>Ribeirão Preto 1</h1>
+                        </div>
+                        
+                        <nav className="flex-1 space-y-2">
+                            <NavItem id="dashboard" icon={LayoutDashboard} label="Dashboard" />
+                            <NavItem id="attendance" icon={ClipboardList} label="Registrar Frequência" />
+                            <NavItem id="analysis" icon={HeartHandshake} label="Resgate" />
+                            <NavItem id="reports" icon={FileText} label="Relatórios" />
+                            <NavItem id="add" icon={PlusCircle} label="Novo Membro" />
+                        </nav>
+
+                        <div className="bg-slate-50 p-6 rounded-[32px] mt-auto">
+                            <p className="font-black text-[10px] uppercase text-slate-700 truncate tracking-tighter italic">{user.name}</p>
+                            <button onClick={handleLogout} className="flex items-center gap-2 text-[9px] font-black text-red-400 mt-2 hover:underline uppercase tracking-widest text-left">
+                                <LogOut size={10} /> Sair
+                            </button>
+                        </div>
+                    </aside>
+
+                    {/* Main Content */}
+                    <main className="flex-1 flex flex-col h-full overflow-hidden relative">
+                        
+                        {/* Mobile Header */}
+                        <header className="lg:hidden p-6 flex justify-between items-center bg-white border-b border-slate-100 shrink-0">
+                            <h2 className="font-black text-[#002e5d] text-lg italic uppercase tracking-tighter">
+                                {view === 'dashboard' ? 'Painel Geral' : 
+                                 view === 'attendance' ? 'Frequência' : 
+                                 view === 'analysis' ? 'Resgate' : 'Ala'}
+                            </h2>
+                            <button onClick={() => setIsMobileMenuOpen(true)} className="w-10 h-10 rounded-xl bg-slate-50 text-[#002e5d] flex items-center justify-center shadow-sm">
+                                <Menu size={20} />
+                            </button>
+                        </header>
+
+                        {/* Scrollable Area */}
+                        <div className="flex-1 overflow-y-auto w-full">
+                            <div className="w-full max-w-[1100px] mx-auto p-5 pb-32 lg:p-10">
+                                {view === 'dashboard' && <Dashboard members={members} attendance={attendance} />}
+                                {view === 'attendance' && <Attendance members={members} attendance={attendance} user={user} onTogglePresence={togglePresence} />}
+                                {view === 'analysis' && <div className="text-center text-slate-400 font-bold mt-20">Módulo de Resgate (Em desenvolvimento)</div>}
+                                {view === 'reports' && <div className="text-center text-slate-400 font-bold mt-20">Relatórios (Em desenvolvimento)</div>}
+                                {view === 'add' && <div className="text-center text-slate-400 font-bold mt-20">Cadastro (Em desenvolvimento)</div>}
+                            </div>
+                        </div>
+
+                        {/* Mobile Bottom Navigation */}
+                        <div className="lg:hidden absolute bottom-6 left-6 right-6 h-20 bg-white/90 backdrop-blur rounded-[28px] flex justify-around items-center px-4 z-50 border-2 border-white shadow-2xl">
+                            <MobileNavItem id="dashboard" icon={LayoutDashboard} />
+                            <MobileNavItem id="attendance" icon={ClipboardList} />
+                            <MobileNavItem id="analysis" icon={HeartHandshake} />
+                            <MobileNavItem id="reports" icon={FileText} />
+                            <MobileNavItem id="add" icon={PlusCircle} />
+                        </div>
+                    </main>
+
+                    {/* Mobile Drawer Overlay */}
+                    {isMobileMenuOpen && (
+                        <div className="fixed inset-0 z-[60]">
+                            <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)}></div>
+                            <div className="absolute top-0 right-0 h-full w-64 bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+                                <div className="p-6 bg-[#002e5d] text-white">
+                                    <p className="font-bold truncate text-sm">{user.name}</p>
+                                    <p className="text-[9px] opacity-70 uppercase tracking-widest font-black">{user.role === 'admin' ? 'Administrador' : 'Secretário'}</p>
+                                </div>
+                                <div className="p-4 space-y-2">
+                                     <button onClick={handleLogout} className="w-full flex items-center gap-3 p-4 rounded-2xl text-red-500 hover:bg-red-50 font-bold text-xs uppercase">
+                                        <LogOut size={16} /> Sair do Sistema
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
