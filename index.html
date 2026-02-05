@@ -489,82 +489,102 @@
             updateCharts();
         }
 
-        function renderAttendance() {
-            const list = document.getElementById('memberList');
-            const search = document.getElementById('searchMember').value.toLowerCase();
-            const data = attendanceHistory[selectedDate] || { presents: [], lideresCount: 0, visitantesCount: 0 };
-            const curP = data.presents || [];
-            list.innerHTML = '';
-            
-            let mP = 0; let vNomP = 0; let totAla = 0; let lastFamily = "";
+        window.renderAttendance = () => {
+    const list = document.getElementById('memberList');
+    const search = document.getElementById('searchMember').value.toLowerCase();
+    const data = attendanceHistory[selectedDate] || { presents: [], lideresCount: 0, visitantesCount: 0 };
+    const curP = data.presents || [];
+    list.innerHTML = '';
+    
+    // VARIÁVEIS DE CONTAGEM ZERADAS PARA RECALCULAR
+    let membrosAlaPresentes = 0;
+    let visitantesLocaisPresentes = 0; // Pessoas da área cadastradas nominalmente
+    let totalMembrosAlaUnidade = 0; // O número total de membros que moram na ala
+    let lastFamily = "";
 
-            if(document.getElementById('display-lideres')) document.getElementById('display-lideres').innerText = data.lideresCount || 0;
-            if(document.getElementById('display-visitantes')) document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
-            
-            document.getElementById('admin-counters').classList.remove('hidden');
-            document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
+    // Atualiza os visores de contagem manual
+    if(document.getElementById('display-lideres')) document.getElementById('display-lideres').innerText = data.lideresCount || 0;
+    if(document.getElementById('display-visitantes')) document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
+    
+    // Esconde botões se não for admin
+    document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
 
-            const sorted = [...members].sort((a, b) => {
-                const famA = (a.familia || "Z-SEM").toUpperCase();
-                const famB = (b.familia || "Z-SEM").toUpperCase();
-                return famA === famB ? a.name.localeCompare(b.name) : famA.localeCompare(famB);
-            });
+    // Ordenação
+    const sorted = [...members].sort((a, b) => {
+        const famA = (a.familia || "Z-SEM").toUpperCase();
+        const famB = (b.familia || "Z-SEM").toUpperCase();
+        return famA === famB ? a.name.localeCompare(b.name) : famA.localeCompare(famB);
+    });
 
-            sorted.forEach(m => {
-                const isP = curP.includes(m.id);
-                const isVisitante = (m.org === 'Visitante');
+    sorted.forEach(m => {
+        const isPresente = curP.includes(m.id);
+        
+        // --- REGRA DE OURO DA CONTAGEM ---
+        // Se a organização for exatamente "Visitante", ele NÃO é membro da ala.
+        const ehMembroOficial = (m.org !== 'Visitante');
 
-                if(!isVisitante) { totAla++; if(isP) mP++; } 
-                else { if(isP) vNomP++; }
-
-                const matchS = m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search));
-                const matchF = currentFilter === 'TODOS' || m.org === currentFilter;
-
-                if(matchS && matchF) {
-                    if (m.familia !== lastFamily && !search) {
-                        list.innerHTML += `<div class="family-divider">Família ${m.familia}</div>`;
-                        lastFamily = m.familia;
-                    }
-                    list.innerHTML += `
-                        <div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isP ? 'card-presente' : 'card-ausente'}" ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name}')"` : ''}>
-                            <div class="check-box ${isP ? 'check-active' : ''} ${currentUser.role !== 'admin' ? 'opacity-30' : ''}">
-                                ${isP ? '<i class="fas fa-check text-[10px]"></i>' : ''}
-                            </div>
-                            <div class="flex-1 min-w-0 text-left">
-                                <h4 class="font-bold text-sm ${isP ? 'text-teal-900' : 'text-slate-800'} truncate">${m.name}</h4>
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${m.org}</p>
-                            </div>
-                        </div>`;
-                }
-            });
-
-            const lC = data.lideresCount || 0; const vC = data.visitantesCount || 0;
-            document.getElementById('stats-present').innerText = mP + vNomP + lC + vC;
-            document.getElementById('stats-total').innerText = totAla;
-
-            // DETALHAMENTO NO DASHBOARD (NOMES ATUALIZADOS)
-            let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1">`;
-            
-            // 1. Membros Oficiais
-            det += `<p class="text-green-600 flex justify-between"><span>✓ Membros da Ala</span> <span>${mP}</span></p>`;
-            
-            // 2. Visitantes Locais (Cadastrados por nome no sistema)
-            if(vNomP > 0) {
-                det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Locais</span> <span>${vNomP}</span></p>`;
-            }
-            
-            // 3. Líderes da Estaca (Contador manual)
-            if(lC > 0) {
-                det += `<p class="text-amber-600 flex justify-between"><span>★ Líderes Estaca</span> <span>${lC}</span></p>`;
-            }
-            
-            // 4. Visitantes de Fora (Contador manual)
-            if(vC > 0) {
-                det += `<p class="text-blue-500 flex justify-between"><span>🚶 Visitantes de Fora</span> <span>${vC}</span></p>`;
-            }
-            det += `</div>`;
+        if(ehMembroOficial) {
+            totalMembrosAlaUnidade++; // Soma no total da unidade (cartão do meio)
+            if(isPresente) membrosAlaPresentes++; // Soma no detalhamento de membros
+        } else {
+            if(isPresente) visitantesLocaisPresentes++; // Soma apenas no detalhamento de visitantes locais
         }
+        // ---------------------------------
 
+        const matchS = m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search));
+        const matchF = currentFilter === 'TODOS' || m.org === currentFilter;
+
+        if(matchS && matchF) {
+            if (m.familia !== lastFamily && !search) {
+                list.innerHTML += `<div class="family-divider">Família ${m.familia}</div>`;
+                lastFamily = m.familia;
+            }
+            list.innerHTML += `
+                <div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isPresente ? 'card-presente' : 'card-ausente'}" 
+                     ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name}')"` : ''}>
+                    <div class="check-box ${isPresente ? 'check-active' : ''}">${isPresente ? '<i class="fas fa-check text-[10px]"></i>' : ''}</div>
+                    <div class="flex-1 min-w-0 text-left">
+                        <h4 class="font-bold text-sm ${isPresente ? 'text-teal-900' : 'text-slate-800'} truncate">${m.name}</h4>
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${m.org}</p>
+                    </div>
+                </div>`;
+        }
+    });
+
+    // TOTAIS PARA O DASHBOARD
+    const lC = data.lideresCount || 0; 
+    const vC = data.visitantesCount || 0;
+    
+    // Soma tudo para o totalzão de presentes
+    const totalGeralPresentes = membrosAlaPresentes + visitantesLocaisPresentes + lC + vC;
+
+    document.getElementById('stats-present').innerText = totalGeralPresentes;
+    document.getElementById('stats-total').innerText = totalMembrosAlaUnidade;
+
+    // MONTAGEM DO DETALHAMENTO NO DASHBOARD
+    let detalheHtml = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1">`;
+    
+    // Sempre mostra membros (mesmo que seja 0)
+    detalheHtml += `<p class="text-green-600 flex justify-between"><span>✓ Membros da Ala</span> <span>${membrosAlaPresentes}</span></p>`;
+    
+    // Só mostra as outras se houver alguém
+    if(visitantesLocaisPresentes > 0) {
+        detalheHtml += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Locais</span> <span>${visitantesLocaisPresentes}</span></p>`;
+    }
+    if(lC > 0) {
+        detalheHtml += `<p class="text-amber-600 flex justify-between"><span>★ Líderes Estaca</span> <span>${lC}</span></p>`;
+    }
+    if(vC > 0) {
+        detalheHtml += `<p class="text-blue-500 flex justify-between"><span>🚶 Visitantes de Fora</span> <span>${vC}</span></p>`;
+    }
+    detalheHtml += `</div>`;
+
+    const cardContainer = document.getElementById('stats-present').parentElement;
+    const oldDet = cardContainer.querySelector('.detalhes-area'); 
+    if(oldDet) oldDet.remove();
+    cardContainer.insertAdjacentHTML('beforeend', detalheHtml);
+};
+        
         window.renderMembersList = () => {
             const container = document.getElementById('manageMembersContainer');
             const search = document.getElementById('searchManageMembers').value.toLowerCase();
