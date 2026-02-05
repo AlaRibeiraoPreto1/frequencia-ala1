@@ -209,7 +209,7 @@
                                 </div>
                             </div>
                             <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center shadow-sm">
-                                <span class="text-[10px] font-bold text-slate-500 uppercase">Visitantes Gerais</span>
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Visitantes de Fora</span>
                                 <div class="flex items-center gap-4">
                                     <button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm">-</button>
                                     <span id="display-visitantes" class="font-black text-[#002e5d]">0</span>
@@ -542,14 +542,27 @@
             document.getElementById('stats-present').innerText = mP + vNomP + lC + vC;
             document.getElementById('stats-total').innerText = totAla;
 
-            let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1">
-                <p class="text-green-600 flex justify-between"><span>✓ Membros Ala</span> <span>${mP}</span></p>`;
-            if(vNomP > 0) det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Unidade</span> <span>${vNomP}</span></p>`;
-            if(lC > 0) det += `<p class="text-amber-600 flex justify-between"><span>★ Líderes Estaca</span> <span>${lC}</span></p>`;
-            if(vC > 0) det += `<p class="text-blue-500 flex justify-between"><span>🚶 Visitantes Gerais</span> <span>${vC}</span></p>`;
-            const card = document.getElementById('stats-present').parentElement;
-            const old = card.querySelector('.detalhes-area'); if(old) old.remove();
-            card.insertAdjacentHTML('beforeend', det + `</div>`);
+            // DETALHAMENTO NO DASHBOARD (NOMES ATUALIZADOS)
+            let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1">`;
+            
+            // 1. Membros Oficiais
+            det += `<p class="text-green-600 flex justify-between"><span>✓ Membros da Ala</span> <span>${mP}</span></p>`;
+            
+            // 2. Visitantes Locais (Cadastrados por nome no sistema)
+            if(vNomP > 0) {
+                det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Locais</span> <span>${vNomP}</span></p>`;
+            }
+            
+            // 3. Líderes da Estaca (Contador manual)
+            if(lC > 0) {
+                det += `<p class="text-amber-600 flex justify-between"><span>★ Líderes Estaca</span> <span>${lC}</span></p>`;
+            }
+            
+            // 4. Visitantes de Fora (Contador manual)
+            if(vC > 0) {
+                det += `<p class="text-blue-500 flex justify-between"><span>🚶 Visitantes de Fora</span> <span>${vC}</span></p>`;
+            }
+            det += `</div>`;
         }
 
         window.renderMembersList = () => {
