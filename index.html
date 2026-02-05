@@ -199,25 +199,37 @@
                             </div>
                             <div id="orgFilters" class="flex overflow-x-auto gap-2 no-scrollbar py-2"></div>
                         </div>
-                        <div id="admin-counters" class="hidden grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center shadow-sm">
-                                <span class="text-[10px] font-bold text-slate-500 uppercase">Líderes Estaca</span>
-                                <div class="flex items-center gap-4">
-                                    <button onclick="updateCount('lideresCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm">-</button>
-                                    <span id="display-lideres" class="font-black text-[#002e5d]">0</span>
-                                    <button onclick="updateCount('lideresCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button>
-                                </div>
-                            </div>
-                            <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center shadow-sm">
-                                <span class="text-[10px] font-bold text-slate-500 uppercase">Visitantes de Fora</span>
-                                <div class="flex items-center gap-4">
-                                    <button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm">-</button>
-                                    <span id="display-visitantes" class="font-black text-[#002e5d]">0</span>
-                                    <button onclick="updateCount('visitantesCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        
+                        <!-- BLOCO DE CONTADORES MANUAIS (LÍDERES, VISITANTES E MISSIONÁRIOS) -->
+<div id="admin-counters" class="hidden grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
+    <!-- Líderes -->
+    <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100">
+        <span class="text-[10px] font-bold text-slate-500 uppercase">Líderes Estaca</span>
+        <div class="flex items-center gap-3">
+            <button onclick="updateCount('lideresCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button>
+            <span id="display-lideres" class="font-black text-sm">0</span>
+            <button onclick="updateCount('lideresCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button>
+        </div>
+    </div>
+    <!-- Visitantes de Fora -->
+    <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100">
+        <span class="text-[10px] font-bold text-slate-500 uppercase">Vist. de Fora</span>
+        <div class="flex items-center gap-3">
+            <button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button>
+            <span id="display-visitantes" class="font-black text-sm">0</span>
+            <button onclick="updateCount('visitantesCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button>
+        </div>
+    </div>
+    <!-- Missionários -->
+    <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100">
+        <span class="text-[10px] font-bold text-slate-500 uppercase">Missionários</span>
+        <div class="flex items-center gap-3">
+            <button onclick="updateCount('missionariosCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button>
+            <span id="display-missionarios" class="font-black text-sm">0</span>
+            <button onclick="updateCount('missionariosCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button>
+        </div>
+    </div>
+</div>
                     <div id="memberList" class="space-y-2"></div>
                 </section>
 
@@ -445,13 +457,14 @@
             onSnapshot(collection(db, "historico"), (snap) => {
                 attendanceHistory = {}; 
                 snap.docs.forEach(d => {
-                    const data = d.data();
-                    attendanceHistory[d.id] = {
-                        presents: data.presents || [],
-                        lideresCount: data.lideresCount || 0,
-                        visitantesCount: data.visitantesCount || 0
-                    };
-                });
+    const docData = d.data();
+    attendanceHistory[d.id] = {
+        presents: docData.presents || [],
+        lideresCount: docData.lideresCount || 0,
+        visitantesCount: docData.visitantesCount || 0,
+        missionariosCount: docData.missionariosCount || 0 // ADICIONADO
+    };
+});
                 renderAll();
             });
             onSnapshot(collection(db, "usuarios"), (snap) => {
@@ -492,19 +505,26 @@
        window.renderAttendance = () => {
     const list = document.getElementById('memberList');
     const search = document.getElementById('searchMember').value.toLowerCase();
-    const data = attendanceHistory[selectedDate] || { presents: [], lideresCount: 0, visitantesCount: 0 };
+    const data = attendanceHistory[selectedDate] || { presents: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
     const curP = data.presents || [];
     list.innerHTML = '';
     
-    let membrosAlaPresentes = 0;
-    let visitantesLocaisPresentes = 0; // Baseado na CATEGORIA
-    let totalMembrosAlaUnidade = 0; 
+    // VARIÁVEIS PARA O DASHBOARD
+    let mP = 0; // Membros Ala presentes
+    let vNomP = 0; // Visitantes Locais (Nominais) presentes
+    let totMembrosAla = 0; // Total de membros registrados (exceto categoria Visitante)
     let lastFamily = "";
 
-    // Atualiza visores manuais
+    // 1. Atualiza números nos visores da aba de registro
     if(document.getElementById('display-lideres')) document.getElementById('display-lideres').innerText = data.lideresCount || 0;
     if(document.getElementById('display-visitantes')) document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
+    if(document.getElementById('display-missionarios')) document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
     
+    // 2. Trava de segurança Admin
+    document.getElementById('admin-counters').classList.remove('hidden');
+    document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
+
+    // 3. Ordenação e Contagem Lógica
     const sorted = [...members].sort((a, b) => {
         const famA = (a.familia || "Z-SEM").toUpperCase();
         const famB = (b.familia || "Z-SEM").toUpperCase();
@@ -512,18 +532,17 @@
     });
 
     sorted.forEach(m => {
-        const isPresente = curP.includes(m.id);
+        const isP = curP.includes(m.id);
         
-        // --- NOVA REGRA DE VERIFICAÇÃO PELA CATEGORIA ---
+        // VERIFICAÇÃO POR CATEGORIA (Conforme solicitado)
         const ehVisitanteLocal = (m.categoria === 'Visitante');
 
         if(!ehVisitanteLocal) {
-            totalMembrosAlaUnidade++; // Só conta no total da ala se NÃO for categoria Visitante
-            if(isPresente) membrosAlaPresentes++;
+            totMembrosAla++; 
+            if(isP) mP++; 
         } else {
-            if(isPresente) visitantesLocaisPresentes++;
+            if(isP) vNomP++;
         }
-        // -----------------------------------------------
 
         const matchS = m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search));
         const matchF = currentFilter === 'TODOS' || m.org === currentFilter;
@@ -534,43 +553,42 @@
                 lastFamily = m.familia;
             }
             list.innerHTML += `
-                <div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isPresente ? 'card-presente' : 'card-ausente'}" 
-                     ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name}')"` : ''}>
-                    <div class="check-box ${isPresente ? 'check-active' : ''}">${isPresente ? '<i class="fas fa-check text-[10px]"></i>' : ''}</div>
+                <div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isP ? 'card-presente' : 'card-ausente'}" ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name}')"` : ''}>
+                    <div class="check-box ${isP ? 'check-active' : ''}">${isP ? '<i class="fas fa-check text-[10px]"></i>' : ''}</div>
                     <div class="flex-1 min-w-0 text-left">
-                        <h4 class="font-bold text-sm ${isPresente ? 'text-teal-900' : 'text-slate-800'} truncate">${m.name}</h4>
+                        <h4 class="font-bold text-sm ${isP ? 'text-teal-900' : 'text-slate-800'} truncate">${m.name}</h4>
                         <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${m.org} • ${m.categoria}</p>
                     </div>
                 </div>`;
         }
     });
 
-    // TOTAIS
+    // 4. CÁLCULO E EXIBIÇÃO NO DASHBOARD
     const lC = data.lideresCount || 0; 
     const vC = data.visitantesCount || 0;
-    const totalGeral = membrosAlaPresentes + visitantesLocaisPresentes + lC + vC;
+    const mssC = data.missionariosCount || 0;
 
+    const totalGeral = mP + vNomP + lC + vC + mssC;
     document.getElementById('stats-present').innerText = totalGeral;
-    document.getElementById('stats-total').innerText = totalMembrosAlaUnidade;
+    document.getElementById('stats-total').innerText = totMembrosAla;
 
-    // DETALHAMENTO
+    // Detalhamento dinâmico (Apenas se > 0)
     let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1">`;
-    det += `<p class="text-green-600 flex justify-between"><span>✓ Membros da Ala</span> <span>${membrosAlaPresentes}</span></p>`;
+    det += `<p class="text-green-600 flex justify-between"><span>✓ Membros da Ala</span> <span>${mP}</span></p>`;
     
-    if(visitantesLocaisPresentes > 0) {
-        det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes da Ala</span> <span>${visitantesLocaisPresentes}</span></p>`;
-    }
-    if(lC > 0) {
-        det += `<p class="text-amber-600 flex justify-between"><span>★ Líderes Estaca</span> <span>${lC}</span></p>`;
-    }
-    if(vC > 0) {
-        det += `<p class="text-blue-500 flex justify-between"><span>🚶 Visitantes de Fora</span> <span>${vC}</span></p>`;
-    }
+    if(vNomP > 0) det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Locais</span> <span>${vNomP}</span></p>`;
+    if(lC > 0) det += `<p class="text-amber-600 flex justify-between"><span>★ Líderes Estaca</span> <span>${lC}</span></p>`;
+    if(mssC > 0) det += `<p class="text-indigo-600 flex justify-between"><span>👔 Missionários</span> <span>${mssC}</span></p>`;
+    if(vC > 0) det += `<p class="text-blue-500 flex justify-between"><span>🚶 Visitantes de Fora</span> <span>${vC}</span></p>`;
     
-    const cardContainer = document.getElementById('stats-present').parentElement;
-    const oldDet = cardContainer.querySelector('.detalhes-area'); 
-    if(oldDet) oldDet.remove();
-    cardContainer.insertAdjacentHTML('beforeend', det + `</div>`);
+    const card = document.getElementById('stats-present').parentElement;
+    const old = card.querySelector('.detalhes-area'); if(old) old.remove();
+    card.insertAdjacentHTML('beforeend', det + `</div>`);
+
+    // BLOQUEIO FINAL PARA NÃO-ADMIN
+    if(currentUser.role !== 'admin') {
+        document.querySelectorAll('#memberList input[type="checkbox"]').forEach(cb => cb.classList.add('hidden'));
+    }
 };
         
         window.renderMembersList = () => {
