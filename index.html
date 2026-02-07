@@ -11,11 +11,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --sacramental-blue: #002e5d; --healing-teal: #0d9488; --rescue-orange: #ea580c; --bg-soft: #f1f5f9; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-soft); color: #1e293b; margin: 0; padding: 0; overflow-x: hidden; }
-        body.status-login { height: 100vh !important; overflow: hidden !important; position: fixed; width: 100%; }
-        body.status-app { height: auto !important; overflow-y: auto !important; position: relative; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-soft); color: #1e293b; margin: 0; padding: 0; }
         .hidden { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        body.status-login { height: 100vh !important; overflow: hidden !important; position: fixed; width: 100%; }
+        body.status-app { height: auto !important; overflow-y: auto !important; position: relative; }
         @media (min-width: 1024px) {
             .app-layout { display: flex !important; height: 100vh; overflow: hidden; }
             .sidebar { width: 300px !important; flex-shrink: 0; display: flex !important; background: white; border-right: 1px solid #e2e8f0; flex-direction: column; }
@@ -25,6 +25,7 @@
         @media (max-width: 1023px) {
             .sidebar { display: none !important; }
             .app-layout { display: block !important; }
+            .main-content { width: 100%; }
             .content-container { padding: 20px; padding-bottom: 120px; }
             .sticky-search { position: sticky; top: 0; z-index: 100; background: var(--bg-soft); padding: 10px 0; }
         }
@@ -45,54 +46,59 @@
     <div id="loading-screen" class="fixed inset-0 bg-white z-[300] flex items-center justify-center">
         <div class="text-center space-y-4">
             <div class="w-12 h-12 border-4 border-slate-100 border-t-[#002e5d] rounded-full animate-spin mx-auto"></div>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Sincronizando...</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center italic">Conectando...</p>
         </div>
     </div>
 
-    <!-- ACESSO -->
+    <!-- ÁREA DE ACESSO -->
     <div id="access-container" class="min-h-screen flex items-center justify-center bg-slate-50 p-6">
         <section id="view-login" class="hidden glass-card p-10 w-full max-w-sm text-center space-y-8 shadow-2xl">
-            <img src="https://images-us-prod.cms.commerce.dynamics.com/cms/api/fswvqbgntk/imageFileData/MA2bhk?ver=9757" alt="Cristo" class="h-32 mx-auto object-contain mb-6">
+            <img src="https://images-us-prod.cms.commerce.dynamics.com/cms/api/fswvqbgntk/imageFileData/MA2bhk?ver=9757" alt="Cristo" class="h-32 mx-auto object-contain">
             <h2 class="text-2xl font-black text-slate-800 tracking-tighter uppercase italic leading-tight">Ala Ribeirão Preto 1</h2>
             <div class="space-y-3">
-                <input type="text" id="login-user" placeholder="Usuário" class="w-full p-4 rounded-2xl bg-slate-100 border-none outline-none text-sm font-bold">
-                <input type="password" id="login-pass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none outline-none text-sm">
+                <input type="text" id="login-user" placeholder="Usuário" class="w-full p-4 rounded-2xl bg-slate-100 border-none outline-none text-sm font-bold shadow-inner">
+                <input type="password" id="login-pass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none outline-none text-sm shadow-inner">
             </div>
             <button onclick="checkLogin()" class="w-full bg-[#002e5d] text-white py-4 rounded-2xl font-bold shadow-xl active:scale-95 transition-all uppercase text-xs">Entrar</button>
-            <button onclick="switchTab('first-login')" class="text-xs font-bold text-slate-400 underline">Ativar Primeiro Acesso</button>
+            <button onclick="switchTab('first-login')" class="text-xs font-bold text-slate-400 underline">Primeiro Acesso?</button>
         </section>
 
         <section id="view-first-login" class="hidden glass-card p-10 w-full max-w-sm text-center space-y-6 shadow-xl">
-            <h2 class="font-black text-xl italic uppercase text-[#002e5d]">Primeiro Acesso</h2>
+            <h2 class="font-black text-xl italic uppercase text-[#002e5d]">Ativar Conta</h2>
             <div class="space-y-3">
                 <input type="text" id="first-user" placeholder="Login Autorizado" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm font-bold">
                 <input type="password" id="first-pass" placeholder="Crie uma Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm">
                 <input type="password" id="first-pass-confirm" placeholder="Confirme a Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm">
             </div>
             <button onclick="processFirstLogin()" class="w-full bg-green-600 text-white p-5 rounded-2xl font-black uppercase text-xs">Ativar</button>
-            <button onclick="switchTab('login')" class="text-xs text-slate-400 underline">Voltar</button>
+            <button onclick="switchTab('login')" class="text-xs text-slate-400 underline font-bold">Voltar</button>
         </section>
     </div>
 
     <!-- MENU MOBILE DRAWER -->
     <div id="mobile-menu-overlay" onclick="toggleMobileMenu()" class="hidden fixed inset-0 bg-black/50 z-[200] backdrop-blur-sm"></div>
-    <div id="mobile-menu-panel" class="fixed top-0 right-0 h-full w-64 bg-white z-[210] shadow-2xl translate-x-full transition-transform duration-300 flex flex-col">
+    <div id="mobile-menu-panel" class="fixed top-0 right-0 h-full w-64 bg-white z-[210] shadow-2xl translate-x-full flex flex-col">
         <div class="p-6 bg-[#002e5d] text-white">
             <p id="user-mobile-name" class="font-bold truncate text-sm">...</p>
             <p id="user-mobile-role" class="text-[9px] opacity-70 uppercase tracking-widest font-black"></p>
         </div>
         <div class="flex-1 p-4 space-y-2">
-            <button id="admin-mobile-btn" onclick="switchTab('admin-users'); toggleMobileMenu();" class="hidden w-full flex items-center gap-3 p-4 rounded-2xl text-slate-600 hover:bg-slate-50 font-bold text-xs uppercase"><i class="fas fa-users-cog text-[#002e5d]"></i> Gerenciar Logins</button>
+            <button id="admin-mobile-btn" onclick="switchTab('admin-users'); toggleMobileMenu();" class="hidden w-full flex items-center gap-3 p-4 rounded-2xl text-slate-600 hover:bg-slate-50 font-bold text-xs uppercase">
+                <i class="fas fa-users-cog text-[#002e5d]"></i> Gerenciar Logins
+            </button>
             <hr class="border-slate-50">
-            <button onclick="logout()" class="w-full flex items-center gap-3 p-4 rounded-2xl text-red-500 hover:bg-red-50 font-bold text-xs uppercase"><i class="fas fa-power-off"></i> Sair do Sistema</button>
+            <button onclick="logout()" class="w-full flex items-center gap-3 p-4 rounded-2xl text-red-500 hover:bg-red-50 font-bold text-xs uppercase">
+                <i class="fas fa-power-off"></i> Sair do Sistema
+            </button>
         </div>
     </div>
 
-    <!-- APP LAYOUT -->
+    <!-- APP PRINCIPAL -->
     <div id="app-layout" class="hidden app-layout">
+        
         <aside class="sidebar p-8">
             <div class="flex items-center gap-3 mb-12 px-2">
-                <div class="w-10 h-10 bg-[#002e5d] rounded-2xl flex items-center justify-center text-white shadow-lg"><i class="fas fa-church"></i></div>
+                <div class="w-10 h-10 bg-[#002e5d] rounded-2xl flex items-center justify-center text-white shadow-lg"><i class="fas fa-church text-lg"></i></div>
                 <h1 class="font-black text-xs uppercase text-[#002e5d] leading-none tracking-tighter">Ala<br>Ribeirão Preto 1</h1>
             </div>
             <nav class="flex-1 space-y-1">
@@ -104,8 +110,8 @@
                 <hr class="border-slate-50 my-6">
                 <button id="admin-btn" onclick="switchTab('admin-users')" class="hidden w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left"><i class="fas fa-users-cog"></i> Gerenciar Logins</button>
             </nav>
-            <div class="bg-slate-50 p-6 rounded-[32px] mt-auto">
-                <p id="user-name-side" class="font-black text-[10px] uppercase text-slate-700 truncate tracking-tighter italic">...</p>
+            <div class="bg-slate-50 p-6 rounded-[32px]">
+                <p id="user-name-side" class="font-black text-[10px] uppercase text-slate-700 truncate tracking-tighter">...</p>
                 <button onclick="logout()" class="text-[9px] font-bold text-red-400 mt-2 hover:underline uppercase tracking-widest text-left">Sair</button>
             </div>
         </aside>
@@ -120,9 +126,18 @@
                 <!-- DASHBOARD -->
                 <section id="view-dashboard" class="hidden space-y-8">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="glass-card p-8 border-l-[12px] border-green-500"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Presentes Hoje</p><p id="stats-present" class="text-5xl font-black text-slate-800 leading-tight">0</p></div>
-                        <div class="glass-card p-8 border-l-[12px] border-[#002e5d]"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Membros Ala</p><p id="stats-total" class="text-5xl font-black text-slate-800 leading-tight">0</p></div>
-                        <div class="glass-card p-8 border-l-[12px] border-orange-500"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resgate</p><p id="stats-rescue" class="text-5xl font-black text-slate-800 leading-tight">0</p></div>
+                        <div class="glass-card p-8 border-l-[12px] border-green-500" id="dash-present-card">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Presentes Hoje</p>
+                            <p id="stats-present" class="text-5xl font-black text-slate-800 leading-tight">0</p>
+                        </div>
+                        <div class="glass-card p-8 border-l-[12px] border-[#002e5d]">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Membros Ala</p>
+                            <p id="stats-total" class="text-5xl font-black text-slate-800 leading-tight">0</p>
+                        </div>
+                        <div class="glass-card p-8 border-l-[12px] border-orange-500">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resgate</p>
+                            <p id="stats-rescue" class="text-5xl font-black text-slate-800 leading-tight">0</p>
+                        </div>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <div class="glass-card p-8"><canvas id="heatmapChart" height="220"></canvas></div>
@@ -137,33 +152,67 @@
                             <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
                             <input type="text" id="searchMember" oninput="renderAttendance()" placeholder="Buscar nome ou família..." class="w-full pl-12 p-4 rounded-2xl bg-white border-none outline-none shadow-sm font-bold text-sm">
                         </div>
-                        <button onclick="toggleOptions()" class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#002e5d] shadow-sm border border-slate-100"><i class="fas fa-sliders"></i></button>
+                        <button onclick="toggleOptions()" class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#002e5d] shadow-sm border border-slate-100 active:scale-95">
+                            <i class="fas fa-sliders"></i>
+                        </button>
                     </div>
+
                     <div id="attendance-options" class="hidden space-y-6 p-6 bg-white rounded-[32px] border shadow-sm">
                         <div class="space-y-2">
                             <p class="text-[10px] font-black text-slate-400 uppercase ml-2">Data e Filtros</p>
-                            <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl">
+                            <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl border">
                                 <i class="fas fa-calendar-day text-[#002e5d]"></i>
                                 <select id="dateSelect" class="bg-transparent font-black text-xs uppercase outline-none border-none flex-1 cursor-pointer"></select>
                             </div>
                             <div id="orgFilters" class="flex overflow-x-auto gap-2 no-scrollbar py-2"></div>
                         </div>
+
                         <div id="admin-counters" class="space-y-2 mt-4 pt-4 border-t border-slate-100">
-                            <p class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest">Contadores Manuais</p>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100"><span class="text-[10px] font-bold text-slate-500 uppercase">Líderes Estaca</span><div class="flex items-center gap-4"><button onclick="updateCount('lideresCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button><span id="display-lideres" class="font-black text-[#002e5d]">0</span><button onclick="updateCount('lideresCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button></div></div>
-                                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100"><span class="text-[10px] font-bold text-slate-500 uppercase">Visitantes Fora</span><div class="flex items-center gap-4"><button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button><span id="display-visitantes" class="font-black text-[#002e5d]">0</span><button onclick="updateCount('visitantesCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button></div></div>
-                                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100"><span class="text-[10px] font-bold text-slate-500 uppercase">Missionários</span><div class="flex items-center gap-4"><button onclick="updateCount('missionariosCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button><span id="display-missionarios" class="font-black text-[#002e5d]">0</span><button onclick="updateCount('missionariosCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button></div></div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest text-left">Contadores Manuais</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-center">
+                                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100">
+                                    <span class="text-[10px] font-bold text-slate-500 uppercase">Líderes Estaca</span>
+                                    <div class="flex items-center gap-4">
+                                        <button onclick="updateCount('lideresCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button>
+                                        <span id="display-lideres" class="font-black text-[#002e5d]">0</span>
+                                        <button onclick="updateCount('lideresCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100">
+                                    <span class="text-[10px] font-bold text-slate-500 uppercase">Visitantes Fora</span>
+                                    <div class="flex items-center gap-4">
+                                        <button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button>
+                                        <span id="display-visitantes" class="font-black text-[#002e5d]">0</span>
+                                        <button onclick="updateCount('visitantesCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100">
+                                    <span class="text-[10px] font-bold text-slate-500 uppercase">Missionários</span>
+                                    <div class="flex items-center gap-4">
+                                        <button onclick="updateCount('missionariosCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button>
+                                        <span id="display-missionarios" class="font-black text-[#002e5d]">0</span>
+                                        <button onclick="updateCount('missionariosCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- LISTA DE MEMBROS (ID IMPORTANTE) -->
                     <div id="memberList" class="space-y-2 mt-6"></div>
                 </section>
 
                 <!-- RELATÓRIOS -->
                 <section id="view-reports" class="hidden space-y-8 text-left">
-                    <div class="glass-card p-6 border-l-[12px] border-slate-800 cursor-pointer hover:bg-slate-50 mb-8" onclick="switchTab('members-list')">
-                        <div class="flex items-center justify-between"><div><h3 class="font-black text-slate-800 uppercase text-[10px] mb-1">Base de Dados</h3><p class="text-lg font-black text-[#002e5d] italic leading-tight">Gestão de Membros</p></div><i class="fas fa-users-rectangle text-3xl text-slate-200"></i></div>
+                    <div class="glass-card p-6 border-l-[12px] border-slate-800 cursor-pointer hover:bg-slate-50 mb-8 transition-all active:scale-95" onclick="switchTab('members-list')">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-black text-slate-800 uppercase text-[10px] mb-1">Base de Dados</h3>
+                                <p class="text-lg font-black text-[#002e5d] italic">Gestão de Membros</p>
+                                <p class="text-[10px] text-slate-400 font-bold mt-1 uppercase italic">Editar nomes e famílias</p>
+                            </div>
+                            <i class="fas fa-users-rectangle text-3xl text-slate-200"></i>
+                        </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="glass-card p-8"><h3 class="font-black text-yellow-600 uppercase text-[10px] mb-4 tracking-widest border-b pb-2">Sinal Amarelo</h3><div id="report-yellow" class="space-y-3"></div></div>
@@ -175,10 +224,15 @@
                 <!-- GESTÃO DE LISTAS -->
                 <section id="view-members-list" class="hidden space-y-6 text-left">
                     <button onclick="switchTab('reports')" class="flex items-center gap-2 text-[#002e5d] font-bold text-xs uppercase mb-4"><i class="fas fa-arrow-left"></i> Voltar</button>
-                    <div class="flex flex-col md:flex-row gap-4 bg-white p-6 rounded-[32px] border">
+                    <div class="flex flex-col md:flex-row gap-4 bg-white p-6 rounded-[32px] border border-slate-100">
                         <input type="text" id="searchManageMembers" oninput="renderMembersList()" placeholder="Buscar para editar..." class="flex-1 p-4 rounded-2xl bg-slate-50 outline-none text-sm font-bold border-none focus:ring-2 focus:ring-[#002e5d]">
-                        <select id="filterOrgList" onchange="renderMembersList()" class="p-3 bg-slate-50 rounded-xl text-[10px] font-bold uppercase border-none outline-none text-slate-500">
-                            <option value="TODOS">Todas Orgs</option><option value="Quórum de Élderes">Élderes</option><option value="Sociedade de Socorro">Socorro</option><option value="Moças">Moças</option><option value="Rapazes">Rapazes</option><option value="Primária">Primária</option>
+                        <select id="filterOrgList" onchange="renderMembersList()" class="p-3 bg-slate-50 rounded-xl text-[10px] font-bold uppercase outline-none border-none text-slate-500">
+                            <option value="TODOS">Todas Organizações</option>
+                            <option value="Quórum de Élderes">Élderes</option>
+                            <option value="Sociedade de Socorro">Socorro</option>
+                            <option value="Moças">Moças</option>
+                            <option value="Rapazes">Rapazes</option>
+                            <option value="Primária">Primária</option>
                         </select>
                     </div>
                     <div id="manageMembersContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-10"></div>
@@ -191,7 +245,7 @@
 
                 <!-- NOVO CADASTRO -->
                 <section id="view-add" class="hidden flex justify-center">
-                    <div class="glass-card p-10 w-full max-w-xl space-y-6 text-left shadow-xl">
+                    <div class="glass-card p-8 w-full max-w-xl space-y-6 text-left shadow-xl">
                         <h3 class="text-xl font-black text-[#002e5d] uppercase text-center italic">Novo Cadastro</h3>
                         <div class="space-y-4">
                             <input type="text" id="newName" oninput="formatNameInput(this)" placeholder="Nome Completo" class="w-full p-4 bg-slate-50 border-none rounded-[20px] font-bold text-sm outline-none">
@@ -204,20 +258,20 @@
                                 <select id="newOrg" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none"><option value="Quórum de Élderes">ÉLDERES</option><option value="Sociedade de Socorro">SOCORRO</option><option value="Moças">MOÇAS</option><option value="Rapazes">RAPAZES</option><option value="Primária">PRIMÁRIA</option></select>
                                 <select id="newCat" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none"><option value="Membro">MEMBRO</option><option value="Recém-Converso">RECÉM-CONVERSO</option><option value="Novo Morador">NOVO MORADOR</option><option value="Visitante">VISITANTE</option></select>
                             </div>
-                            <input type="tel" id="newPhone" oninput="formatPhone(this)" placeholder="WhatsApp (DDD)" class="w-full p-4 bg-slate-50 rounded-2xl font-bold text-sm border-none outline-none">
-                            <button onclick="saveNewMember()" class="w-full bg-[#002e5d] text-white p-6 rounded-[32px] font-black shadow-2xl transition-all active:scale-95 uppercase text-xs">Cadastrar</button>
+                            <input type="tel" id="newPhone" oninput="formatPhone(this)" placeholder="WhatsApp (DDD)" class="w-full p-4 bg-slate-50 rounded-2xl font-bold text-sm border-none outline-none shadow-inner">
+                            <button onclick="saveNewMember()" class="w-full bg-[#002e5d] text-white p-6 rounded-[32px] font-black shadow-2xl transition-all active:scale-95 uppercase text-xs">Concluir Cadastro</button>
                         </div>
                     </div>
                 </section>
 
                 <!-- ADMIN USUÁRIOS -->
                 <section id="view-admin-users" class="hidden space-y-8 text-left">
-                    <div class="glass-card p-10 max-w-md mx-auto space-y-4 shadow-xl">
+                    <div class="glass-card p-8 max-w-md mx-auto space-y-4 shadow-xl">
                         <h4 class="font-black text-xs text-center uppercase tracking-widest text-slate-400">Autorizar Login</h4>
                         <input type="text" id="admin-new-name" placeholder="Nome" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none font-bold">
                         <input type="text" id="admin-new-user" placeholder="Login (Usuário)" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none font-bold">
                         <select id="admin-new-role" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none font-bold uppercase text-xs outline-none"><option value="user">Secretário</option><option value="admin">Administrador</option></select>
-                        <button onclick="adminCreateUser()" class="w-full bg-[#002e5d] text-white p-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg transition-all active:scale-95">Autorizar</button>
+                        <button onclick="adminCreateUser()" class="w-full bg-[#002e5d] text-white p-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg active:scale-95 transition-all">Autorizar</button>
                     </div>
                     <div id="users-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </section>
@@ -238,12 +292,12 @@
     <div id="memberEditModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
         <div class="glass-card w-full max-w-sm p-10 space-y-6">
             <h3 class="font-black uppercase text-xs text-slate-400 border-b pb-2 tracking-widest">Editar Registro</h3>
-            <div class="space-y-4">
-                <input type="text" id="edit-member-name" oninput="formatNameInput(this)" class="w-full p-4 bg-slate-50 rounded-2xl uppercase text-sm font-bold border-none outline-none">
-                <input type="text" id="edit-member-family" class="w-full p-4 bg-slate-50 rounded-2xl uppercase text-sm font-bold border-none outline-none">
-                <select id="edit-member-org" class="w-full p-4 bg-slate-50 rounded-2xl text-[10px] font-bold border-none outline-none"><option value="Quórum de Élderes">Quórum de Élderes</option><option value="Sociedade de Socorro">Sociedade de Socorro</option><option value="Moças">Moças</option><option value="Rapazes">Rapazes</option><option value="Primária">Primária</option><option value="Visitante">Visitante</option></select>
-                <select id="edit-member-cat" class="w-full p-4 bg-slate-50 rounded-2xl text-[10px] font-bold border-none outline-none"><option value="Membro">Membro</option><option value="Recém-Converso">Recém-Converso</option><option value="Novo Morador">Novo Morador</option><option value="Visitante">Visitante</option></select>
-                <input type="tel" id="edit-member-phone" oninput="formatPhone(this)" class="w-full p-4 bg-slate-50 rounded-2xl text-sm font-bold border-none outline-none" placeholder="Celular">
+            <div class="space-y-4 text-left">
+                <input type="text" id="edit-member-name" oninput="formatNameInput(this)" class="w-full p-4 bg-slate-50 rounded-2xl uppercase text-sm font-bold outline-none border-none">
+                <input type="text" id="edit-member-family" class="w-full p-4 bg-slate-50 rounded-2xl uppercase text-sm font-bold outline-none border-none">
+                <select id="edit-member-org" class="w-full p-4 bg-slate-50 rounded-2xl text-xs font-bold border-none outline-none"><option value="Quórum de Élderes">Quórum de Élderes</option><option value="Sociedade de Socorro">Sociedade de Socorro</option><option value="Moças">Moças</option><option value="Rapazes">Rapazes</option><option value="Primária">Primária</option><option value="Visitante">Visitante</option></select>
+                <select id="edit-member-cat" class="w-full p-4 bg-slate-50 rounded-2xl text-xs font-bold border-none outline-none"><option value="Membro">Membro</option><option value="Recém-Converso">Recém-Converso</option><option value="Novo Morador">Novo Morador</option><option value="Visitante">Visitante</option></select>
+                <input type="tel" id="edit-member-phone" oninput="formatPhone(this)" class="w-full p-4 bg-slate-50 rounded-2xl text-sm font-bold border-none outline-none shadow-inner" placeholder="WhatsApp">
                 <div class="flex items-center gap-3 px-4"><input type="checkbox" id="edit-member-isHead" class="w-4 h-4 accent-[#002e5d]"><label class="text-xs font-bold text-slate-500 italic">Chefe da Família</label></div>
             </div>
             <div class="flex gap-4 pt-4 border-t"><button onclick="deleteMemberAction()" class="flex-1 text-red-400 font-bold text-[10px] uppercase underline">Excluir</button><button onclick="saveMemberAction()" class="flex-[2] py-4 bg-[#002e5d] text-white rounded-2xl font-black text-xs shadow-lg">Gravar</button></div>
@@ -252,7 +306,7 @@
     </div>
 
     <div id="userEditModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
-        <div class="glass-card w-full max-w-sm p-10 space-y-6 text-center">
+        <div class="glass-card w-full max-w-sm p-10 space-y-6 text-center shadow-2xl">
             <h3 class="font-black uppercase text-xs text-slate-400 border-b pb-2 tracking-widest">Editar Acesso</h3>
             <input type="text" id="edit-user-name" class="w-full p-4 bg-slate-50 rounded-2xl text-sm font-bold border-none outline-none" placeholder="Nome">
             <input type="password" id="edit-user-pass" class="w-full p-4 bg-slate-50 rounded-2xl text-sm outline-none" placeholder="Nova Senha (opcional)">
@@ -265,13 +319,13 @@
     <div id="justificationModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
         <div class="glass-card w-full max-w-sm p-10 space-y-6 shadow-2xl">
             <div class="flex justify-between items-center border-b pb-4"><h3 class="font-black uppercase text-xs text-slate-400 tracking-widest">Justificar Ausência</h3><button onclick="closeJustify()"><i class="fas fa-times text-slate-300"></i></button></div>
-            <div class="space-y-4"><p id="justify-member-name" class="font-bold text-slate-700 text-sm italic"></p><textarea id="justify-text" rows="3" placeholder="Ex: Doente, Viajando, Trabalho..." class="w-full p-4 bg-slate-50 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-[#002e5d]"></textarea></div>
-            <button onclick="saveJustification()" class="w-full py-4 bg-[#002e5d] text-white rounded-2xl font-black text-xs shadow-lg">SALVAR JUSTIFICATIVA</button>
+            <div class="space-y-4 text-left"><p id="justify-member-name" class="font-bold text-slate-700 text-sm italic"></p><textarea id="justify-text" rows="3" placeholder="Ex: Doente, Viajando..." class="w-full p-4 bg-slate-50 rounded-2xl text-sm outline-none border shadow-inner"></textarea></div>
+            <button onclick="saveJustification()" class="w-full py-4 bg-[#002e5d] text-white rounded-2xl font-black text-xs shadow-lg">SALVAR NOTA</button>
             <button onclick="closeJustify()" class="w-full text-[10px] text-slate-300 font-bold uppercase">Cancelar</button>
         </div>
     </div>
 
-    <!-- SCRIPT -->
+    <!-- SCRIPT CENTRALIZADO -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy, setDoc, deleteDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -288,6 +342,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // Global State
         let members = []; let attendanceHistory = {}; let allUsersList = [];
         let currentUser = JSON.parse(localStorage.getItem('user_data')) || null;
         let selectedDate = new Date().toISOString().split('T')[0];
@@ -295,17 +350,18 @@
         let hChart = null; let aChart = null;
         let memberIdEditing = null; let userIdEditing = null; let memberIdJustifying = null;
 
-        const dateEl = document.getElementById('dateSelect');
+        // Date Initializer
+        const dateSelectEl = document.getElementById('dateSelect');
         const domingosISO = [];
         for(let i=0; i<12; i++) {
             let d = new Date(); d.setDate(d.getDate() - (d.getDay() + (7 * i)) % 84);
             let iso = d.toISOString().split('T')[0];
             domingosISO.push(iso);
-            dateEl.innerHTML += `<option value="${iso}">${i==0 ? 'DOMINGO HOJE ('+d.toLocaleDateString('pt-BR')+')' : d.toLocaleDateString('pt-BR')}</option>`;
+            dateSelectEl.innerHTML += `<option value="${iso}">${i==0 ? 'DOMINGO HOJE ('+d.toLocaleDateString('pt-BR')+')' : d.toLocaleDateString('pt-BR')}</option>`;
         }
-        selectedDate = dateEl.value;
+        selectedDate = dateSelectEl.value;
 
-        // AUTH
+        // AUTH LOGIC
         window.checkLogin = async () => {
             const u = document.getElementById('login-user').value.toLowerCase().trim();
             const p = document.getElementById('login-pass').value.trim();
@@ -316,25 +372,28 @@
                 const d = snap.docs[0].data(); d.id = snap.docs[0].id;
                 localStorage.setItem('user_data', JSON.stringify(d));
                 location.reload();
-            } else alert("Usuário ou senha incorretos.");
+            } else alert("Dados incorretos.");
         };
+
         window.processFirstLogin = async () => {
             const u = document.getElementById('first-user').value.toLowerCase().trim();
             const p1 = document.getElementById('first-pass').value.trim();
             const p2 = document.getElementById('first-pass-confirm').value.trim();
-            if(!u || p1 !== p2) return alert("Senhas não coincidem.");
+            if(!u || p1 !== p2) return alert("As senhas não coincidem.");
             const q = query(collection(db, "usuarios"), where("username", "==", u));
             const snap = await getDocs(q);
             if(snap.empty) return alert("Não autorizado.");
             await updateDoc(doc(db, "usuarios", snap.docs[0].id), { password: p1 });
-            alert("Sucesso!"); switchTab('login');
+            alert("Sucesso! Logue agora."); switchTab('login');
         };
+
         window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
 
-        // NAVIGATION
+        // TAB NAVIGATION
         window.switchTab = (tab) => {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             const view = document.getElementById(`view-${tab}`);
+            
             if (tab === 'login' || tab === 'first-login') {
                 document.getElementById('app-layout').classList.add('hidden');
                 document.getElementById('access-container').classList.remove('hidden');
@@ -344,12 +403,17 @@
                 document.getElementById('access-container').classList.add('hidden');
                 document.body.className = "antialiased status-app";
             }
+
             if(view) view.classList.remove('hidden');
+
             document.querySelectorAll('aside button, nav button').forEach(b => b.classList.remove('nav-btn-active', 'text-[#002e5d]', 'scale-125'));
             if(document.getElementById(`side-${tab}`)) document.getElementById(`side-${tab}`).classList.add('nav-btn-active');
             if(document.getElementById(`nav-${tab}`)) document.getElementById(`nav-${tab}`).classList.add('text-[#002e5d]', 'scale-125');
-            const titles = {'dashboard':'Painel Geral','attendance':'Registrar Frequência','analysis':'Resgate','reports':'Relatórios Estratégicos','add':'Novo','members-list':'Gestão de Listas', 'admin-users': 'Gerenciar Logins'};
-            if(document.getElementById('mobile-page-title')) document.getElementById('mobile-page-title').innerText = titles[tab] || 'Ala';
+
+            const titles = {'dashboard':'Painel Geral','attendance':'Registrar Frequência','analysis':'Resgate','reports':'Relatórios Estratégicos','add':'Novo Cadastro','members-list':'Gestão de Listas', 'admin-users': 'Gerenciar Logins'};
+            const headerTitle = document.getElementById('mobile-page-title');
+            if(headerTitle) headerTitle.innerText = titles[tab] || 'Ala';
+
             if(tab === 'members-list') renderMembersList();
             if(tab === 'admin-users') renderAdminUsers();
             if(tab === 'reports' || tab === 'dashboard') renderAll();
@@ -366,13 +430,15 @@
             }
         };
 
-        // DATA LOGIC
+        // FIREBASE DATA FLOW
         function listenData() {
             onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => {
-                members = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAll();
+                members = snap.docs.map(d => ({id: d.id, ...d.data()})); 
+                renderAll();
             });
             onSnapshot(collection(db, "historico"), (snap) => {
-                attendanceHistory = {}; snap.docs.forEach(d => { attendanceHistory[d.id] = d.data(); }); renderAll();
+                attendanceHistory = {}; snap.docs.forEach(d => { attendanceHistory[d.id] = d.data(); }); 
+                renderAll();
             });
             onSnapshot(collection(db, "usuarios"), (snap) => {
                 allUsersList = snap.docs.map(d => ({id: d.id, ...d.data()}));
@@ -419,29 +485,35 @@
         window.renderAttendance = () => {
             const list = document.getElementById('memberList'); if(!list) return;
             const search = document.getElementById('searchMember').value.toLowerCase();
-            const data = attendanceHistory[selectedDate] || { presents: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
+            const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], justifications: {}, lideresCount:0, visitantesCount:0, missionariosCount:0 };
             const curP = data.presents || []; const onlP = data.online_ids || []; const notes = data.justifications || {};
             list.innerHTML = ''; let mP = 0; let vNomP = 0; let totAla = 0; let lastFamily = "";
+
             document.getElementById('display-lideres').innerText = data.lideresCount || 0;
             document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
             document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
+            
             const sorted = [...members].sort((a, b) => {
                 const famA = (a.familia || "Z-SEM").toUpperCase(); const famB = (b.familia || "Z-SEM").toUpperCase();
                 return famA === famB ? a.name.localeCompare(b.name) : famA.localeCompare(famB);
             });
+
             sorted.forEach(m => {
                 const isP = curP.includes(m.id); const isOn = onlP.includes(m.id); const note = notes[m.id] || "";
-                if(m.categoria !== 'Visitante') { totAla++; if(isP) mP++; } else { if(isP) vNomP++; }
+                const isVisitante = (m.categoria === 'Visitante');
+                if(!isVisitante) { totAla++; if(isP) mP++; } else { if(isP) vNomP++; }
+
                 if((m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) && (currentFilter === 'TODOS' || m.org === currentFilter)) {
                     if (m.familia !== lastFamily && !search) { list.innerHTML += `<div class="family-divider">Família ${m.familia}</div>`; lastFamily = m.familia; }
                     list.innerHTML += `<div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isP ? (isOn ? 'card-online' : 'card-presente') : 'card-ausente'} transition-all"><div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name}')"` : ''} class="flex-1 flex items-center gap-4 cursor-pointer"><div class="check-box ${isP ? (isOn ? 'check-online' : 'check-active') : ''}">${isP ? `<i class="fas ${isOn ? 'fa-wifi' : 'fa-check'} text-[10px]"></i>` : ''}</div><div class="flex-1 text-left"><h4 class="font-bold text-sm ${isP ? (isOn ? 'text-blue-900' : 'text-teal-900') : 'text-slate-800'} truncate">${m.name}</h4><p class="text-[9px] font-black uppercase text-slate-400">${m.org}</p>${note ? `<div class="justificativa-tag italic"><i class="fas fa-comment-dots mr-1"></i>${note}</div>` : ''}</div></div>${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name}')" class="text-slate-300 p-2"><i class="fas fa-sticky-note text-sm"></i></button>` : ''}</div>`;
                 }
             });
+
             const lC = data.lideresCount || 0; const vC = data.visitantesCount || 0; const msC = data.missionariosCount || 0;
             document.getElementById('stats-present').innerText = mP + vNomP + lC + vC + msC;
             document.getElementById('stats-total').innerText = totAla;
             let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1"><p class="text-green-600 flex justify-between"><span>✓ Membros Ala</span> <span>${mP}</span></p>`;
-            if(vNomP > 0) det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Unidade</span> <span>${vNomP}</span></p>`;
+            if(vNomP > 0) det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Locais</span> <span>${vNomP}</span></p>`;
             if(msC > 0) det += `<p class="text-indigo-600 flex justify-between"><span>👔 Missionários</span> <span>${msC}</span></p>`;
             if(lC > 0) det += `<p class="text-amber-600 flex justify-between"><span>★ Líderes Estaca</span> <span>${lC}</span></p>`;
             if(vC > 0) det += `<p class="text-blue-500 flex justify-between"><span>🚶 Visitantes Fora</span> <span>${vC}</span></p>`;
@@ -455,8 +527,8 @@
             members.forEach(m => {
                 const search = document.getElementById('searchManageMembers').value.toLowerCase();
                 const orgFilter = document.getElementById('filterOrgList').value;
-                if((m.name.toLowerCase().includes(search) || m.familia.toLowerCase().includes(search)) && (orgFilter === 'TODOS' || m.org === orgFilter)) {
-                    container.innerHTML += `<div class="glass-card p-6 flex justify-between items-center border-l-8 border-slate-200"><div><h4 class="font-bold text-sm uppercase">${m.name}</h4><p class="text-[9px] font-black uppercase text-slate-400">${m.org} • ${m.categoria || 'Membro'}</p><p class="text-[9px] font-bold text-blue-900 uppercase">Família ${m.familia} ${m.isHead ? '(Chefe)' : ''}</p></div>${currentUser.role === 'admin' ? `<button onclick="openMemberEdit('${m.id}')" class="w-10 h-10 bg-slate-50 text-slate-300 rounded-xl flex items-center justify-center border hover:bg-blue-900 hover:text-white transition-all"><i class="fas fa-pen-to-square text-xs"></i></button>` : ''}</div>`;
+                if((m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) && (orgFilter === 'TODOS' || m.org === orgFilter)) {
+                    container.innerHTML += `<div class="glass-card p-6 flex justify-between items-center border-l-8 border-slate-200 text-left"><div><h4 class="font-bold text-sm text-slate-800">${m.name}</h4><p class="text-[9px] font-black uppercase text-slate-400">${m.org} • ${m.categoria || 'Membro'}</p><p class="text-[9px] font-bold text-blue-900 uppercase">Família ${m.familia} ${m.isHead ? '(Chefe)' : ''}</p></div>${currentUser.role === 'admin' ? `<button onclick="openMemberEdit('${m.id}')" class="w-10 h-10 bg-slate-50 text-slate-300 rounded-xl flex items-center justify-center border hover:bg-[#002e5d] hover:text-white transition-all"><i class="fas fa-pen-to-square text-xs"></i></button>` : ''}</div>`;
                 }
             });
         };
@@ -464,7 +536,7 @@
         window.renderAdminUsers = () => {
             const l = document.getElementById('users-list'); if(!l) return; l.innerHTML = '';
             allUsersList.forEach(u => {
-                l.innerHTML += `<div class="bg-white p-5 rounded-3xl flex justify-between items-center text-xs border shadow-sm"><div><p class="font-black uppercase text-[#002e5d]">${u.name}</p><p class="opacity-40 font-bold uppercase text-[9px]">${u.username} • ${u.role}</p></div><div class="flex items-center gap-2"><button onclick="openEditUser({id:'${u.id}', name:'${u.name}', role:'${u.role}'})" class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400"><i class="fas fa-cog text-xs"></i></button><div class="w-2 h-2 rounded-full ${u.password?'bg-green-400':'bg-yellow-400'}"></div></div></div>`;
+                l.innerHTML += `<div class="bg-white p-5 rounded-3xl flex justify-between items-center text-xs border shadow-sm text-left"><div><p class="font-black uppercase text-[#002e5d]">${u.name}</p><p class="opacity-40 font-bold uppercase text-[9px] tracking-wider">${u.username} • ${u.role}</p></div><div class="flex items-center gap-2"><button onclick="openEditUser({id:'${u.id}', name:'${u.name}', role:'${u.role}'})" class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-[#002e5d] hover:text-white transition-all"><i class="fas fa-cog text-xs"></i></button><div class="w-2 h-2 rounded-full ${u.password?'bg-green-400':'bg-yellow-400'}"></div></div></div>`;
             });
         };
 
@@ -474,7 +546,7 @@
         window.handleFamilySearch = (query) => {
             const sug = document.getElementById('familySuggestions'); if (query.length < 2) { sug.classList.add('hidden'); return; }
             const heads = members.filter(m => m.isHead && m.familia.toLowerCase().includes(query.toLowerCase()));
-            if (heads.length > 0) { sug.classList.remove('hidden'); sug.innerHTML = heads.map(h => `<div onclick="selectFamily('${h.familia}')" class="p-4 hover:bg-slate-50 border-b cursor-pointer font-bold text-xs uppercase">${h.familia} <span class="font-normal opacity-50">(Chefe: ${h.name})</span></div>`).join(''); } else sug.classList.add('hidden');
+            if (heads.length > 0) { sug.classList.remove('hidden'); sug.innerHTML = heads.map(h => `<div onclick="selectFamily('${h.familia}')" class="p-4 hover:bg-slate-50 border-b cursor-pointer font-bold text-xs uppercase text-slate-600 text-left">${h.familia} <span class="font-normal opacity-50">(Chefe: ${h.name})</span></div>`).join(''); } else sug.classList.add('hidden');
         };
         window.selectFamily = (f) => { document.getElementById('familySearch').value = f; document.getElementById('familySuggestions').classList.add('hidden'); };
         
@@ -515,7 +587,7 @@
             members.forEach(m => {
                 if(m.categoria === 'Visitante') return;
                 const diff = Math.floor((new Date() - new Date(m.lastAttended)) / (1000*60*60*24));
-                if(diff >= 21) list.innerHTML += `<div class="glass-card p-6 border-t-8 border-orange-500"><div><p class="text-[9px] font-black text-orange-500 uppercase tracking-widest">${Math.floor(diff/7)} SEMANAS</p><h4 class="font-black text-slate-800 text-sm uppercase">${m.name}</h4></div><a href="https://wa.me/${m.telefone || ''}?text=Olá, sentimos sua falta!" target="_blank" class="block mt-4 bg-teal-600 text-white p-3 rounded-xl text-center font-black text-[10px] uppercase">WhatsApp</a></div>`;
+                if(diff >= 21) list.innerHTML += `<div class="glass-card p-6 border-t-8 border-orange-500 text-left"><div><p class="text-[9px] font-black text-orange-500 uppercase tracking-widest">${Math.floor(diff/7)} SEMANAS</p><h4 class="font-black text-slate-800 text-sm uppercase">${m.name}</h4></div><a href="https://wa.me/${m.telefone || ''}?text=Olá, sentimos sua falta!" target="_blank" class="block mt-4 bg-teal-600 text-white p-3 rounded-xl text-center font-black text-[10px] uppercase">WhatsApp</a></div>`;
             });
             if(document.getElementById('stats-rescue')) document.getElementById('stats-rescue').innerText = list.children.length;
         }
@@ -526,19 +598,20 @@
             members.forEach(m => {
                 if(m.categoria === 'Visitante') return;
                 let fq = domingosISO.slice(0, 4).filter(d => (attendanceHistory[d]?.presents || []).includes(m.id)).length;
-                if(fq === 1) yl.innerHTML += `<div class="p-3 bg-yellow-50 rounded-xl text-[10px] font-bold text-yellow-700 uppercase">⚠️ ${m.name}</div>`;
+                if(fq === 1) yl.innerHTML += `<div class="p-3 bg-yellow-50 rounded-xl text-[10px] font-bold text-yellow-700 uppercase text-left"><i class="fas fa-triangle-exclamation mr-2"></i>${m.name}</div>`;
                 const f = m.familia || 'S/ FAM'; if(!fams[f]) fams[f] = { t: 0, p: 0 }; fams[f].t++; if((attendanceHistory[selectedDate]?.presents || []).includes(m.id)) fams[f].p++;
                 if(m.categoria && m.categoria !== 'Membro') {
                     const isP = (attendanceHistory[selectedDate]?.presents || []).includes(m.id);
-                    rl.innerHTML += `<div class="p-3 rounded-xl border text-[10px] font-bold flex justify-between ${isP?'bg-green-50 text-green-700':'bg-red-50 text-red-700'}"><span>${m.name}</span> <i class="fas ${isP?'fa-check':'fa-times'}"></i></div>`;
+                    rl.innerHTML += `<div class="p-3 rounded-xl border text-[10px] uppercase font-bold flex justify-between text-left ${isP?'bg-green-50 text-green-700':'bg-red-50 text-red-700'}"><span>${m.name}</span> <i class="fas ${isP?'fa-check':'fa-times'}"></i></div>`;
                 }
             });
-            Object.keys(fams).forEach(f => { if(fams[f].p === 0) fl.innerHTML += `<div class="p-3 bg-blue-50 rounded-xl text-[10px] font-black uppercase text-blue-700">Família ${f} Ausente</div>`; });
+            Object.keys(fams).forEach(f => { if(fams[f].p === 0) fl.innerHTML += `<div class="p-3 bg-blue-50 rounded-xl text-[10px] font-black uppercase text-blue-700 text-left">Família ${f} Ausente</div>`; });
         }
 
         function updateCharts() {
             const ctx1 = document.getElementById('heatmapChart'); if(!ctx1) return;
-            const stats = ['Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária'].map(o => {
+            const orgs = ['Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária'];
+            const stats = orgs.map(o => {
                 const tot = members.filter(m => m.org === o).length;
                 const prs = members.filter(m => m.org === o && (attendanceHistory[selectedDate]?.presents || []).includes(m.id)).length;
                 return tot > 0 ? Math.round((prs/tot)*100) : 0;
@@ -551,8 +624,8 @@
             aChart = new Chart(ctx2.getContext('2d'), { type: 'line', data: { labels: domingosISO.slice(0, 5).reverse().map(d=>d.split('-')[2]), datasets: [{ data: cts, borderColor: '#002e5d', fill: true, tension: 0.5 }] }, options: { plugins: { legend: false } } });
         }
 
-        // DATE SELECTION FIX
-        dateEl.addEventListener('change', (e) => { selectedDate = e.target.value; renderAll(); });
+        // Event Listener para trocar Data
+        dateSelectEl.addEventListener('change', (e) => { selectedDate = e.target.value; renderAll(); });
 
         if(currentUser) {
             document.getElementById('user-name-side').innerText = currentUser.name;
@@ -566,7 +639,9 @@
             });
             window.setFilter = (f) => { currentFilter = f; document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active', 'bg-[#002e5d]', 'text-white')); const el = document.getElementById('pill-'+f.replace(/\s+/g, '')); if(el) el.classList.add('active', 'bg-[#002e5d]', 'text-white'); renderAttendance(); };
             listenData(); switchTab('dashboard');
-        } else { switchTab('login'); document.getElementById('loading-screen').classList.add('hidden'); }
+        } else { 
+            switchTab('login'); document.getElementById('loading-screen').classList.add('hidden'); 
+        }
     </script>
 </body>
 </html>
