@@ -619,31 +619,18 @@
     });
 
     sorted.forEach(m => {
-        const isP = curP.includes(m.id);
-        
-        // VERIFICAÇÃO POR CATEGORIA (Conforme solicitado)
-        const ehVisitanteLocal = (m.categoria === 'Visitante');
+        // --- INÍCIO DO BLOCO CORRIGIDO ---
+            const isP = curP.includes(m.id); // Define se está presente
+            const isOnline = (data.online_ids || []).includes(m.id); // Define se é online
+            const justificativa = (data.justifications || {})[m.id] || ""; // Pega a nota
 
-        if(!ehVisitanteLocal) {
-            totMembrosAla++; 
-            if(isP) mP++; 
-        } else {
-            if(isP) vNomP++;
-        }
-
-        const matchS = m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search));
-        const matchF = currentFilter === 'TODOS' || m.org === currentFilter;
-
-        if(matchS && matchF) {
-            // ESSAS DUAS LINHAS SÃO NOVAS: Elas perguntam ao banco se o membro é online ou tem nota
-            const isOnline = (data.online_ids || []).includes(m.id);
-            const justificativa = (data.justifications || {})[m.id] || "";
-
+            // Organiza os títulos de família
             if (m.familia !== lastFamily && !search) {
                 list.innerHTML += `<div class="family-divider">Família ${m.familia}</div>`;
                 lastFamily = m.familia;
             }
 
+            // Desenha o cartão na tela
             list.innerHTML += `
                 <div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isP ? (isOnline ? 'card-online' : 'card-presente') : 'card-ausente'} transition-all">
                     
@@ -663,12 +650,12 @@
 
                     <!-- BOTÃO DE NOTA: Só aparece se o membro estiver AUSENTE -->
                     ${!isP && currentUser.role === 'admin' ? `
-                        <button onclick="event.stopPropagation(); openJustify('${m.id}', '${m.name}')" class="text-slate-300 hover:text-[#002e5d] p-3 rounded-xl hover:bg-slate-50">
+                        <button onclick="openJustify('${m.id}', '${m.name}')" class="text-slate-300 hover:text-[#002e5d] p-3 rounded-xl hover:bg-slate-50">
                             <i class="fas fa-sticky-note text-sm"></i>
                         </button>
                     ` : ''}
                 </div>`;
-        }
+            // --- FIM DO BLOCO CORRIGIDO ---
     });
 
     // 4. CÁLCULO E EXIBIÇÃO NO DASHBOARD
