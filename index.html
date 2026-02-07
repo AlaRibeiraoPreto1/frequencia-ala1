@@ -142,14 +142,39 @@
                             </div>
                             <div id="orgFilters" class="flex overflow-x-auto gap-2 no-scrollbar py-2"></div>
                         </div>
-                        <div id="admin-counters" class="hidden space-y-2 mt-4 pt-4 border-t border-slate-100">
-                            <p class="text-[10px] font-black text-slate-400 uppercase ml-2">Contadores Adicionais</p>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100"><span class="text-[10px] font-bold text-slate-500 uppercase">Líderes Estaca</span><div class="flex items-center gap-4"><button onclick="updateCount('lideresCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button><span id="display-lideres" class="font-black text-[#002e5d]">0</span><button onclick="updateCount('lideresCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button></div></div>
-                                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100"><span class="text-[10px] font-bold text-slate-500 uppercase">Visitantes Fora</span><div class="flex items-center gap-4"><button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button><span id="display-visitantes" class="font-black text-[#002e5d]">0</span><button onclick="updateCount('visitantesCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button></div></div>
-                                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100"><span class="text-[10px] font-bold text-slate-500 uppercase">Missionários</span><div class="flex items-center gap-4"><button onclick="updateCount('missionariosCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button><span id="display-missionarios" class="font-black text-[#002e5d]">0</span><button onclick="updateCount('missionariosCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button></div></div>
-                            </div>
-                        </div>
+                        <!-- BLOCO DE CONTADORES RESTAURADO -->
+<div id="admin-counters" class="hidden space-y-2 mt-4 pt-4 border-t border-slate-100">
+    <p class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest text-left">Contadores Adicionais</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <!-- Líderes -->
+        <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100">
+            <span class="text-[10px] font-bold text-slate-500 uppercase">Líderes Estaca</span>
+            <div class="flex items-center gap-4">
+                <button onclick="updateCount('lideresCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button>
+                <span id="display-lideres" class="font-black text-[#002e5d]">0</span>
+                <button onclick="updateCount('lideresCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button>
+            </div>
+        </div>
+        <!-- Visitantes de Fora -->
+        <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100">
+            <span class="text-[10px] font-bold text-slate-500 uppercase">Visitantes Fora</span>
+            <div class="flex items-center gap-4">
+                <button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button>
+                <span id="display-visitantes" class="font-black text-[#002e5d]">0</span>
+                <button onclick="updateCount('visitantesCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button>
+            </div>
+        </div>
+        <!-- Missionários -->
+        <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100">
+            <span class="text-[10px] font-bold text-slate-500 uppercase">Missionários</span>
+            <div class="flex items-center gap-4">
+                <button onclick="updateCount('missionariosCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button>
+                <span id="display-missionarios" class="font-black text-[#002e5d]">0</span>
+                <button onclick="updateCount('missionariosCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button>
+            </div>
+        </div>
+    </div>
+</div>
                     </div>
                     <div id="memberList" class="space-y-2 mt-6"></div>
                 </section>
@@ -299,6 +324,12 @@
         }
         selectedDate = dSelect.value;
 
+        // Adicione este bloco aqui
+dSelect.addEventListener('change', (e) => {
+    selectedDate = e.target.value; // Atualiza a data escolhida
+    renderAll(); // Manda o sistema redesenhar tudo com os dados da nova data
+});
+
         window.checkLogin = async () => {
             const u = document.getElementById('login-user').value.toLowerCase().trim();
             const p = document.getElementById('login-pass').value.trim();
@@ -412,6 +443,11 @@
         function renderAll() { renderAttendance(); renderRescue(); renderReports(); updateCharts(); }
 
         window.renderAttendance = () => {
+            // Garante que os números apareçam nos botões ao carregar/trocar data
+if(document.getElementById('display-lideres')) document.getElementById('display-lideres').innerText = data.lideresCount || 0;
+if(document.getElementById('display-visitantes')) document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
+if(document.getElementById('display-missionarios')) document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
+            
             const list = document.getElementById('memberList'); if(!list) return;
             const search = document.getElementById('searchMember').value.toLowerCase();
             const data = attendanceHistory[selectedDate] || { presents: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
