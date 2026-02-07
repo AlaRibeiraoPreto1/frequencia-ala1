@@ -520,35 +520,44 @@
         };
 
         window.togglePresence = async (memberId, memberName) => {
-            if(currentUser.role !== 'admin') return;
+    // 1. Verificação de segurança: Só admin marca
+    if (!currentUser || currentUser.role !== 'admin') {
+        alert("Apenas administradores podem registrar frequência.");
+        return;
+    }
 
-            const hRef = doc(db, "historico", selectedDate);
-            // Pega o que já está salvo hoje
-            let curHistory = attendanceHistory[selectedDate] || { presents: [], online_ids: [] };
-            
-            let allPresents = curHistory.presents || []; // Lista de todos presentes
-            let onlinePresents = curHistory.online_ids || []; // Lista de quem é online
+    const hRef = doc(db, "historico", selectedDate);
+    
+    // 2. Pega os dados atuais ou cria um modelo vazio se for um domingo novo
+    const curHistory = attendanceHistory[selectedDate] || {};
+    let allPresents = curHistory.presents ? [...curHistory.presents] : [];
+    let onlinePresents = curHistory.online_ids ? [...curHistory.online_ids] : [];
 
-            // LÓGICA DO CICLO DE CLIQUE
-            if (!allPresents.includes(memberId)) {
-                // Se estava ausente, vira PRESENTE FÍSICO (Verde)
-                allPresents.push(memberId);
-            } else if (allPresents.includes(memberId) && !onlinePresents.includes(memberId)) {
-                // Se era físico, vira ONLINE (Azul)
-                onlinePresents.push(memberId);
-            } else {
-                // Se era online, pergunta se quer DESMARCAR e ficar Ausente
-                if(!confirm(`Deseja remover totalmente a presença de ${memberName}?`)) return;
-                allPresents = allPresents.filter(i => i !== memberId);
-                onlinePresents = onlinePresents.filter(i => i !== memberId);
-            }
+    // 3. LÓGICA DO CICLO DE CLIQUE (3 ESTADOS)
+    if (!allPresents.includes(memberId)) {
+        // ESTADO: AUSENTE -> PRESENTE FÍSICO (VERDE)
+        allPresents.push(memberId);
+    } else if (!onlinePresents.includes(memberId)) {
+        // ESTADO: FÍSICO -> ONLINE (AZUL)
+        onlinePresents.push(memberId);
+    } else {
+        // ESTADO: ONLINE -> AUSENTE (PEDE CONFIRMAÇÃO)
+        if(!confirm(`Deseja remover totalmente a presença de ${memberName}?`)) return;
+        allPresents = allPresents.filter(id => id !== memberId);
+        onlinePresents = onlinePresents.filter(id => id !== memberId);
+    }
 
-            // Salva as duas listas no banco de dados
-            await setDoc(hRef, { 
-                presents: allPresents, 
-                online_ids: onlinePresents 
-            }, { merge: true });
-        };
+    // 4. Grava no Banco de Dados
+    try {
+        await setDoc(hRef, { 
+            presents: allPresents, 
+            online_ids: onlinePresents 
+        }, { merge: true });
+        // O Firebase vai avisar o site para atualizar a cor sozinho
+    } catch (e) {
+        alert("Erro ao salvar: " + e.message);
+    }
+};
 
         // FUNÇÕES PARA O MODAL DE JUSTIFICATIVA
         let memberIdJustifying = null;
@@ -592,26 +601,17 @@
        window.renderAttendance = () => {
     const list = document.getElementById('memberList');
     const search = document.getElementById('searchMember').value.toLowerCase();
-    const data = attendanceHistory[selectedDate] || { presents: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
+    
+    // Pega os dados salvos do domingo selecionado
+    const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], justifications: {} };
     const curP = data.presents || [];
+    const onlineIds = data.online_ids || [];
+    const notes = data.justifications || {};
+    
     list.innerHTML = '';
-    
-    // VARIÁVEIS PARA O DASHBOARD
-    let mP = 0; // Membros Ala presentes
-    let vNomP = 0; // Visitantes Locais (Nominais) presentes
-    let totMembrosAla = 0; // Total de membros registrados (exceto categoria Visitante)
-    let lastFamily = "";
+    let pC = 0; let tC = 0; let lastFamily = "";
 
-    // 1. Atualiza números nos visores da aba de registro
-    if(document.getElementById('display-lideres')) document.getElementById('display-lideres').innerText = data.lideresCount || 0;
-    if(document.getElementById('display-visitantes')) document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
-    if(document.getElementById('display-missionarios')) document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
-    
-    // 2. Trava de segurança Admin
-    document.getElementById('admin-counters').classList.remove('hidden');
-    document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
-
-    // 3. Ordenação e Contagem Lógica
+    // Ordenação por Família e Nome
     const sorted = [...members].sort((a, b) => {
         const famA = (a.familia || "Z-SEM").toUpperCase();
         const famB = (b.familia || "Z-SEM").toUpperCase();
@@ -619,44 +619,63 @@
     });
 
     sorted.forEach(m => {
-        // --- INÍCIO DO BLOCO CORRIGIDO ---
-            const isP = curP.includes(m.id); // Define se está presente
-            const isOnline = (data.online_ids || []).includes(m.id); // Define se é online
-            const justificativa = (data.justifications || {})[m.id] || ""; // Pega a nota
+        // DEFINE AS VARIÁVEIS DO MEMBRO ATUAL
+        const isPresente = curP.includes(m.id);
+        const isOnline = onlineIds.includes(m.id);
+        const justificativa = notes[m.id] || "";
+        const ehVisitante = (m.org === 'Visitante');
 
-            // Organiza os títulos de família
+        // Contagem para o Dashboard
+        if(!ehVisitante) { 
+            tC++; 
+            if(isPresente) pC++; 
+        }
+
+        // Filtro de Busca e Organização
+        const matchS = m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search));
+        const matchF = currentFilter === 'TODOS' || m.org === currentFilter;
+
+        if(matchS && matchF) {
+            // Título da Família
             if (m.familia !== lastFamily && !search) {
                 list.innerHTML += `<div class="family-divider">Família ${m.familia}</div>`;
                 lastFamily = m.familia;
             }
 
-            // Desenha o cartão na tela
+            // DESENHO DO CARTÃO
             list.innerHTML += `
-                <div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isP ? (isOnline ? 'card-online' : 'card-presente') : 'card-ausente'} transition-all">
+                <div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isPresente ? (isOnline ? 'card-online' : 'card-presente') : 'card-ausente'} transition-all shadow-sm">
                     
-                    <!-- ÁREA DE CLIQUE: Marca presença física ou online -->
+                    <!-- ÁREA DE CLIQUE -->
                     <div onclick="togglePresence('${m.id}', '${m.name}')" class="flex-1 flex items-center gap-4 cursor-pointer">
-                        <div class="check-box ${isP ? (isOnline ? 'check-online' : 'check-active') : ''}">
-                            <i class="fas ${isOnline ? 'fa-wifi' : 'fa-check'} text-[10px] ${isP ? '' : 'hidden'}"></i>
+                        <div class="check-box ${isPresente ? (isOnline ? 'check-online' : 'check-active') : ''}">
+                            <i class="fas ${isOnline ? 'fa-wifi' : 'fa-check'} text-[10px] ${isPresente ? '' : 'hidden'}"></i>
                         </div>
                         <div class="min-w-0 text-left">
-                            <h4 class="font-bold text-sm ${isP ? (isOnline ? 'text-blue-900' : 'text-teal-900') : 'text-slate-800'} truncate">${m.name}</h4>
+                            <h4 class="font-bold text-sm ${isPresente ? (isOnline ? 'text-blue-900' : 'text-teal-900') : 'text-slate-800'} truncate">${m.name}</h4>
                             <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${m.org}</p>
-                            
-                            <!-- MOSTRA A NOTA SE ELA EXISTIR -->
-                            ${justificativa ? `<div class="justificativa-tag italic text-left"><i class="fas fa-comment-dots mr-1"></i>${justificativa}</div>` : ''}
+                            ${justificativa ? `<div class="justificativa-tag italic"><i class="fas fa-comment-dots mr-1"></i>${justificativa}</div>` : ''}
                         </div>
                     </div>
 
-                    <!-- BOTÃO DE NOTA: Só aparece se o membro estiver AUSENTE -->
-                    ${!isP && currentUser.role === 'admin' ? `
-                        <button onclick="openJustify('${m.id}', '${m.name}')" class="text-slate-300 hover:text-[#002e5d] p-3 rounded-xl hover:bg-slate-50">
+                    <!-- BOTÃO DE NOTA (SÓ SE AUSENTE) -->
+                    ${!isPresente && currentUser.role === 'admin' ? `
+                        <button onclick="openJustify('${m.id}', '${m.name}')" class="text-slate-300 hover:text-blue-900 p-2">
                             <i class="fas fa-sticky-note text-sm"></i>
                         </button>
                     ` : ''}
                 </div>`;
-            // --- FIM DO BLOCO CORRIGIDO ---
+        }
     });
+
+    // ATUALIZA OS NÚMEROS DO TOPO (DASHBOARD)
+    if(document.getElementById('stats-present')) {
+        const lC = data.lideresCount || 0; 
+        const vC = data.visitantesCount || 0;
+        document.getElementById('stats-present').innerText = pC + lC + vC;
+        document.getElementById('stats-total').innerText = tC;
+    }
+};
 
     // 4. CÁLCULO E EXIBIÇÃO NO DASHBOARD
     const lC = data.lideresCount || 0; 
