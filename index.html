@@ -51,7 +51,26 @@
         .card-ausente { background-color: #ffffff !important; border-left: 8px solid #f1f5f9 !important; }
         
         #mobile-menu-panel { transition: transform 0.3s ease-in-out; }
+
+        /* Cor para quem assiste Online */
+        .card-online { background-color: #eff6ff !important; border-left: 8px solid #3b82f6 !important; }
+        .check-online { background: #3b82f6; border-color: #3b82f6; color: white; }
+
+        /* Estilo para a etiqueta de justificativa */
+        .justificativa-tag {
+            font-size: 10px;
+            background: #f1f5f9;
+            color: #475569;
+            padding: 4px 10px;
+            border-radius: 8px;
+            margin-top: 6px;
+            display: inline-block;
+            border: 1px dashed #cbd5e1;
+            font-weight: bold;
+        }
     </style>
+
+    
 </head>
 <body class="antialiased status-login">
 
@@ -346,6 +365,24 @@
         </div>
     </div>
 
+    <!-- MODAL PARA ESCREVER POR QUE A PESSOA FALTOU -->
+        <div id="justificationModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
+            <div class="glass-card w-full max-w-sm p-10 space-y-6 shadow-2xl">
+                <div class="flex justify-between items-center border-b pb-4">
+                    <h3 class="font-black uppercase text-xs text-slate-400">Justificar Ausência</h3>
+                    <button onclick="closeJustify()"><i class="fas fa-times text-slate-300"></i></button>
+                </div>
+                <div class="space-y-4">
+                    <p id="justify-member-name" class="font-bold text-slate-700 text-sm italic"></p>
+                    <textarea id="justify-text" rows="3" placeholder="Ex: Doente, Viajando, Trabalho..." class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none outline-none focus:ring-2 focus:ring-[#002e5d]"></textarea>
+                </div>
+                <div class="flex gap-4">
+                    <button onclick="saveJustification()" class="w-full py-4 bg-[#002e5d] text-white rounded-2xl font-black text-xs shadow-lg">SALVAR JUSTIFICATIVA</button>
+                </div>
+                <button onclick="closeJustify()" class="w-full text-[10px] text-slate-300 font-bold uppercase">Cancelar</button>
+            </div>
+        </div>
+
     <!-- FIREBASE & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -484,16 +521,65 @@
 
         window.togglePresence = async (memberId, memberName) => {
             if(currentUser.role !== 'admin') return;
+
             const hRef = doc(db, "historico", selectedDate);
-            let cur = attendanceHistory[selectedDate]?.presents || [];
-            if(cur.includes(memberId)) {
-                if(!confirm(`Deseja remover a presença de ${memberName}?`)) return;
-                cur = cur.filter(i => i !== memberId);
+            // Pega o que já está salvo hoje
+            let curHistory = attendanceHistory[selectedDate] || { presents: [], online_ids: [] };
+            
+            let allPresents = curHistory.presents || []; // Lista de todos presentes
+            let onlinePresents = curHistory.online_ids || []; // Lista de quem é online
+
+            // LÓGICA DO CICLO DE CLIQUE
+            if (!allPresents.includes(memberId)) {
+                // Se estava ausente, vira PRESENTE FÍSICO (Verde)
+                allPresents.push(memberId);
+            } else if (allPresents.includes(memberId) && !onlinePresents.includes(memberId)) {
+                // Se era físico, vira ONLINE (Azul)
+                onlinePresents.push(memberId);
             } else {
-                cur.push(memberId);
-                await updateDoc(doc(db, "membros", memberId), { lastAttended: selectedDate });
+                // Se era online, pergunta se quer DESMARCAR e ficar Ausente
+                if(!confirm(`Deseja remover totalmente a presença de ${memberName}?`)) return;
+                allPresents = allPresents.filter(i => i !== memberId);
+                onlinePresents = onlinePresents.filter(i => i !== memberId);
             }
-            await setDoc(hRef, { presents: cur }, { merge: true });
+
+            // Salva as duas listas no banco de dados
+            await setDoc(hRef, { 
+                presents: allPresents, 
+                online_ids: onlinePresents 
+            }, { merge: true });
+        };
+
+        // FUNÇÕES PARA O MODAL DE JUSTIFICATIVA
+        let memberIdJustifying = null;
+
+        window.openJustify = (id, name) => {
+            memberIdJustifying = id;
+            document.getElementById('justify-member-name').innerText = "Membro: " + name;
+            // Pega a nota que já existe ou deixa em branco
+            const currentNote = attendanceHistory[selectedDate]?.justifications?.[id] || '';
+            document.getElementById('justify-text').value = currentNote;
+            document.getElementById('justificationModal').classList.remove('hidden');
+        };
+
+        window.closeJustify = () => {
+            document.getElementById('justificationModal').classList.add('hidden');
+            memberIdJustifying = null;
+        };
+
+        window.saveJustification = async () => {
+            const text = document.getElementById('justify-text').value.trim();
+            const hRef = doc(db, "historico", selectedDate);
+            let justifications = attendanceHistory[selectedDate]?.justifications || {};
+            
+            if(text === "") {
+                delete justifications[memberIdJustifying]; 
+            } else {
+                justifications[memberIdJustifying] = text;
+            }
+
+            await setDoc(hRef, { justifications: justifications }, { merge: true });
+            closeJustify();
         };
 
         function renderAll() {
@@ -549,17 +635,38 @@
         const matchF = currentFilter === 'TODOS' || m.org === currentFilter;
 
         if(matchS && matchF) {
+            // ESSAS DUAS LINHAS SÃO NOVAS: Elas perguntam ao banco se o membro é online ou tem nota
+            const isOnline = (data.online_ids || []).includes(m.id);
+            const justificativa = (data.justifications || {})[m.id] || "";
+
             if (m.familia !== lastFamily && !search) {
                 list.innerHTML += `<div class="family-divider">Família ${m.familia}</div>`;
                 lastFamily = m.familia;
             }
+
             list.innerHTML += `
-                <div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isP ? 'card-presente' : 'card-ausente'}" ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name}')"` : ''}>
-                    <div class="check-box ${isP ? 'check-active' : ''}">${isP ? '<i class="fas fa-check text-[10px]"></i>' : ''}</div>
-                    <div class="flex-1 min-w-0 text-left">
-                        <h4 class="font-bold text-sm ${isP ? 'text-teal-900' : 'text-slate-800'} truncate">${m.name}</h4>
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${m.org} • ${m.categoria}</p>
+                <div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isP ? (isOnline ? 'card-online' : 'card-presente') : 'card-ausente'} transition-all">
+                    
+                    <!-- ÁREA DE CLIQUE: Marca presença física ou online -->
+                    <div onclick="togglePresence('${m.id}', '${m.name}')" class="flex-1 flex items-center gap-4 cursor-pointer">
+                        <div class="check-box ${isP ? (isOnline ? 'check-online' : 'check-active') : ''}">
+                            <i class="fas ${isOnline ? 'fa-wifi' : 'fa-check'} text-[10px] ${isP ? '' : 'hidden'}"></i>
+                        </div>
+                        <div class="min-w-0 text-left">
+                            <h4 class="font-bold text-sm ${isP ? (isOnline ? 'text-blue-900' : 'text-teal-900') : 'text-slate-800'} truncate">${m.name}</h4>
+                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${m.org}</p>
+                            
+                            <!-- MOSTRA A NOTA SE ELA EXISTIR -->
+                            ${justificativa ? `<div class="justificativa-tag italic text-left"><i class="fas fa-comment-dots mr-1"></i>${justificativa}</div>` : ''}
+                        </div>
                     </div>
+
+                    <!-- BOTÃO DE NOTA: Só aparece se o membro estiver AUSENTE -->
+                    ${!isP && currentUser.role === 'admin' ? `
+                        <button onclick="event.stopPropagation(); openJustify('${m.id}', '${m.name}')" class="text-slate-300 hover:text-[#002e5d] p-3 rounded-xl hover:bg-slate-50">
+                            <i class="fas fa-sticky-note text-sm"></i>
+                        </button>
+                    ` : ''}
                 </div>`;
         }
     });
