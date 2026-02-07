@@ -122,6 +122,17 @@
                 <button onclick="toggleMobileMenu()" class="w-10 h-10 rounded-xl bg-slate-50 text-[#002e5d] flex items-center justify-center shadow-sm"><i class="fas fa-bars"></i></button>
             </header>
 
+            <!-- BARRA DE DATA GLOBAL (VISÍVEL EM TODAS AS ABAS) -->
+<div class="w-full bg-white border-b border-slate-100 py-3 px-6 sticky top-[80px] lg:top-0 z-[140] flex justify-center">
+    <div class="glass-card flex items-center px-6 py-2 gap-4 bg-slate-50 border-slate-200 shadow-sm hover:border-[#002e5d] transition-all cursor-pointer">
+        <i class="fas fa-calendar-alt text-[#002e5d]"></i>
+        <div class="flex flex-col">
+            <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">Domingo de Referência</span>
+            <select id="dateSelectGlobal" class="bg-transparent font-black text-xs uppercase tracking-tighter outline-none border-none cursor-pointer text-slate-700"></select>
+        </div>
+    </div>
+</div>
+
             <div class="content-container w-full">
                 <!-- DASHBOARD -->
                 <section id="view-dashboard" class="hidden space-y-8">
@@ -159,11 +170,7 @@
 
                     <div id="attendance-options" class="hidden space-y-6 p-6 bg-white rounded-[32px] border shadow-sm">
                         <div class="space-y-2">
-                            <p class="text-[10px] font-black text-slate-400 uppercase ml-2">Data e Filtros</p>
-                            <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl border">
-                                <i class="fas fa-calendar-day text-[#002e5d]"></i>
-                                <select id="dateSelect" class="bg-transparent font-black text-xs uppercase outline-none border-none flex-1 cursor-pointer"></select>
-                            </div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase ml-2">Filtros</p>
                             <div id="orgFilters" class="flex overflow-x-auto gap-2 no-scrollbar py-2"></div>
                         </div>
 
@@ -351,7 +358,12 @@
         let memberIdEditing = null; let userIdEditing = null; let memberIdJustifying = null;
 
         // Date Initializer
-        const dateSelectEl = document.getElementById('dateSelect');
+        const dSelect = document.getElementById('dateSelectGlobal');
+        dSelect.addEventListener('change', (e) => {
+    selectedDate = e.target.value;
+    renderAll(); // Isso garante que Dashboard, Frequência e Relatórios atualizem juntos!
+});
+        
         const domingosISO = [];
         for(let i=0; i<12; i++) {
             let d = new Date(); d.setDate(d.getDate() - (d.getDay() + (7 * i)) % 84);
