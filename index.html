@@ -357,21 +357,32 @@
         let hChart = null; let aChart = null;
         let memberIdEditing = null; let userIdEditing = null; let memberIdJustifying = null;
 
-        // Date Initializer
+        // --- CORREÇÃO DO SELETOR DE DATA ---
         const dSelect = document.getElementById('dateSelectGlobal');
-        dSelect.addEventListener('change', (e) => {
-    selectedDate = e.target.value;
-    renderAll(); // Isso garante que Dashboard, Frequência e Relatórios atualizem juntos!
-});
-        
         const domingosISO = [];
+
         for(let i=0; i<12; i++) {
-            let d = new Date(); d.setDate(d.getDate() - (d.getDay() + (7 * i)) % 84);
+            let d = new Date(); 
+            // Calcula os domingos retroativos
+            d.setDate(d.getDate() - (d.getDay() + (7 * i)) % 84);
             let iso = d.toISOString().split('T')[0];
             domingosISO.push(iso);
-            dateSelectEl.innerHTML += `<option value="${iso}">${i==0 ? 'DOMINGO HOJE ('+d.toLocaleDateString('pt-BR')+')' : d.toLocaleDateString('pt-BR')}</option>`;
+            
+            // Aqui usamos o nome correto: dSelect
+            if(dSelect) {
+                dSelect.innerHTML += `<option value="${iso}">${i==0 ? 'DOMINGO HOJE ('+d.toLocaleDateString('pt-BR')+')' : d.toLocaleDateString('pt-BR')}</option>`;
+            }
         }
-        selectedDate = dateSelectEl.value;
+
+        // Garante que o sistema comece com a data de hoje selecionada
+        if(dSelect) {
+            selectedDate = dSelect.value;
+            dSelect.addEventListener('change', (e) => {
+                selectedDate = e.target.value;
+                renderAll(); 
+            });
+        }
+        // --- FIM DA CORREÇÃO ---
 
         // AUTH LOGIC
         window.checkLogin = async () => {
