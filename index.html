@@ -527,53 +527,101 @@
             updateCharts(); 
         }
 
-        window.renderAttendance = () => {
-            const list = document.getElementById('memberList'); if(!list) return;
-            const search = document.getElementById('searchMember').value.toLowerCase();
-            const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], justifications: {}, lideresCount:0, visitantesCount:0, missionariosCount:0 };
-            const curP = data.presents || []; const onlP = data.online_ids || []; const notes = data.justifications || {};
-            
-            list.innerHTML = ''; 
-            let mP = 0; let vNomP = 0; let totAla = 0; let lastFamily = "";
+       window.renderAttendance = () => {
+    const list = document.getElementById('memberList');
+    if(!list) return;
+    const search = document.getElementById('searchMember').value.toLowerCase();
+    
+    // Pega os dados do banco
+    const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], justifications: {}, lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
+    const curP = data.presents || []; 
+    const onlP = data.online_ids || []; 
+    const notes = data.justifications || {};
 
-            // Atualiza visores numéricos
-            if(document.getElementById('display-lideres')) document.getElementById('display-lideres').innerText = data.lideresCount || 0;
-            if(document.getElementById('display-visitantes')) document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
-            if(document.getElementById('display-missionarios')) document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
-            
-            const sorted = [...members].sort((a, b) => {
-                const famA = (a.familia || "Z-SEM").toUpperCase(); const famB = (b.familia || "Z-SEM").toUpperCase();
-                return famA === famB ? a.name.localeCompare(b.name) : famA.localeCompare(famB);
-            });
+    list.innerHTML = ''; 
+    
+    // GAVETAS DE CONTAGEM (MEMBROS)
+    let mP_Fisico = 0;
+    let mP_Online = 0;
+    
+    // GAVETAS DE CONTAGEM (VISITANTES DA UNIDADE - NOMINAIS)
+    let vNomP_Fisico = 0;
+    let vNomP_Online = 0;
 
-            sorted.forEach(m => {
-                const isP = curP.includes(m.id); const isOn = onlP.includes(m.id); const note = notes[m.id] || "";
-                if(m.categoria !== 'Visitante') { totAla++; if(isP) mP++; } else { if(isP) vNomP++; }
+    let totAla = 0; 
+    let lastFamily = "";
 
-                if((m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) && (currentFilter === 'TODOS' || m.org === currentFilter)) {
-                    if (m.familia !== lastFamily && !search) { list.innerHTML += `<div class="family-divider">Família ${m.familia}</div>`; lastFamily = m.familia; }
-                    list.innerHTML += `<div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isP ? (isOn ? 'card-online' : 'card-presente') : 'card-ausente'} transition-all"><div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name}')"` : ''} class="flex-1 flex items-center gap-4 cursor-pointer"><div class="check-box ${isP ? (isOn ? 'check-online' : 'check-active') : ''}">${isP ? `<i class="fas ${isOn ? 'fa-wifi' : 'fa-check'} text-[10px]"></i>` : ''}</div><div class="flex-1 text-left"><h4 class="font-bold text-sm ${isP ? (isOn ? 'text-blue-900' : 'text-teal-900') : 'text-slate-800'} truncate">${m.name}</h4><p class="text-[9px] font-black uppercase text-slate-400">${m.org}</p>${note ? `<div class="justificativa-tag italic"><i class="fas fa-comment-dots mr-1"></i>${note}</div>` : ''}</div></div>${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name}')" class="text-slate-300 p-2"><i class="fas fa-sticky-note text-sm"></i></button>` : ''}</div>`;
-                }
-            });
+    // Atualiza os números dos visores manuais (Líderes, Fora, Miss)
+    document.getElementById('display-lideres').innerText = data.lideresCount || 0;
+    document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
+    document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
 
-            // Atualiza Dashboard
-            const lC = data.lideresCount || 0; const vC = data.visitantesCount || 0; const msC = data.missionariosCount || 0;
-            if(document.getElementById('stats-present')) {
-                document.getElementById('stats-present').innerText = mP + vNomP + lC + vC + msC;
-                document.getElementById('stats-total').innerText = totAla;
-                
-                let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1"><p class="text-green-600 flex justify-between"><span>✓ Membros Ala</span> <span>${mP}</span></p>`;
-                if(vNomP > 0) det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Locais</span> <span>${vNomP}</span></p>`;
-                if(msC > 0) det += `<p class="text-indigo-600 flex justify-between"><span>👔 Missionários</span> <span>${msC}</span></p>`;
-                if(lC > 0) det += `<p class="text-amber-600 flex justify-between"><span>★ Líderes Estaca</span> <span>${lC}</span></p>`;
-                if(vC > 0) det += `<p class="text-blue-500 flex justify-between"><span>🚶 Visitantes Fora</span> <span>${vC}</span></p>`;
-                
-                const card = document.getElementById('stats-present').parentElement; 
-                const old = card.querySelector('.detalhes-area'); if(old) old.remove();
-                card.insertAdjacentHTML('beforeend', det + `</div>`);
+    const sorted = [...members].sort((a, b) => {
+        const famA = (a.familia || "Z-SEM").toUpperCase(); const famB = (b.familia || "Z-SEM").toUpperCase();
+        return famA === famB ? a.name.localeCompare(b.name) : famA.localeCompare(famB);
+    });
+
+    sorted.forEach(m => {
+        const isP = curP.includes(m.id); 
+        const isOn = onlP.includes(m.id); 
+        const note = notes[m.id] || "";
+        const isVisitante = (m.categoria === 'Visitante');
+
+        // LÓGICA DE CONTAGEM DETALHADA
+        if(!isVisitante) { 
+            totAla++; // Soma no total de membros da ala
+            if(isP) {
+                if(isOn) mP_Online++; else mP_Fisico++; 
             }
-            document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
-        };
+        } else {
+            if(isP) {
+                if(isOn) vNomP_Online++; else vNomP_Fisico++;
+            }
+        }
+
+        // Filtro de Busca e Visual da Lista
+        if((m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) && (currentFilter === 'TODOS' || m.org === currentFilter)) {
+            if (m.familia !== lastFamily && !search) { list.innerHTML += `<div class="family-divider">Família ${m.familia}</div>`; lastFamily = m.familia; }
+            list.innerHTML += `<div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isP ? (isOn ? 'card-online' : 'card-presente') : 'card-ausente'} transition-all"><div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name}')"` : ''} class="flex-1 flex items-center gap-4 cursor-pointer"><div class="check-box ${isP ? (isOn ? 'check-online' : 'check-active') : ''}">${isP ? `<i class="fas ${isOn ? 'fa-wifi' : 'fa-check'} text-[10px]"></i>` : ''}</div><div class="flex-1 text-left"><h4 class="font-bold text-sm ${isP ? (isOn ? 'text-blue-900' : 'text-teal-900') : 'text-slate-800'} truncate">${m.name}</h4><p class="text-[9px] font-black uppercase text-slate-400">${m.org}</p>${note ? `<div class="justificativa-tag italic"><i class="fas fa-comment-dots mr-1"></i>${note}</div>` : ''}</div></div>${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name}')" class="text-slate-300 p-2"><i class="fas fa-sticky-note text-sm"></i></button>` : ''}</div>`;
+        }
+    });
+
+    // CÁLCULOS DOS TOTAIS DO DASHBOARD
+    const lC = data.lideresCount || 0; 
+    const vC = data.visitantesCount || 0; 
+    const msC = data.missionariosCount || 0;
+    const somaGeralPresentes = mP_Fisico + mP_Online + vNomP_Fisico + vNomP_Online + lC + vC + msC;
+
+    document.getElementById('stats-present').innerText = somaGeralPresentes;
+    document.getElementById('stats-total').innerText = totAla;
+
+    // --- CONSTRUÇÃO DO NOVO DETALHAMENTO ---
+    let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1">`;
+    
+    // Linha Membros (com detalhe Físico/Online se houver online)
+    let txtMembros = `✓ Membros Ala: ${mP_Fisico + mP_Online}`;
+    if(mP_Online > 0) txtMembros += ` <span class="text-[9px] opacity-60 font-normal">(${mP_Fisico} Fís. / ${mP_Online} Onl.)</span>`;
+    det += `<p class="text-green-600 flex justify-between"><span>${txtMembros}</span></p>`;
+
+    // Linha Visitantes Locais Nominais
+    if((vNomP_Fisico + vNomP_Online) > 0) {
+        let txtVistLoc = `👤 Visitantes Locais: ${vNomP_Fisico + vNomP_Online}`;
+        if(vNomP_Online > 0) txtVistLoc += ` <span class="text-[9px] opacity-60 font-normal">(${vNomP_Fisico} Fís. / ${vNomP_Online} Onl.)</span>`;
+        det += `<p class="text-teal-600 flex justify-between"><span>${txtVistLoc}</span></p>`;
+    }
+
+    if(msC > 0) det += `<p class="text-indigo-600 flex justify-between"><span>👔 Missionários</span> <span>${msC}</span></p>`;
+    if(lC > 0) det += `<p class="text-amber-600 flex justify-between"><span>★ Líderes Estaca</span> <span>${lC}</span></p>`;
+    if(vC > 0) det += `<p class="text-blue-500 flex justify-between"><span>🚶 Visitantes Fora</span> <span>${vC}</span></p>`;
+
+    // Injeta no Dashboard
+    const card = document.getElementById('stats-present').parentElement; 
+    const old = card.querySelector('.detalhes-area'); if(old) old.remove();
+    card.insertAdjacentHTML('beforeend', det + `</div>`);
+
+    // Trava de segurança para botões admin
+    document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
+};
 
         window.renderMembersList = () => {
             const container = document.getElementById('manageMembersContainer'); if(!container) return; container.innerHTML = '';
