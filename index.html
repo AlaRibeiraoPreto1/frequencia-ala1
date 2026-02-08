@@ -211,7 +211,7 @@
                     <div id="headOfFamilyContainer" class="flex items-center gap-3 px-4 mt-2"><input type="checkbox" id="isHeadOfFamily" class="w-4 h-4 accent-[#002e5d]"><label class="text-xs font-bold text-slate-500 italic uppercase">Sou Chefe da família</label></div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <select id="newOrg" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none"><option value="Quórum de Élderes">ÉLDERES</option><option value="Sociedade de Socorro">SOCORRO</option><option value="Moças">MOÇAS</option><option value="Rapazes">RAPAZES</option><option value="Primária">PRIMÁRIA</option></select>
+                    <select id="newOrg" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none"><option value="Quórum de Élderes">Quórum de Élderes</option><option value="Sociedade de Socorro">Sociedade de Socorro</option><option value="Moças">Moças</option><option value="Rapazes">Rapazes</option><option value="Primária">Primária</option></select>
                     <select id="newCat" onchange="toggleBaptismDate(this.value, 'baptismDateContainer')" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none"><option value="Membro">MEMBRO</option><option value="Recém-Converso">RECÉM-CONVERSO</option><option value="Novo Morador">NOVO MORADOR</option><option value="Visitante">VISITANTE</option></select>
                 </div>
                 <div id="baptismDateContainer" class="hidden space-y-1">
@@ -558,7 +558,23 @@
             const n = document.getElementById('newName').value; const f = document.getElementById('familySearch').value.toUpperCase();
             if(!n || !f) return alert("Preencha Nome e Família.");
             await addDoc(collection(db, "membros"), { name: n, familia: f, org: document.getElementById('newOrg').value, categoria: document.getElementById('newCat').value, telefone: document.getElementById('newPhone').value || '', isHead: document.getElementById('isHeadOfFamily').checked, lastAttended: "2024-01-01", dataBatismo: document.getElementById('newBaptismDate').value });
-            alert("Sucesso!"); document.getElementById('newName').value = ''; document.getElementById('familySearch').value = ''; switchTab('attendance');
+            // --- CÓDIGO ATUALIZADO PARA LIMPAR E CONTINUAR ---
+            alert("Membro cadastrado com sucesso!"); 
+            
+            // Limpa todos os campos de texto
+            document.getElementById('newName').value = ''; 
+            document.getElementById('familySearch').value = ''; 
+            document.getElementById('newPhone').value = ''; 
+            document.getElementById('newBaptismDate').value = ''; 
+            
+            // Desmarca o checkbox de chefe de família
+            document.getElementById('isHeadOfFamily').checked = false;
+            
+            // Faz o checkbox e a data de batismo sumirem novamente
+            document.getElementById('headOfFamilyContainer').classList.remove('hidden');
+            document.getElementById('baptismDateContainer').classList.add('hidden');
+            
+            // NÃO usamos mais o switchTab aqui, então ele continua na mesma página.
         };
 
         window.openMemberEdit = (id) => {
