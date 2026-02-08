@@ -349,32 +349,35 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Global State
-        let members = []; let attendanceHistory = {}; let allUsersList = [];
+        // VARIÁVEIS GLOBAIS
+        let members = []; 
+        let attendanceHistory = {}; 
+        let allUsersList = [];
         let currentUser = JSON.parse(localStorage.getItem('user_data')) || null;
         let selectedDate = new Date().toISOString().split('T')[0];
         let currentFilter = 'TODOS';
-        let hChart = null; let aChart = null;
-        let memberIdEditing = null; let userIdEditing = null; let memberIdJustifying = null;
+        let hChart = null; 
+        let aChart = null;
+        let memberIdEditing = null; 
+        let userIdEditing = null; 
+        let memberIdJustifying = null;
 
-        // --- CORREÇÃO DO SELETOR DE DATA ---
+        // --- INICIALIZADOR DE DATA GLOBAL ---
         const dSelect = document.getElementById('dateSelectGlobal');
         const domingosISO = [];
 
+        // Preenche o seletor com os últimos 12 domingos
         for(let i=0; i<12; i++) {
             let d = new Date(); 
-            // Calcula os domingos retroativos
             d.setDate(d.getDate() - (d.getDay() + (7 * i)) % 84);
             let iso = d.toISOString().split('T')[0];
             domingosISO.push(iso);
-            
-            // Aqui usamos o nome correto: dSelect
             if(dSelect) {
                 dSelect.innerHTML += `<option value="${iso}">${i==0 ? 'DOMINGO HOJE ('+d.toLocaleDateString('pt-BR')+')' : d.toLocaleDateString('pt-BR')}</option>`;
             }
         }
 
-        // Garante que o sistema comece com a data de hoje selecionada
+        // Configura a data inicial e o evento de mudança
         if(dSelect) {
             selectedDate = dSelect.value;
             dSelect.addEventListener('change', (e) => {
@@ -382,9 +385,8 @@
                 renderAll(); 
             });
         }
-        // --- FIM DA CORREÇÃO ---
 
-        // AUTH LOGIC
+        // --- AUTENTICAÇÃO ---
         window.checkLogin = async () => {
             const u = document.getElementById('login-user').value.toLowerCase().trim();
             const p = document.getElementById('login-pass').value.trim();
@@ -395,7 +397,7 @@
                 const d = snap.docs[0].data(); d.id = snap.docs[0].id;
                 localStorage.setItem('user_data', JSON.stringify(d));
                 location.reload();
-            } else alert("Dados incorretos.");
+            } else alert("Usuário ou senha incorretos.");
         };
 
         window.processFirstLogin = async () => {
@@ -405,14 +407,14 @@
             if(!u || p1 !== p2) return alert("As senhas não coincidem.");
             const q = query(collection(db, "usuarios"), where("username", "==", u));
             const snap = await getDocs(q);
-            if(snap.empty) return alert("Não autorizado.");
+            if(snap.empty) return alert("Autorização não encontrada.");
             await updateDoc(doc(db, "usuarios", snap.docs[0].id), { password: p1 });
             alert("Sucesso! Logue agora."); switchTab('login');
         };
 
         window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
 
-        // TAB NAVIGATION
+        // --- NAVEGAÇÃO ENTRE ABAS ---
         window.switchTab = (tab) => {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             const view = document.getElementById(`view-${tab}`);
@@ -429,14 +431,17 @@
 
             if(view) view.classList.remove('hidden');
 
+            // Atualiza botões do menu
             document.querySelectorAll('aside button, nav button').forEach(b => b.classList.remove('nav-btn-active', 'text-[#002e5d]', 'scale-125'));
             if(document.getElementById(`side-${tab}`)) document.getElementById(`side-${tab}`).classList.add('nav-btn-active');
             if(document.getElementById(`nav-${tab}`)) document.getElementById(`nav-${tab}`).classList.add('text-[#002e5d]', 'scale-125');
 
-            const titles = {'dashboard':'Painel Geral','attendance':'Registrar Frequência','analysis':'Resgate','reports':'Relatórios Estratégicos','add':'Novo Cadastro','members-list':'Gestão de Listas', 'admin-users': 'Gerenciar Logins'};
+            // Atualiza título no celular
+            const titles = {'dashboard':'Painel Geral','attendance':'Registrar Frequência','analysis':'Resgate','reports':'Relatórios Estratégicos','add':'Novo','members-list':'Gestão de Listas', 'admin-users': 'Gerenciar Logins'};
             const headerTitle = document.getElementById('mobile-page-title');
             if(headerTitle) headerTitle.innerText = titles[tab] || 'Ala';
 
+            // Recarrega dados da aba
             if(tab === 'members-list') renderMembersList();
             if(tab === 'admin-users') renderAdminUsers();
             if(tab === 'reports' || tab === 'dashboard') renderAll();
@@ -453,25 +458,28 @@
             }
         };
 
-        // FIREBASE DATA FLOW
+        // --- CONEXÃO COM O BANCO DE DADOS ---
         function listenData() {
             onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => {
                 members = snap.docs.map(d => ({id: d.id, ...d.data()})); 
                 renderAll();
             });
             onSnapshot(collection(db, "historico"), (snap) => {
-                attendanceHistory = {}; snap.docs.forEach(d => { attendanceHistory[d.id] = d.data(); }); 
+                attendanceHistory = {}; 
+                snap.docs.forEach(d => { attendanceHistory[d.id] = d.data(); }); 
                 renderAll();
             });
             onSnapshot(collection(db, "usuarios"), (snap) => {
                 allUsersList = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 if(currentUser && currentUser.role === 'admin') renderAdminUsers();
             });
+            // Tira a tela de sincronismo
             document.getElementById('loading-screen').classList.add('hidden');
         }
 
+        // --- FUNÇÕES DE REGISTRO ---
         window.updateCount = async (tipo, delta) => {
-            if (currentUser.role !== 'admin') return alert("Acesso negado.");
+            if (currentUser.role !== 'admin') return alert("Apenas Administrador.");
             let cur = attendanceHistory[selectedDate]?.[tipo] || 0;
             let val = cur + delta; if (val < 0) val = 0;
             await setDoc(doc(db, "historico", selectedDate), { [tipo]: val }, { merge: true });
@@ -483,14 +491,22 @@
             let data = attendanceHistory[selectedDate] || {};
             let presents = data.presents ? [...data.presents] : [];
             let online = data.online_ids ? [...data.online_ids] : [];
-            if (!presents.includes(memberId)) { presents.push(memberId); }
-            else if (!online.includes(memberId)) { online.push(memberId); }
-            else { if(!confirm(`Remover presença de ${memberName}?`)) return; presents = presents.filter(i => i !== memberId); online = online.filter(i => i !== memberId); }
+
+            if (!presents.includes(memberId)) { 
+                presents.push(memberId); 
+            } else if (!online.includes(memberId)) { 
+                online.push(memberId); 
+            } else { 
+                if(!confirm(`Remover presença de ${memberName}?`)) return; 
+                presents = presents.filter(i => i !== memberId); 
+                online = online.filter(i => i !== memberId); 
+            }
             await setDoc(hRef, { presents, online_ids: online }, { merge: true });
         };
 
         window.openJustify = (id, name) => {
-            memberIdJustifying = id; document.getElementById('justify-member-name').innerText = "Membro: " + name;
+            memberIdJustifying = id; 
+            document.getElementById('justify-member-name').innerText = "Membro: " + name;
             document.getElementById('justify-text').value = attendanceHistory[selectedDate]?.justifications?.[id] || '';
             document.getElementById('justificationModal').classList.remove('hidden');
         };
@@ -503,18 +519,27 @@
             closeJustify();
         };
 
-        function renderAll() { renderAttendance(); renderRescue(); renderReports(); updateCharts(); }
+        // --- RENDERIZAÇÃO ---
+        function renderAll() { 
+            renderAttendance(); 
+            renderRescue(); 
+            renderReports(); 
+            updateCharts(); 
+        }
 
         window.renderAttendance = () => {
             const list = document.getElementById('memberList'); if(!list) return;
             const search = document.getElementById('searchMember').value.toLowerCase();
             const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], justifications: {}, lideresCount:0, visitantesCount:0, missionariosCount:0 };
             const curP = data.presents || []; const onlP = data.online_ids || []; const notes = data.justifications || {};
-            list.innerHTML = ''; let mP = 0; let vNomP = 0; let totAla = 0; let lastFamily = "";
+            
+            list.innerHTML = ''; 
+            let mP = 0; let vNomP = 0; let totAla = 0; let lastFamily = "";
 
-            document.getElementById('display-lideres').innerText = data.lideresCount || 0;
-            document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
-            document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
+            // Atualiza visores numéricos
+            if(document.getElementById('display-lideres')) document.getElementById('display-lideres').innerText = data.lideresCount || 0;
+            if(document.getElementById('display-visitantes')) document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
+            if(document.getElementById('display-missionarios')) document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
             
             const sorted = [...members].sort((a, b) => {
                 const famA = (a.familia || "Z-SEM").toUpperCase(); const famB = (b.familia || "Z-SEM").toUpperCase();
@@ -523,8 +548,7 @@
 
             sorted.forEach(m => {
                 const isP = curP.includes(m.id); const isOn = onlP.includes(m.id); const note = notes[m.id] || "";
-                const isVisitante = (m.categoria === 'Visitante');
-                if(!isVisitante) { totAla++; if(isP) mP++; } else { if(isP) vNomP++; }
+                if(m.categoria !== 'Visitante') { totAla++; if(isP) mP++; } else { if(isP) vNomP++; }
 
                 if((m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) && (currentFilter === 'TODOS' || m.org === currentFilter)) {
                     if (m.familia !== lastFamily && !search) { list.innerHTML += `<div class="family-divider">Família ${m.familia}</div>`; lastFamily = m.familia; }
@@ -532,16 +556,22 @@
                 }
             });
 
+            // Atualiza Dashboard
             const lC = data.lideresCount || 0; const vC = data.visitantesCount || 0; const msC = data.missionariosCount || 0;
-            document.getElementById('stats-present').innerText = mP + vNomP + lC + vC + msC;
-            document.getElementById('stats-total').innerText = totAla;
-            let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1"><p class="text-green-600 flex justify-between"><span>✓ Membros Ala</span> <span>${mP}</span></p>`;
-            if(vNomP > 0) det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Locais</span> <span>${vNomP}</span></p>`;
-            if(msC > 0) det += `<p class="text-indigo-600 flex justify-between"><span>👔 Missionários</span> <span>${msC}</span></p>`;
-            if(lC > 0) det += `<p class="text-amber-600 flex justify-between"><span>★ Líderes Estaca</span> <span>${lC}</span></p>`;
-            if(vC > 0) det += `<p class="text-blue-500 flex justify-between"><span>🚶 Visitantes Fora</span> <span>${vC}</span></p>`;
-            const card = document.getElementById('stats-present').parentElement; const old = card.querySelector('.detalhes-area'); if(old) old.remove();
-            card.insertAdjacentHTML('beforeend', det + `</div>`);
+            if(document.getElementById('stats-present')) {
+                document.getElementById('stats-present').innerText = mP + vNomP + lC + vC + msC;
+                document.getElementById('stats-total').innerText = totAla;
+                
+                let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1"><p class="text-green-600 flex justify-between"><span>✓ Membros Ala</span> <span>${mP}</span></p>`;
+                if(vNomP > 0) det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Locais</span> <span>${vNomP}</span></p>`;
+                if(msC > 0) det += `<p class="text-indigo-600 flex justify-between"><span>👔 Missionários</span> <span>${msC}</span></p>`;
+                if(lC > 0) det += `<p class="text-amber-600 flex justify-between"><span>★ Líderes Estaca</span> <span>${lC}</span></p>`;
+                if(vC > 0) det += `<p class="text-blue-500 flex justify-between"><span>🚶 Visitantes Fora</span> <span>${vC}</span></p>`;
+                
+                const card = document.getElementById('stats-present').parentElement; 
+                const old = card.querySelector('.detalhes-area'); if(old) old.remove();
+                card.insertAdjacentHTML('beforeend', det + `</div>`);
+            }
             document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
         };
 
@@ -559,13 +589,15 @@
         window.renderAdminUsers = () => {
             const l = document.getElementById('users-list'); if(!l) return; l.innerHTML = '';
             allUsersList.forEach(u => {
-                l.innerHTML += `<div class="bg-white p-5 rounded-3xl flex justify-between items-center text-xs border shadow-sm text-left"><div><p class="font-black uppercase text-[#002e5d]">${u.name}</p><p class="opacity-40 font-bold uppercase text-[9px] tracking-wider">${u.username} • ${u.role}</p></div><div class="flex items-center gap-2"><button onclick="openEditUser({id:'${u.id}', name:'${u.name}', role:'${u.role}'})" class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-[#002e5d] hover:text-white transition-all"><i class="fas fa-cog text-xs"></i></button><div class="w-2 h-2 rounded-full ${u.password?'bg-green-400':'bg-yellow-400'}"></div></div></div>`;
+                l.innerHTML += `<div class="bg-white p-5 rounded-3xl flex justify-between items-center text-xs border shadow-sm text-left"><div><p class="font-black uppercase text-[#002e5d]">${u.name}</p><p class="opacity-40 font-bold uppercase text-[9px]">${u.username} • ${u.role}</p></div><div class="flex items-center gap-2"><button onclick="openEditUser({id:'${u.id}', name:'${u.name}', role:'${u.role}'})" class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-[#002e5d] hover:text-white transition-all"><i class="fas fa-cog text-xs"></i></button><div class="w-2 h-2 rounded-full ${u.password?'bg-green-400':'bg-yellow-400'}"></div></div></div>`;
             });
         };
 
+        // --- HELPERS E BUSCA ---
         window.toggleOptions = () => document.getElementById('attendance-options').classList.toggle('hidden');
         window.formatNameInput = (el) => el.value = el.value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
         window.formatPhone = (el) => { let v = el.value.replace(/\D/g,''); v = v.replace(/^(\d{2})(\d)/g,"($1) $2"); v = v.replace(/(\d)(\d{4})$/,"$1-$2"); el.value = v; };
+        
         window.handleFamilySearch = (query) => {
             const sug = document.getElementById('familySuggestions'); if (query.length < 2) { sug.classList.add('hidden'); return; }
             const heads = members.filter(m => m.isHead && m.familia.toLowerCase().includes(query.toLowerCase()));
@@ -621,7 +653,7 @@
             members.forEach(m => {
                 if(m.categoria === 'Visitante') return;
                 let fq = domingosISO.slice(0, 4).filter(d => (attendanceHistory[d]?.presents || []).includes(m.id)).length;
-                if(fq === 1) yl.innerHTML += `<div class="p-3 bg-yellow-50 rounded-xl text-[10px] font-bold text-yellow-700 uppercase text-left"><i class="fas fa-triangle-exclamation mr-2"></i>${m.name}</div>`;
+                if(fq === 1) yl.innerHTML += `<div class="p-3 bg-yellow-50 rounded-xl text-[10px] font-bold text-yellow-700 uppercase text-left">⚠️ ${m.name}</div>`;
                 const f = m.familia || 'S/ FAM'; if(!fams[f]) fams[f] = { t: 0, p: 0 }; fams[f].t++; if((attendanceHistory[selectedDate]?.presents || []).includes(m.id)) fams[f].p++;
                 if(m.categoria && m.categoria !== 'Membro') {
                     const isP = (attendanceHistory[selectedDate]?.presents || []).includes(m.id);
@@ -641,29 +673,43 @@
             });
             if(hChart) hChart.destroy();
             hChart = new Chart(ctx1.getContext('2d'), { type: 'bar', data: { labels: ['ÉLD', 'SOC', 'MOÇ', 'RAP', 'PRI'], datasets: [{ data: stats, backgroundColor: '#002e5d', borderRadius: 8 }] }, options: { indexAxis: 'y', plugins: { legend: false }, scales: { x: { max: 100 } } } });
+            
             const ctx2 = document.getElementById('attendanceChart'); if(!ctx2) return;
             const cts = domingosISO.slice(0, 5).reverse().map(d => (attendanceHistory[d]?.presents || []).length);
             if(aChart) aChart.destroy();
             aChart = new Chart(ctx2.getContext('2d'), { type: 'line', data: { labels: domingosISO.slice(0, 5).reverse().map(d=>d.split('-')[2]), datasets: [{ data: cts, borderColor: '#002e5d', fill: true, tension: 0.5 }] }, options: { plugins: { legend: false } } });
         }
 
-        // Event Listener para trocar Data
-        dateSelectEl.addEventListener('change', (e) => { selectedDate = e.target.value; renderAll(); });
-
+        // --- INICIALIZAÇÃO FINAL ---
         if(currentUser) {
             document.getElementById('user-name-side').innerText = currentUser.name;
             document.getElementById('user-mobile-name').innerText = currentUser.name;
             document.getElementById('user-mobile-role').innerText = currentUser.role === 'admin' ? 'Administrador' : 'Secretário';
-            if(currentUser.role === 'admin') { document.getElementById('admin-btn').classList.remove('hidden'); document.getElementById('admin-mobile-btn').classList.remove('hidden'); }
+            
+            if(currentUser.role === 'admin') {
+                document.getElementById('admin-btn').classList.remove('hidden');
+                document.getElementById('admin-mobile-btn').classList.remove('hidden');
+            }
+            
             const fArea = document.getElementById('orgFilters');
             ['TODOS', 'Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária'].forEach(o => {
                 const id = o.replace(/\s+/g, '');
                 fArea.innerHTML += `<button onclick="setFilter('${o}')" class="filter-pill ${o=='TODOS' ? 'active' : ''} glass-card px-6 py-3 whitespace-nowrap text-[10px] font-black uppercase tracking-widest border border-slate-100 shadow-sm" id="pill-${id}">${o}</button>`;
             });
-            window.setFilter = (f) => { currentFilter = f; document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active', 'bg-[#002e5d]', 'text-white')); const el = document.getElementById('pill-'+f.replace(/\s+/g, '')); if(el) el.classList.add('active', 'bg-[#002e5d]', 'text-white'); renderAttendance(); };
-            listenData(); switchTab('dashboard');
+
+            window.setFilter = (f) => {
+                currentFilter = f;
+                document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active', 'bg-[#002e5d]', 'text-white'));
+                const el = document.getElementById('pill-'+f.replace(/\s+/g, ''));
+                if(el) el.classList.add('active', 'bg-[#002e5d]', 'text-white');
+                renderAttendance();
+            };
+            
+            listenData(); 
+            switchTab('dashboard');
         } else { 
-            switchTab('login'); document.getElementById('loading-screen').classList.add('hidden'); 
+            switchTab('login');
+            document.getElementById('loading-screen').classList.add('hidden'); 
         }
     </script>
 </body>
