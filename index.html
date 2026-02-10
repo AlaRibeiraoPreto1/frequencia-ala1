@@ -17,26 +17,26 @@
         body.status-login { height: 100vh !important; overflow: hidden !important; position: fixed; width: 100%; }
         body.status-app { height: auto !important; overflow-y: auto !important; position: relative; }
         @media (min-width: 1024px) {
-            .app-layout { display: flex !important; height: 100vh; overflow: hidden; }
-            .sidebar { width: 300px !important; flex-shrink: 0; display: flex !important; background: white; border-right: 1px solid #e2e8f0; flex-direction: column; }
+            .app-layout { display: flex !ant; height: 100vh; overflow: hidden; }
+            .sidebar { width: 300px !ant; flex-shrink: 0; display: flex !ant; background: white; border-right: 1px solid #e2e8f0; flex-direction: column; }
             .main-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
             .content-container { width: 100%; max-width: 1100px; padding: 40px; }
         }
         @media (max-width: 1023px) {
-            .sidebar { display: none !important; }
-            .app-layout { display: block !important; }
+            .sidebar { display: none !ant; }
+            .app-layout { display: block !ant; }
             .content-container { padding: 20px; padding-bottom: 120px; }
             .sticky-search { position: sticky; top: 0; z-index: 100; background: var(--bg-soft); padding: 10px 0; }
         }
         .glass-card { background: white; border-radius: 28px; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.04); border: 1px solid #f1f5f9; }
-        .nav-btn-active { background-color: #f0f7ff; color: var(--sacramental-blue) !important; font-weight: 800; border-right: 4px solid var(--sacramental-blue); }
+        .nav-btn-active { background-color: #f0f7ff; color: var(--sacramental-blue) !ant; font-weight: 800; border-right: 4px solid var(--sacramental-blue); }
         .check-box { width: 28px; height: 28px; border-radius: 10px; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .check-active { background: var(--healing-teal); border-color: var(--healing-teal); color: white; }
-        .card-online { background-color: #eff6ff !important; border-left: 8px solid #3b82f6 !important; }
+        .card-online { background-color: #eff6ff !ant; border-left: 8px solid #3b82f6 !ant; }
         .check-online { background: #3b82f6; border-color: #3b82f6; color: white; }
         .family-divider { background-color: #f8fafc; padding: 8px 16px; border-radius: 12px; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-top: 15px; border: 1px solid #e2e8f0; width: 100%; display: block; }
-        .card-presente { background-color: #ecfdf5 !important; border-left: 8px solid #10b981 !important; }
-        .card-ausente { background-color: #ffffff !important; border-left: 8px solid #f1f5f9 !important; }
+        .card-presente { background-color: #ecfdf5 !ant; border-left: 8px solid #10b981 !ant; }
+        .card-ausente { background-color: #ffffff !ant; border-left: 8px solid #f1f5f9 !ant; }
         .justificativa-tag { font-size: 10px; background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 8px; margin-top: 6px; display: inline-block; border: 1px dashed #cbd5e1; font-weight: bold; }
     </style>
 </head>
@@ -303,8 +303,8 @@
 
     <!-- SCRIPT CENTRALIZADO -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy, setDoc, deleteDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+         { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy, setDoc, deleteDoc, getDocs, where, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyAaEKx9n4N847WW97FhfZxLZYtsa5cTsE0",
@@ -421,18 +421,34 @@
     }
 };
 
-        // DATA CORE
+
+        // --- CENTRAL DE SINCRONIZAÇÃO (Vigia o banco de dados em tempo real) ---
         function listenData() {
+            // 1. Vigia a lista de MEMBROS
             onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => {
-                members = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAll();
+                members = snap.docs.map(d => ({id: d.id, ...d.data()})); 
+                renderAll(); // Redesenha a lista sempre que um nome mudar ou for criado
             });
+
+            // 2. Vigia o HISTÓRICO de frequências (O que você marca nos domingos)
             onSnapshot(collection(db, "historico"), (snap) => {
-                attendanceHistory = {}; snap.docs.forEach(d => { attendanceHistory[d.id] = d.data(); }); renderAll();
+                // Atualiza as presenças de cada domingo sem apagar o que já está na tela
+                snap.docs.forEach(d => { 
+                    attendanceHistory[d.id] = d.data(); 
+                }); 
+                renderAll(); // Redesenha a lista e o Dashboard com os números novos
             });
+
+            // 3. Vigia os USUÁRIOS (Logins autorizados)
             onSnapshot(collection(db, "usuarios"), (snap) => {
                 allUsersList = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                if(currentUser && currentUser.role === 'admin') renderAdminUsers();
+                // Só desenha a lista de usuários se você for o Administrador
+                if(currentUser && currentUser.role === 'admin') {
+                    renderAdminUsers();
+                }
             });
+
+            // Comando final: Esconde a tela de "Sincronizando..."
             document.getElementById('loading-screen').classList.add('hidden');
         }
 
@@ -446,23 +462,52 @@
         window.toggleBaptismDate = (val, id) => { document.getElementById(id).classList.toggle('hidden', val !== 'Recém-Converso'); };
 
         window.updateCount = async (tipo, delta) => {
-            if (currentUser.role !== 'admin') return alert("Apenas Admin.");
-            let cur = attendanceHistory[selectedDate]?.[tipo] || 0;
-            let val = cur + delta; if (val < 0) val = 0;
-            await setDoc(doc(db, "historico", selectedDate), { [tipo]: val }, { merge: true });
-        };
+    if (currentUser.role !== 'admin') return;
+
+    // Pega o valor atual direto do que está na memória
+    let valorAtual = attendanceHistory[selectedDate]?.[tipo] || 0;
+    let novoValor = valorAtual + delta;
+    if (novoValor < 0) novoValor = 0;
+
+    const hRef = doc(db, "historico", selectedDate);
+    
+    try {
+        await setDoc(hRef, { [tipo]: novoValor }, { merge: true });
+    } catch (e) {
+        console.error("Erro ao atualizar contador:", e);
+        alert("Falha na conexão. O valor não foi salvo.");
+    }
+};
 
         window.togglePresence = async (memberId, memberName) => {
-            if(currentUser.role !== 'admin') return;
-            const hRef = doc(db, "historico", selectedDate);
-            let data = attendanceHistory[selectedDate] || {};
-            let presents = data.presents ? [...data.presents] : [];
-            let online = data.online_ids ? [...data.online_ids] : [];
-            if (!presents.includes(memberId)) { presents.push(memberId); }
-            else if (!online.includes(memberId)) { online.push(memberId); }
-            else { if(!confirm(`Remover presença de ${memberName}?`)) return; presents = presents.filter(i => i !== memberId); online = online.filter(i => i !== memberId); }
-            await setDoc(hRef, { presents, online_ids: online }, { merge: true });
-        };
+    if(currentUser.role !== 'admin') return;
+
+    const hRef = doc(db, "historico", selectedDate);
+    const dataHoje = attendanceHistory[selectedDate] || {};
+    const presents = dataHoje.presents || [];
+    const online = dataHoje.online_ids || [];
+
+    // 1. Estava Ausente -> Vai virar Presente Físico
+    if (!presents.includes(memberId)) {
+        await setDoc(hRef, { 
+            presents: arrayUnion(memberId) 
+        }, { merge: true });
+    } 
+    // 2. Estava Físico -> Vai virar Online
+    else if (!online.includes(memberId)) {
+        await setDoc(hRef, { 
+            online_ids: arrayUnion(memberId) 
+        }, { merge: true });
+    } 
+    // 3. Estava Online -> Vai virar Ausente (Pede confirmação)
+    else {
+        if(!confirm(`Deseja remover totalmente a presença de ${memberName}?`)) return;
+        await setDoc(hRef, { 
+            presents: arrayRemove(memberId),
+            online_ids: arrayRemove(memberId)
+        }, { merge: true });
+    }
+};
 
         window.openJustify = (id, name) => {
             memberIdJustifying = id; document.getElementById('justify-member-name').innerText = "Membro: " + name;
