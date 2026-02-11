@@ -337,18 +337,41 @@
         let hChart = null; let aChart = null;
         let memberIdEditing = null; let userIdEditing = null; let memberIdJustifying = null;
 
-        // DATA GLOBAL
+        // --- NOVO CÁLCULO DE DOMINGOS (LOCAL E SEGURO) ---
         const dSelect = document.getElementById('dateSelectGlobal');
         const domingosISO = [];
-        for(let i=0; i<12; i++) {
-            let d = new Date(); d.setDate(d.getDate() - (d.getDay() + (7 * i)) % 84);
-            let iso = d.toISOString().split('T')[0];
-            domingosISO.push(iso);
-            if(dSelect) dSelect.innerHTML += `<option value="${iso}">${i==0 ? 'DOMINGO HOJE ('+d.toLocaleDateString('pt-BR')+')' : d.toLocaleDateString('pt-BR')}</option>`;
+        let dataAux = new Date(); // Pega a data de agora (local)
+
+        // Se hoje não for domingo, volta para o domingo mais próximo
+        while (dataAux.getDay() !== 0) {
+            dataAux.setDate(dataAux.getDate() - 1);
         }
+
+        // Gera os últimos 12 domingos
+        for(let i=0; i<12; i++) {
+            let ano = dataAux.getFullYear();
+            let mes = String(dataAux.getMonth() + 1).padStart(2, '0');
+            let dia = String(dataAux.getDate()).padStart(2, '0');
+            let iso = `${ano}-${mes}-${dia}`; // Formato YYYY-MM-DD (Padrão ouro de banco de dados)
+            
+            domingosISO.push(iso);
+            
+            let label = dataAux.toLocaleDateString('pt-BR');
+            if(dSelect) {
+                dSelect.innerHTML += `<option value="${iso}">${i==0 ? 'DOMINGO HOJE ('+label+')' : 'DOMINGO '+label}</option>`;
+            }
+            
+            // Pula para o domingo anterior
+            dataAux.setDate(dataAux.getDate() - 7);
+        }
+
+        // TRAVA: Define a data selecionada EXATAMENTE pelo que está no seletor
         if(dSelect) {
-            selectedDate = dSelect.value;
-            dSelect.addEventListener('change', (e) => { selectedDate = e.target.value; renderAll(); });
+            selectedDate = dSelect.value; 
+            dSelect.addEventListener('change', (e) => {
+                selectedDate = e.target.value; // A variável só muda se você clicar
+                renderAll(); 
+            });
         }
 
         // AUTH
@@ -449,23 +472,67 @@
         }
 
         window.updateCount = async (tipo, delta) => {
-            if (currentUser.role !== 'admin') return alert("Admin apenas.");
-            let cur = attendanceHistory[selectedDate]?.[tipo] || 0;
-            let val = cur + delta; if (val < 0) val = 0;
-            await setDoc(doc(db, "historico", selectedDate), { [tipo]: val }, { merge: true });
-        };
+    // 1. Verificação de Segurança
+    if (!currentUser || currentUser.role !== 'admin') return alert("Acesso negado.");
+    
+    // 2. Trava de Segurança da Data (Usa a data selecionada no topo)
+    if (!selectedDate) return alert("Erro: Nenhuma data selecionada.");
+
+    // 3. Pega o valor que já existe no banco para aquela data específica
+    let valorAtual = attendanceHistory[selectedDate]?.[tipo] || 0;
+    
+    // 4. Calcula o novo valor (não deixa ser menor que zero)
+    let novoValor = valorAtual + delta;
+    if (novoValor < 0) novoValor = 0;
+
+    // 5. Salva no Google (Firebase) usando a data selecionada como chave
+    const hRef = doc(db, "historico", selectedDate);
+    try {
+        await setDoc(hRef, { [tipo]: novoValor }, { merge: true });
+    } catch (e) {
+        console.error("Erro ao salvar contagem:", e);
+        alert("Falha na conexão. O dado não foi salvo.");
+    }
+};
 
         window.togglePresence = async (memberId, memberName) => {
-            if(currentUser.role !== 'admin') return;
-            const hRef = doc(db, "historico", selectedDate);
-            let data = attendanceHistory[selectedDate] || {};
-            let presents = data.presents ? [...data.presents] : [];
-            let online = data.online_ids ? [...data.online_ids] : [];
-            if (!presents.includes(memberId)) { presents.push(memberId); }
-            else if (!online.includes(memberId)) { online.push(memberId); }
-            else { if(!confirm(`Remover presença de ${memberName}?`)) return; presents = presents.filter(i => i !== memberId); online = online.filter(i => i !== memberId); }
-            await setDoc(hRef, { presents, online_ids: online }, { merge: true });
-        };
+    // 1. Verificação de Segurança
+    if (!currentUser || currentUser.role !== 'admin') return alert("Acesso negado.");
+    
+    // 2. Trava de Segurança da Data (Garante que salva no dia certo)
+    if (!selectedDate) return alert("Erro: Nenhuma data selecionada.");
+
+    const hRef = doc(db, "historico", selectedDate);
+    
+    // 3. Pega os dados que estão salvos AGORA para esse dia
+    const dataHoje = attendanceHistory[selectedDate] || {};
+    const presents = dataHoje.presents || [];
+    const online = dataHoje.online_ids || [];
+
+    // 4. LÓGICA DE CICLO (3 ESTADOS)
+    if (!presents.includes(memberId)) {
+        // ESTADO 1: Estava Ausente -> Vai virar Presente Físico (Verde)
+        await setDoc(hRef, { 
+            presents: arrayUnion(memberId) 
+        }, { merge: true });
+    } 
+    else if (!online.includes(memberId)) {
+        // ESTADO 2: Estava Físico -> Vai virar Online (Azul)
+        await setDoc(hRef, { 
+            online_ids: arrayUnion(memberId) 
+        }, { merge: true });
+    } 
+    else {
+        // ESTADO 3: Estava Online -> Vai virar Ausente (Branco)
+        if(!confirm(`Deseja remover totalmente a presença de ${memberName}?`)) return;
+        await setDoc(hRef, { 
+            presents: arrayRemove(memberId),
+            online_ids: arrayRemove(memberId)
+        }, { merge: true });
+    }
+    
+    // Obs: Usamos arrayUnion e arrayRemove para garantir que nenhum dado seja "atropelado"
+};
 
         window.openJustify = (id, name) => {
             memberIdJustifying = id; document.getElementById('justify-member-name').innerText = name;
