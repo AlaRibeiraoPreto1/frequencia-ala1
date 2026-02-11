@@ -567,89 +567,118 @@
     const list = document.getElementById('memberList');
     if (!list) return;
     const search = document.getElementById('searchMember').value.toLowerCase();
-    // Mostra o botão "X" apenas se houver texto na busca
+    
+    // Gerencia visibilidade do botão de limpar busca
     const btnClear = document.getElementById('btnClearSearch');
     if (btnClear) {
-        if (search.length > 0) {
-            btnClear.classList.remove('hidden');
-        } else {
-            btnClear.classList.add('hidden');
-        }
+        search.length > 0 ? btnClear.classList.remove('hidden') : btnClear.classList.add('hidden');
     }
+
+    // Puxa dados do histórico para a data selecionada
     const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], justifications: {}, lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
-    const curP = data.presents || [];
-    const onlP = data.online_ids || [];
+    const curP = data.presents || []; 
+    const onlP = data.online_ids || []; 
     const notes = data.justifications || {};
 
-    let htmlBuffer = ''; // Buffer para otimização de performance
+    let htmlBuffer = ''; // Otimização de Performance: Buffer de string
     let mFis = 0, mOnl = 0, vFis = 0, vOnl = 0, totAla = 0, lastFamily = "";
 
-    // Atualização de visores (UI secundária)
+    // Atualiza visores numéricos manuais
     document.getElementById('display-lideres').innerText = data.lideresCount || 0;
     document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
     document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
 
+    // Ordenação alfabética por Família > Nome
     const sorted = [...members].sort((a, b) => {
-        const famA = (a.familia || "Z-SEM").toUpperCase();
+        const famA = (a.familia || "Z-SEM").toUpperCase(); 
         const famB = (b.familia || "Z-SEM").toUpperCase();
         return famA === famB ? a.name.localeCompare(b.name) : famA.localeCompare(famB);
     });
 
     sorted.forEach(m => {
-        const isP = curP.includes(m.id);
-        const isOn = onlP.includes(m.id);
-        const realCat = getRealCategory(m);
+        const isP = curP.includes(m.id); 
+        const isOn = onlP.includes(m.id); 
+        const note = notes[m.id] || "";
+        const realCat = getRealCategory(m); // Regra dos 12 meses
         const isVist = (realCat === 'Visitante');
 
-        if (!isVist) { totAla++; if (isP) isOn ? mOnl++ : mFis++; } 
-        else { if (isP) isOn ? vOnl++ : vFis++; }
+        // Lógica de Contagem para Dashboard
+        if (!isVist) { 
+            totAla++; 
+            if (isP) isOn ? mOnl++ : mFis++; 
+        } else {
+            if (isP) isOn ? vOnl++ : vFis++;
+        }
 
+        // Filtros de busca e organização
         if ((m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) && (currentFilter === 'TODOS' || m.org === currentFilter)) {
-            if (m.familia !== lastFamily && !search) {
-                htmlBuffer += `<div class="family-divider">Família ${m.familia}</div>`;
-                lastFamily = m.familia;
+            
+            // Inserção de divisor de família
+            if (m.familia !== lastFamily && !search) { 
+                htmlBuffer += `<div class="family-divider">Família ${m.familia}</div>`; 
+                lastFamily = m.familia; 
             }
 
+            // Construção do Card com Correção de UI para nomes longos
             htmlBuffer += `
-                <div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isP ? (isOn ? 'card-online' : 'card-presente') : 'card-ausente'} transition-all">
-                    <div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name}')"` : ''} class="flex-1 flex items-center gap-4 cursor-pointer">
-                        <div class="check-box ${isP ? (isOn ? 'check-online' : 'check-active') : ''}">
+                <div class="glass-card p-5 flex items-center justify-between border-l-8 ${isP ? (isOn ? 'card-online' : 'card-presente') : 'card-ausente'} transition-all">
+                    
+                    <!-- Área de Clique (Info do Membro) -->
+                    <div onclick="togglePresence('${m.id}', '${m.name}')" class="flex-1 flex items-start gap-4 cursor-pointer min-w-0">
+                        <!-- Checkbox: flex-shrink-0 impede que o quadrado suma -->
+                        <div class="check-box mt-1 flex-shrink-0 ${isP ? (isOn ? 'check-online' : 'check-active') : ''}">
                             <i class="fas ${isOn ? 'fa-wifi' : 'fa-check'} text-[10px] ${isP ? '' : 'hidden'}"></i>
                         </div>
-                        <div class="flex-1 text-left">
-                            <h4 class="font-bold text-sm ${isP ? (isOn ? 'text-blue-900' : 'text-teal-900') : 'text-slate-800'} truncate">${m.name}</h4>
-                            <p class="text-[9px] font-black uppercase text-slate-400">${m.org} • ${realCat}</p>
-                            ${notes[m.id] ? `<div class="justificativa-tag italic"><i class="fas fa-comment-dots mr-1"></i>${notes[m.id]}</div>` : ''}
+                        
+                        <!-- Conteúdo de Texto: min-w-0 permite que os filhos respeitem o container flex -->
+                        <div class="min-w-0">
+                            <h4 class="font-bold text-sm ${isP ? (isOn ? 'text-blue-900' : 'text-teal-900') : 'text-slate-800'} break-words whitespace-normal leading-tight">
+                                ${m.name}
+                            </h4>
+                            <p class="text-[9px] font-black uppercase text-slate-400 mt-1 tracking-wider">${m.org} • ${realCat}</p>
+                            
+                            <!-- Exibição de Justificativa -->
+                            ${note ? `<div class="justificativa-tag italic"><i class="fas fa-comment-dots mr-1"></i>${note}</div>` : ''}
                         </div>
                     </div>
+
+                    <!-- Botão de Justificativa: flex-shrink-0 garante que o ícone nunca suma -->
                     ${!isP && currentUser.role === 'admin' ? `
-                        <button onclick="openJustify('${m.id}', '${m.name}')" class="text-slate-300 hover:text-blue-900 p-2"><i class="fas fa-sticky-note text-sm"></i></button>
+                        <button onclick="openJustify('${m.id}', '${m.name}')" class="text-slate-300 hover:text-blue-900 p-2 ml-2 flex-shrink-0 transition-colors">
+                            <i class="fas fa-sticky-note text-sm"></i>
+                        </button>
                     ` : ''}
                 </div>`;
         }
     });
 
-    // Injeção única no DOM (Ganho expressivo de performance)
+    // Injeção Atômica no DOM (Alta Performance)
     list.innerHTML = htmlBuffer;
 
-    // Atualização do Dashboard e UI de Contadores
-    const lC = data.lideresCount || 0, viC = data.visitantesCount || 0, msC = data.missionariosCount || 0;
-    document.getElementById('stats-present').innerText = mFis + mOnl + vFis + vOnl + lC + viC + msC;
+    // Atualização de Totais e Detalhamento no Dashboard
+    const lC = data.lideresCount || 0; 
+    const viC = data.visitantesCount || 0; 
+    const msC = data.missionariosCount || 0;
+    const somaPresentes = mFis + mOnl + vFis + vOnl + lC + viC + msC;
+
+    document.getElementById('stats-present').innerText = somaPresentes;
     document.getElementById('stats-total').innerText = totAla;
 
-    let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1">
-        <p class="text-green-600 flex justify-between"><span>✓ Membros Ala: ${mFis + mOnl}</span> ${mOnl > 0 ? `<span class="opacity-60 font-normal">(${mFis} F/ ${mOnl} O)</span>` : ''}</p>`;
-    if (vFis + vOnl > 0) det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Locais: ${vFis + vOnl}</span> ${vOnl > 0 ? `<span class="opacity-60 font-normal">(${vFis} F/ ${vOnl} O)</span>` : ''}</p>`;
-    if (msC > 0) det += `<p class="text-indigo-600 flex justify-between">👔 Missionários: ${msC}</p>`;
-    if (lC > 0) det += `<p class="text-amber-600 flex justify-between">★ Líderes Estaca: ${lC}</p>`;
-    if (viC > 0) det += `<p class="text-blue-500 flex justify-between">🚶 Visitantes Fora: ${viC}</p>`;
+    let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1">`;
+    det += `<p class="text-green-600 flex justify-between"><span>✓ Membros Ala: ${mFis + mOnl}</span> ${mOnl > 0 ? `<span class="opacity-60 font-normal">(${mFis} F/ ${mOnl} O)</span>`:''}</p>`;
+    if(vFis + vOnl > 0) det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Locais: ${vFis + vOnl}</span> ${vOnl > 0 ? `<span class="opacity-60 font-normal">(${vFis} F/ ${vOnl} O)</span>`:''}</p>`;
+    if(msC > 0) det += `<p class="text-indigo-600 flex justify-between">👔 Missionários: ${msC}</p>`;
+    if(lC > 0) det += `<p class="text-amber-600 flex justify-between">★ Líderes Estaca: ${lC}</p>`;
+    if(viC > 0) det += `<p class="text-blue-500 flex justify-between">🚶 Visitantes Fora: ${viC}</p>`;
     
     const card = document.getElementById('stats-present').parentElement;
-    const old = card.querySelector('.detalhes-area'); if (old) old.remove();
+    const old = card.querySelector('.detalhes-area'); if(old) old.remove();
     card.insertAdjacentHTML('beforeend', det + `</div>`);
-    
+
+    // Sincroniza estado de botões administrativos
     document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
 };
+        
         window.renderMembersList = () => {
             const container = document.getElementById('manageMembersContainer'); container.innerHTML = '';
             members.forEach(m => {
