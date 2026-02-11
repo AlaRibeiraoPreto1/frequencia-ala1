@@ -316,7 +316,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy, setDoc, deleteDoc, getDocs, where, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy, setDoc, deleteDoc, getDocs, where, arrayUnion, arrayRemove, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyAaEKx9n4N847WW97FhfZxLZYtsa5cTsE0",
@@ -496,42 +496,46 @@
 };
 
         window.togglePresence = async (memberId, memberName) => {
-    // 1. Verificação de Segurança
-    if (!currentUser || currentUser.role !== 'admin') return alert("Acesso negado.");
-    
-    // 2. Trava de Segurança da Data (Garante que salva no dia certo)
-    if (!selectedDate) return alert("Erro: Nenhuma data selecionada.");
+    if (!currentUser || currentUser.role !== 'admin' || !selectedDate) return;
 
-    const hRef = doc(db, "historico", selectedDate);
-    
-    // 3. Pega os dados que estão salvos AGORA para esse dia
+    const batch = writeBatch(db);
+    const histRef = doc(db, "historico", selectedDate);
+    const membRef = doc(db, "membros", memberId);
+
     const dataHoje = attendanceHistory[selectedDate] || {};
     const presents = dataHoje.presents || [];
     const online = dataHoje.online_ids || [];
 
-    // 4. LÓGICA DE CICLO (3 ESTADOS)
-    if (!presents.includes(memberId)) {
-        // ESTADO 1: Estava Ausente -> Vai virar Presente Físico (Verde)
-        await setDoc(hRef, { 
-            presents: arrayUnion(memberId) 
-        }, { merge: true });
-    } 
-    else if (!online.includes(memberId)) {
-        // ESTADO 2: Estava Físico -> Vai virar Online (Azul)
-        await setDoc(hRef, { 
-            online_ids: arrayUnion(memberId) 
-        }, { merge: true });
-    } 
-    else {
-        // ESTADO 3: Estava Online -> Vai virar Ausente (Branco)
-        if(!confirm(`Deseja remover totalmente a presença de ${memberName}?`)) return;
-        await setDoc(hRef, { 
-            presents: arrayRemove(memberId),
-            online_ids: arrayRemove(memberId)
-        }, { merge: true });
+    try {
+        if (!presents.includes(memberId)) {
+            // ESTADO 0 -> 1: Físico (Adiciona em ambos)
+            batch.set(histRef, { presents: arrayUnion(memberId) }, { merge: true });
+            batch.update(membRef, { 
+                attendanceLog: arrayUnion(selectedDate),
+                lastAttended: selectedDate 
+            });
+        } 
+        else if (!online.includes(memberId)) {
+            // ESTADO 1 -> 2: Online (Apenas histórico do dia muda o status)
+            batch.set(histRef, { online_ids: arrayUnion(memberId) }, { merge: true });
+        } 
+        else {
+            // ESTADO 2 -> 0: Ausente (Remove de ambos por segurança de integridade)
+            if (!confirm(`Remover presença de ${memberName}?`)) return;
+            batch.set(histRef, { 
+                presents: arrayRemove(memberId), 
+                online_ids: arrayRemove(memberId) 
+            }, { merge: true });
+            batch.update(membRef, { 
+                attendanceLog: arrayRemove(selectedDate) 
+            });
+        }
+
+        await batch.commit();
+    } catch (error) {
+        console.error("Erro na transação atômica:", error);
+        alert("Erro crítico de sincronização. Tente novamente.");
     }
-    
-    // Obs: Usamos arrayUnion e arrayRemove para garantir que nenhum dado seja "atropelado"
 };
 
         window.openJustify = (id, name) => {
@@ -551,48 +555,84 @@
         function renderAll() { renderAttendance(); renderRescue(); renderReports(); updateCharts(); }
 
         window.renderAttendance = () => {
-            const list = document.getElementById('memberList'); if(!list) return;
-            const search = document.getElementById('searchMember').value.toLowerCase();
-            const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], justifications: {}, lideresCount:0, visitantesCount:0, missionariosCount:0 };
-            const curP = data.presents || []; const onlP = data.online_ids || []; const notes = data.justifications || {};
-            list.innerHTML = ''; let mFis = 0; let mOnl = 0; let vFis = 0; let vOnl = 0; let totAla = 0; let lastFamily = "";
+    const list = document.getElementById('memberList');
+    if (!list) return;
+    const search = document.getElementById('searchMember').value.toLowerCase();
+    
+    const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], justifications: {}, lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
+    const curP = data.presents || [];
+    const onlP = data.online_ids || [];
+    const notes = data.justifications || {};
 
-            if(document.getElementById('display-lideres')) document.getElementById('display-lideres').innerText = data.lideresCount || 0;
-            if(document.getElementById('display-visitantes')) document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
-            if(document.getElementById('display-missionarios')) document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
+    let htmlBuffer = ''; // Buffer para otimização de performance
+    let mFis = 0, mOnl = 0, vFis = 0, vOnl = 0, totAla = 0, lastFamily = "";
 
-            const sorted = [...members].sort((a, b) => {
-                const fA = (a.familia || "Z-SEM").toUpperCase(); const fB = (b.familia || "Z-SEM").toUpperCase();
-                return fA === fB ? a.name.localeCompare(b.name) : fA.localeCompare(fB);
-            });
+    // Atualização de visores (UI secundária)
+    document.getElementById('display-lideres').innerText = data.lideresCount || 0;
+    document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
+    document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
 
-            sorted.forEach(m => {
-                const isP = curP.includes(m.id); const isOn = onlP.includes(m.id);
-                const realCat = getRealCategory(m);
-                const isVist = (realCat === 'Visitante');
-                if(!isVist) { totAla++; if(isP) isOn ? mOnl++ : mFis++; } else { if(isP) isOn ? vOnl++ : vFis++; }
+    const sorted = [...members].sort((a, b) => {
+        const famA = (a.familia || "Z-SEM").toUpperCase();
+        const famB = (b.familia || "Z-SEM").toUpperCase();
+        return famA === famB ? a.name.localeCompare(b.name) : famA.localeCompare(famB);
+    });
 
-                if((m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) && (currentFilter === 'TODOS' || m.org === currentFilter)) {
-                    if (m.familia !== lastFamily && !search) { list.innerHTML += `<div class="family-divider">Família ${m.familia}</div>`; lastFamily = m.familia; }
-                    list.innerHTML += `<div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isP ? (isOn ? 'card-online' : 'card-presente') : 'card-ausente'} transition-all"><div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name}')"` : ''} class="flex-1 flex items-center gap-4 cursor-pointer"><div class="check-box ${isP ? (isOn ? 'check-online' : 'check-active') : ''}">${isP ? `<i class="fas ${isOn ? 'fa-wifi' : 'fa-check'} text-[10px]"></i>` : ''}</div><div class="flex-1 text-left"><h4 class="font-bold text-sm ${isP ? (isOn ? 'text-blue-900' : 'text-teal-900') : 'text-slate-800'} truncate text-left">${m.name}</h4><p class="text-[9px] font-black uppercase text-slate-400 text-left">${m.org} • ${realCat}</p>${notes[m.id] ? `<div class="justificativa-tag italic"><i class="fas fa-comment-dots mr-1"></i>${notes[m.id]}</div>` : ''}</div></div>${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name}')" class="text-slate-300 p-2"><i class="fas fa-sticky-note text-sm"></i></button>` : ''}</div>`;
-                }
-            });
+    sorted.forEach(m => {
+        const isP = curP.includes(m.id);
+        const isOn = onlP.includes(m.id);
+        const realCat = getRealCategory(m);
+        const isVist = (realCat === 'Visitante');
 
-            const lC = data.lideresCount || 0; const vC = data.visitantesCount || 0; const msC = data.missionariosCount || 0;
-            document.getElementById('stats-present').innerText = mFis + mOnl + vFis + vOnl + lC + vC + msC;
-            document.getElementById('stats-total').innerText = totAla;
-            
-            let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1"><p class="text-green-600 flex justify-between"><span>✓ Membros Ala: ${mFis + mOnl}</span> ${mOnl > 0 ? `<span class="opacity-60 font-normal">(${mFis} F/ ${mOnl} O)</span>`:''}</p>`;
-            if(vFis + vOnl > 0) det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Locais: ${vFis + vOnl}</span> ${vOnl > 0 ? `<span class="opacity-60 font-normal">(${vFis} F/ ${vOnl} O)</span>`:''}</p>`;
-            if(msC > 0) det += `<p class="text-indigo-600 flex justify-between">👔 Missionários: ${msC}</p>`;
-            if(lC > 0) det += `<p class="text-amber-600 flex justify-between">★ Líderes Estaca: ${lC}</p>`;
-            if(vC > 0) det += `<p class="text-blue-500 flex justify-between">🚶 Visitantes Fora: ${vC}</p>`;
-            const card = document.getElementById('stats-present').parentElement; const old = card.querySelector('.detalhes-area'); if(old) old.remove();
-            card.insertAdjacentHTML('beforeend', det + `</div>`);
-            document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
-            document.getElementById('admin-counters').classList.remove('hidden');
-        };
+        if (!isVist) { totAla++; if (isP) isOn ? mOnl++ : mFis++; } 
+        else { if (isP) isOn ? vOnl++ : vFis++; }
 
+        if ((m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) && (currentFilter === 'TODOS' || m.org === currentFilter)) {
+            if (m.familia !== lastFamily && !search) {
+                htmlBuffer += `<div class="family-divider">Família ${m.familia}</div>`;
+                lastFamily = m.familia;
+            }
+
+            htmlBuffer += `
+                <div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isP ? (isOn ? 'card-online' : 'card-presente') : 'card-ausente'} transition-all">
+                    <div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name}')"` : ''} class="flex-1 flex items-center gap-4 cursor-pointer">
+                        <div class="check-box ${isP ? (isOn ? 'check-online' : 'check-active') : ''}">
+                            <i class="fas ${isOn ? 'fa-wifi' : 'fa-check'} text-[10px] ${isP ? '' : 'hidden'}"></i>
+                        </div>
+                        <div class="flex-1 text-left">
+                            <h4 class="font-bold text-sm ${isP ? (isOn ? 'text-blue-900' : 'text-teal-900') : 'text-slate-800'} truncate">${m.name}</h4>
+                            <p class="text-[9px] font-black uppercase text-slate-400">${m.org} • ${realCat}</p>
+                            ${notes[m.id] ? `<div class="justificativa-tag italic"><i class="fas fa-comment-dots mr-1"></i>${notes[m.id]}</div>` : ''}
+                        </div>
+                    </div>
+                    ${!isP && currentUser.role === 'admin' ? `
+                        <button onclick="openJustify('${m.id}', '${m.name}')" class="text-slate-300 hover:text-blue-900 p-2"><i class="fas fa-sticky-note text-sm"></i></button>
+                    ` : ''}
+                </div>`;
+        }
+    });
+
+    // Injeção única no DOM (Ganho expressivo de performance)
+    list.innerHTML = htmlBuffer;
+
+    // Atualização do Dashboard e UI de Contadores
+    const lC = data.lideresCount || 0, viC = data.visitantesCount || 0, msC = data.missionariosCount || 0;
+    document.getElementById('stats-present').innerText = mFis + mOnl + vFis + vOnl + lC + viC + msC;
+    document.getElementById('stats-total').innerText = totAla;
+
+    let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1">
+        <p class="text-green-600 flex justify-between"><span>✓ Membros Ala: ${mFis + mOnl}</span> ${mOnl > 0 ? `<span class="opacity-60 font-normal">(${mFis} F/ ${mOnl} O)</span>` : ''}</p>`;
+    if (vFis + vOnl > 0) det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Locais: ${vFis + vOnl}</span> ${vOnl > 0 ? `<span class="opacity-60 font-normal">(${vFis} F/ ${vOnl} O)</span>` : ''}</p>`;
+    if (msC > 0) det += `<p class="text-indigo-600 flex justify-between">👔 Missionários: ${msC}</p>`;
+    if (lC > 0) det += `<p class="text-amber-600 flex justify-between">★ Líderes Estaca: ${lC}</p>`;
+    if (viC > 0) det += `<p class="text-blue-500 flex justify-between">🚶 Visitantes Fora: ${viC}</p>`;
+    
+    const card = document.getElementById('stats-present').parentElement;
+    const old = card.querySelector('.detalhes-area'); if (old) old.remove();
+    card.insertAdjacentHTML('beforeend', det + `</div>`);
+    
+    document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
+};
         window.renderMembersList = () => {
             const container = document.getElementById('manageMembersContainer'); container.innerHTML = '';
             members.forEach(m => {
