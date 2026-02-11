@@ -166,10 +166,19 @@
                    <!-- NOVA ESTRUTURA DA BUSCA (MAIS SEGURA) -->
                     <div class="sticky-search">
                         <div class="flex gap-2 w-full px-1">
-                            <div class="relative flex-1">
-                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
-                                <input type="text" id="searchMember" oninput="renderAttendance()" placeholder="Buscar nome ou família..." class="w-full pl-11 p-4 rounded-2xl bg-white border-none outline-none shadow-sm font-bold text-sm">
-                            </div>
+                            <!-- BLOCO DE BUSCA ATUALIZADO COM BOTÃO DE LIMPAR -->
+<div class="relative flex-1">
+    <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
+    
+    <!-- Note que adicionei 'pr-12' na class abaixo -->
+    <input type="text" id="searchMember" oninput="renderAttendance()" placeholder="Buscar nome ou família..." 
+           class="w-full pl-12 pr-12 p-4 rounded-2xl bg-white border-none outline-none shadow-sm font-bold text-sm focus:ring-2 focus:ring-[#002e5d]">
+    
+    <!-- Botão de Limpar (X) -->
+    <button id="btnClearSearch" onclick="clearSearch()" class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 p-1 transition-colors">
+        <i class="fas fa-times-circle text-lg"></i>
+    </button>
+</div>
                             <button onclick="toggleOptions()" class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#002e5d] shadow-sm border border-slate-100 flex-shrink-0">
                                 <i class="fas fa-sliders"></i>
                             </button>
@@ -558,7 +567,15 @@
     const list = document.getElementById('memberList');
     if (!list) return;
     const search = document.getElementById('searchMember').value.toLowerCase();
-    
+    // Mostra o botão "X" apenas se houver texto na busca
+    const btnClear = document.getElementById('btnClearSearch');
+    if (btnClear) {
+        if (search.length > 0) {
+            btnClear.classList.remove('hidden');
+        } else {
+            btnClear.classList.add('hidden');
+        }
+    }
     const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], justifications: {}, lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
     const curP = data.presents || [];
     const onlP = data.online_ids || [];
@@ -652,6 +669,13 @@
         };
 
         window.toggleOptions = () => document.getElementById('attendance-options').classList.toggle('hidden');
+        // Função para limpar a busca
+window.clearSearch = () => {
+    const input = document.getElementById('searchMember');
+    input.value = ''; // Limpa o texto
+    renderAttendance(); // Redesenha a lista completa
+    input.focus(); // Deixa o cursor pronto para digitar de novo se necessário
+};
         window.formatNameInput = (el) => el.value = el.value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
         window.formatPhone = (el) => { let v = el.value.replace(/\D/g,''); v = v.replace(/^(\d{2})(\d)/g,"($1) $2"); v = v.replace(/(\d)(\d{4})$/,"$1-$2"); el.value = v; };
         window.handleFamilySearch = (query) => {
