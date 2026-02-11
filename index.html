@@ -708,11 +708,77 @@ window.clearSearch = () => {
         window.formatNameInput = (el) => el.value = el.value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
         window.formatPhone = (el) => { let v = el.value.replace(/\D/g,''); v = v.replace(/^(\d{2})(\d)/g,"($1) $2"); v = v.replace(/(\d)(\d{4})$/,"$1-$2"); el.value = v; };
         window.handleFamilySearch = (query) => {
-            const sug = document.getElementById('familySuggestions'); if (query.length < 2) { sug.classList.add('hidden'); return; }
-            const heads = members.filter(m => m.isHead && m.familia.toLowerCase().includes(query.toLowerCase()));
-            if (heads.length > 0) { sug.classList.remove('hidden'); sug.innerHTML = heads.map(h => `<div onclick="selectFamily('${h.familia}')" class="p-4 hover:bg-slate-50 border-b cursor-pointer font-bold text-xs uppercase text-slate-600 text-left">${h.familia} <span class="font-normal opacity-50">(Chefe: ${h.name})</span></div>`).join(''); } else sug.classList.add('hidden');
-        };
-        window.selectFamily = (f) => { document.getElementById('familySearch').value = f; document.getElementById('familySuggestions').classList.add('hidden'); };
+    const sug = document.getElementById('familySuggestions');
+    const headBox = document.getElementById('headOfFamilyContainer');
+    
+    // Limpeza inicial: menos de 2 caracteres esconde a lista e mostra o checkbox de chefe
+    if (query.length < 2) {
+        sug.classList.add('hidden');
+        if(headBox) headBox.classList.remove('hidden');
+        return;
+    }
+
+    const queryUpper = query.trim().toUpperCase();
+    
+    // Filtra no banco apenas membros que são chefes de família (isHead: true)
+    const existingHeads = members.filter(m => 
+        m.isHead && m.familia.toLowerCase().includes(query.toLowerCase())
+    );
+
+    sug.classList.remove('hidden');
+
+    // ITEM 1: Opção de "Nova Família" baseada no que o usuário está digitando
+    let html = `
+        <div onclick="selectFamily('${queryUpper}', true)" class="p-4 bg-blue-50 hover:bg-blue-100 border-b border-blue-200 cursor-pointer transition-colors group">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1">
+                        <i class="fas fa-plus-circle mr-1"></i> Criar Nova
+                    </p>
+                    <p class="text-sm font-black text-slate-800 uppercase tracking-tight">Família ${queryUpper}</p>
+                </div>
+                <i class="fas fa-chevron-right text-blue-300 group-hover:translate-x-1 transition-transform"></i>
+            </div>
+        </div>
+    `;
+
+    // ITEM 2: Lista de famílias que já existem no banco
+    if (existingHeads.length > 0) {
+        html += existingHeads.map(h => `
+            <div onclick="selectFamily('${h.familia}', false)" class="p-4 hover:bg-slate-50 border-b border-slate-100 cursor-pointer transition-colors group">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Família Existente</p>
+                        <p class="text-sm font-bold text-slate-700 uppercase tracking-tight">${h.familia}</p>
+                        <p class="text-[9px] text-slate-400 font-medium uppercase italic">Chefe: ${h.name}</p>
+                    </div>
+                    <i class="fas fa-arrow-turn-down -rotate-90 text-slate-200 group-hover:text-[#002e5d] transition-colors"></i>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    sug.innerHTML = html;
+};
+        window.selectFamily = (family, isNew) => {
+    const input = document.getElementById('familySearch');
+    const sug = document.getElementById('familySuggestions');
+    const headBox = document.getElementById('headOfFamilyContainer');
+    const checkbox = document.getElementById('isHeadOfFamily');
+
+    input.value = family;
+    sug.classList.add('hidden');
+
+    if (isNew) {
+        // Se for nova, mostra o checkbox e sugere marcar como chefe
+        headBox.classList.remove('hidden');
+        checkbox.checked = true;
+    } else {
+        // Se selecionou uma existente, esconde o checkbox e desmarca
+        headBox.classList.add('hidden');
+        checkbox.checked = false;
+    }
+};
         
         window.saveNewMember = async () => {
             const n = document.getElementById('newName').value; const f = document.getElementById('familySearch').value;
