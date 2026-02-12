@@ -131,16 +131,27 @@
                 <button onclick="toggleMobileMenu()" class="w-10 h-10 rounded-xl bg-slate-50 text-[#002e5d] flex items-center justify-center shadow-sm"><i class="fas fa-bars"></i></button>
             </header>
 
-            <!-- BARRA DE DATA GLOBAL -->
-            <div id="global-date-bar" class="w-full bg-white border-b border-slate-100 py-3 px-6 sticky top-[80px] lg:top-0 z-[140] flex justify-center">
-                <div class="glass-card flex items-center px-6 py-2 gap-4 bg-slate-50 border-slate-200 shadow-sm hover:border-[#002e5d] transition-all cursor-pointer">
-                    <i class="fas fa-calendar-alt text-[#002e5d]"></i>
-                    <div class="flex flex-col">
-                        <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">Domingo de Referência</span>
-                        <select id="dateSelectGlobal" class="bg-transparent font-black text-xs uppercase tracking-tighter outline-none border-none cursor-pointer text-slate-700"></select>
-                    </div>
-                </div>
-            </div>
+           <!-- BARRA DE DATA GLOBAL (OTIMIZADA COM NAVEGAÇÃO RÁPIDA) -->
+<div id="global-date-bar" class="w-full bg-white border-b border-slate-100 py-3 px-6 sticky top-[80px] lg:top-0 z-[140] flex items-center justify-center gap-2">
+    <!-- Botão Recuar Domingo (Passado) -->
+    <button onclick="navigateDate(1)" class="w-12 h-12 flex items-center justify-center bg-slate-50 text-slate-400 rounded-2xl hover:bg-slate-100 active:scale-90 transition-all border border-slate-100 shadow-sm">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+
+    <!-- Dropdown Central -->
+    <div class="glass-card flex items-center px-4 py-2 gap-3 bg-slate-50 border-slate-200 shadow-sm min-w-[180px] sm:min-w-[220px]">
+        <i class="fas fa-calendar-alt text-[#002e5d]"></i>
+        <div class="flex flex-col flex-1 text-left">
+            <span class="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none">Referência</span>
+            <select id="dateSelectGlobal" class="bg-transparent font-black text-xs uppercase tracking-tighter outline-none border-none cursor-pointer text-slate-700 w-full"></select>
+        </div>
+    </div>
+
+    <!-- Botão Avançar Domingo (Futuro) -->
+    <button onclick="navigateDate(-1)" class="w-12 h-12 flex items-center justify-center bg-slate-50 text-slate-400 rounded-2xl hover:bg-slate-100 active:scale-90 transition-all border border-slate-100 shadow-sm">
+        <i class="fas fa-chevron-right"></i>
+    </button>
+</div>
 
             <div class="content-container w-full">
                 <!-- SEÇÃO DASHBOARD -->
@@ -433,25 +444,43 @@
         }
 
         window.togglePresence = async (memberId, memberName) => {
-            if (currentUser.role !== 'admin' || !selectedDate) return;
-            const batch = writeBatch(db);
-            const hRef = doc(db, "historico", selectedDate);
-            const mRef = doc(db, "membros", memberId);
-            const data = attendanceHistory[selectedDate] || {};
-            const presents = data.presents || []; const online = data.online_ids || [];
+    if (currentUser.role !== 'admin' || !selectedDate) return;
 
-            if (!presents.includes(memberId)) {
-                batch.set(hRef, { presents: arrayUnion(memberId) }, { merge: true });
-                batch.update(mRef, { attendanceLog: arrayUnion(selectedDate), lastAttended: selectedDate });
-            } else if (!online.includes(memberId)) {
-                batch.set(hRef, { online_ids: arrayUnion(memberId) }, { merge: true });
-            } else {
-                if(!confirm(`Remover presença de ${memberName}?`)) return;
-                batch.set(hRef, { presents: arrayRemove(memberId), online_ids: arrayRemove(memberId) }, { merge: true });
-                batch.update(mRef, { attendanceLog: arrayRemove(selectedDate) });
-            }
-            await batch.commit();
-        };
+    const batch = writeBatch(db);
+    const hRef = doc(db, "historico", selectedDate);
+    const mRef = doc(db, "membros", memberId);
+    
+    const data = attendanceHistory[selectedDate] || {};
+    const presents = data.presents ? [...data.presents] : [];
+    const online = data.online_ids ? [...data.online_ids] : [];
+
+    try {
+        if (!presents.includes(memberId)) {
+            // Ausente para Físico
+            batch.set(hRef, { presents: arrayUnion(memberId) }, { merge: true });
+            batch.update(mRef, { attendanceLog: arrayUnion(selectedDate), lastAttended: selectedDate });
+        } else if (!online.includes(memberId)) {
+            // Físico para Online
+            batch.set(hRef, { online_ids: arrayUnion(memberId) }, { merge: true });
+        } else {
+            // Online para Ausente
+            if(!confirm(`Remover presença de ${memberName}?`)) return;
+            batch.set(hRef, { presents: arrayRemove(memberId), online_ids: arrayRemove(memberId) }, { merge: true });
+            batch.update(mRef, { attendanceLog: arrayRemove(selectedDate) });
+        }
+
+        await batch.commit();
+
+        // FEEDBACK TÁTIL (Haptic Feedback) - Vibrar por 50ms ao salvar com sucesso
+        if ("vibrate" in navigator) {
+            navigator.vibrate(50);
+        }
+
+    } catch (error) {
+        console.error("Erro na transação:", error);
+        showToast("Erro ao sincronizar dados", "error");
+    }
+};
 
         window.renderAttendance = () => {
             const list = document.getElementById('memberList'); if(!list) return;
@@ -569,6 +598,27 @@
             window.setFilter = (f) => { currentFilter = f; document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active', 'bg-[#002e5d]', 'text-white')); const el = document.getElementById('pill-'+f.replace(/\s+/g, '')); if(el) el.classList.add('active', 'bg-[#002e5d]', 'text-white'); renderAttendance(); };
             listenData(); switchTab('dashboard');
         } else { switchTab('login'); document.getElementById('loading-screen').classList.add('hidden'); }
+
+        // LÓGICA DE NAVEGAÇÃO RÁPIDA ENTRE DATAS
+window.navigateDate = (direction) => {
+    const dSelect = document.getElementById('dateSelectGlobal');
+    const currentIndex = dSelect.selectedIndex;
+    const newIndex = currentIndex + direction;
+
+    // Verifica se existe a próxima ou anterior data disponível no seletor
+    if (newIndex >= 0 && newIndex < dSelect.options.length) {
+        dSelect.selectedIndex = newIndex;
+        selectedDate = dSelect.value;
+        
+        // Pequeno feedback tátil suave na troca de data (10ms)
+        if ("vibrate" in navigator) navigator.vibrate(10);
+        
+        renderAll();
+    } else {
+        showToast("Fim das datas geradas", "info");
+    }
+};
+        
     </script>
 </body>
 </html>
