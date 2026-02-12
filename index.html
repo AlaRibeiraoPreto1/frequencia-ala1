@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="pt-br" class="light"> <head>
+<html lang="pt-br" class="light">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Frequência Sacramental</title>
@@ -12,8 +13,17 @@
             theme: {
                 extend: {
                     colors: {
-                        darkbg: '#0f172a', // Slate 900
-                        darkcard: '#1e293b', // Slate 800
+                        darkbg: '#0f172a',
+                        darkcard: '#1e293b',
+                    },
+                    keyframes: {
+                        fadeInDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    },
+                    animation: {
+                        'fade-in-down': 'fadeInDown 0.3s ease-out',
                     }
                 }
             }
@@ -26,9 +36,7 @@
     <style>
         :root { --sacramental-blue: #002e5d; --healing-teal: #0d9488; --rescue-orange: #ea580c; --bg-soft: #f1f5f9; }
         
-        /* Estilos base adaptados para Dark Mode */
         body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s, color 0.3s; }
-        
         .hidden { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         body.status-login { height: 100vh !important; overflow: hidden !important; position: fixed; width: 100%; }
@@ -48,49 +56,18 @@
             .sticky-search { position: sticky; top: 0; z-index: 100; padding: 10px 0; }
         }
 
-        /* Glass Card Adaptativo */
-        .glass-card { 
-            background: white; 
-            border-radius: 28px; 
-            box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.04); 
-            border: 1px solid #f1f5f9; 
-            transition: all 0.3s ease;
-        }
-        
-        /* Dark Mode Overrides manuais para classes específicas */
-        html.dark .glass-card {
-            background: #1e293b; /* Slate 800 */
-            border-color: #334155;
-            box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.2); 
-        }
-        
+        .glass-card { background: white; border-radius: 28px; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.04); border: 1px solid #f1f5f9; transition: all 0.3s ease; }
+        html.dark .glass-card { background: #1e293b; border-color: #334155; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.2); }
         html.dark body { background-color: #0f172a; color: #f1f5f9; }
         html.dark .sticky-search { background: #0f172a; }
 
         .nav-btn-active { background-color: #f0f7ff; color: var(--sacramental-blue) !important; font-weight: 800; border-right: 4px solid var(--sacramental-blue); }
         html.dark .nav-btn-active { background-color: #1e293b; color: #60a5fa !important; border-right: 4px solid #60a5fa; }
 
-        .check-box { width: 28px; height: 28px; border-radius: 10px; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        html.dark .check-box { border-color: #475569; }
-
-        .check-active { background: var(--healing-teal); border-color: var(--healing-teal); color: white; }
-        
-        .card-online { background-color: #eff6ff !important; border-left: 8px solid #3b82f6 !important; }
-        html.dark .card-online { background-color: #172554 !important; border-left: 8px solid #3b82f6 !important; }
-
-        .check-online { background: #3b82f6; border-color: #3b82f6; color: white; }
-        
         .family-divider { background-color: #f8fafc; padding: 8px 16px; border-radius: 12px; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-top: 15px; border: 1px solid #e2e8f0; width: 100%; display: block; }
         html.dark .family-divider { background-color: #1e293b; color: #94a3b8; border-color: #334155; }
 
-        .card-presente { background-color: #ecfdf5 !important; border-left: 8px solid #10b981 !important; }
-        html.dark .card-presente { background-color: #064e3b !important; border-left: 8px solid #10b981 !important; } /* Emerald 900 */
-        
-        .card-ausente { background-color: #ffffff !important; border-left: 8px solid #f1f5f9 !important; }
-        html.dark .card-ausente { background-color: #1e293b !important; border-left: 8px solid #334155 !important; }
-
-        .justificativa-tag { font-size: 10px; background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 8px; margin-top: 6px; display: inline-block; border: 1px dashed #cbd5e1; font-weight: bold; }
-        html.dark .justificativa-tag { background: #334155; color: #cbd5e1; border-color: #475569; }
+        .fade-right { mask-image: linear-gradient(to right, black 85%, transparent 100%); -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%); }
 
         @keyframes toastIn { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
         .toast-active { animation: toastIn 0.3s ease-out forwards; }
@@ -108,7 +85,6 @@
     <div id="access-container" class="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-6">
         <section id="view-login" class="hidden glass-card p-10 w-full max-w-sm text-center space-y-8 shadow-2xl border border-white dark:border-slate-700">
             <div class="w-20 h-20 bg-[#002e5d] rounded-2xl mx-auto flex items-center justify-center text-white shadow-lg text-3xl"><i class="fas fa-church"></i></div>
-            
             <h2 class="text-2xl font-black text-slate-800 dark:text-white tracking-tighter uppercase italic leading-tight">Ala <br>Ribeirão Preto 1</h2>
             <div class="space-y-3">
                 <input type="text" id="login-user" placeholder="Usuário" class="w-full p-4 rounded-2xl bg-slate-100 dark:bg-slate-700 dark:text-white border-none outline-none text-sm font-bold shadow-inner">
@@ -142,7 +118,6 @@
                 <i class="fas fa-moon text-[#002e5d] dark:text-yellow-400"></i> Alternar Tema
             </button>
             <hr class="border-slate-50 dark:border-slate-700">
-            
             <button id="admin-mobile-btn" onclick="switchTab('admin-users'); toggleMobileMenu();" class="hidden w-full flex items-center gap-3 p-4 rounded-2xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 font-bold text-xs uppercase transition-colors">
                 <i class="fas fa-users-cog text-[#002e5d] dark:text-blue-400"></i> Gerenciar Logins
             </button>
@@ -168,7 +143,6 @@
                 <button onclick="switchTab('add')" id="side-add" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-left"><i class="fas fa-users"></i> Membros</button>
                 <hr class="border-slate-50 dark:border-slate-700 my-6">
                 <button id="admin-btn" onclick="switchTab('admin-users')" class="hidden w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-left"><i class="fas fa-users-cog"></i> Gerenciar Logins</button>
-                
                 <button onclick="toggleTheme()" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all text-left mt-2">
                     <i id="theme-icon-desktop" class="fas fa-moon"></i> <span id="theme-text-desktop">Modo Escuro</span>
                 </button>
@@ -189,7 +163,6 @@
                 <button onclick="navigateDate(1)" class="w-12 h-12 flex items-center justify-center bg-slate-50 dark:bg-slate-700 text-slate-400 dark:text-slate-300 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-600 active:scale-90 transition-all border border-slate-100 dark:border-slate-600 shadow-sm">
                     <i class="fas fa-chevron-left"></i>
                 </button>
-
                 <div class="glass-card flex items-center px-4 py-2 gap-3 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 shadow-sm min-w-[180px] sm:min-w-[220px]">
                     <i class="fas fa-calendar-alt text-[#002e5d] dark:text-blue-400"></i>
                     <div class="flex flex-col flex-1 text-left">
@@ -197,7 +170,6 @@
                         <select id="dateSelectGlobal" class="bg-transparent font-black text-xs uppercase tracking-tighter outline-none border-none cursor-pointer text-slate-700 dark:text-slate-200 w-full dark:bg-slate-900"></select>
                     </div>
                 </div>
-
                 <button onclick="navigateDate(-1)" class="w-12 h-12 flex items-center justify-center bg-slate-50 dark:bg-slate-700 text-slate-400 dark:text-slate-300 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-600 active:scale-90 transition-all border border-slate-100 dark:border-slate-600 shadow-sm">
                     <i class="fas fa-chevron-right"></i>
                 </button>
@@ -231,32 +203,63 @@
                     </div>
                 </section>
 
-                <section id="view-attendance" class="hidden space-y-6">
-                    <div class="sticky-search flex gap-3">
-                        <div class="relative flex-1">
-                            <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
-                            <input type="text" id="searchMember" oninput="debounceSearch()" placeholder="Buscar nome ou família..." class="w-full pl-12 pr-12 p-4 rounded-2xl bg-white dark:bg-slate-800 dark:text-white border-none outline-none shadow-sm font-bold text-sm focus:ring-2 focus:ring-[#002e5d] dark:focus:ring-blue-500">
-                            <button id="btnClearSearch" onclick="clearSearch()" class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500"><i class="fas fa-times-circle"></i></button>
+                <section id="view-attendance" class="hidden flex flex-col h-full">
+                    <div class="sticky top-0 z-30 bg-slate-50 dark:bg-slate-900 pb-2 pt-1 transition-colors duration-300">
+                        <div class="flex gap-2 mb-3">
+                            <div class="relative flex-1 group">
+                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#002e5d] dark:group-focus-within:text-blue-400 transition-colors"></i>
+                                <input type="text" id="searchMember" oninput="debounceSearch()" placeholder="Buscar membro..." 
+                                    class="w-full pl-10 pr-10 py-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-[#002e5d] dark:focus:ring-blue-500 dark:text-white shadow-sm transition-all">
+                                <button id="btnClearSearch" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-red-500 p-1"><i class="fas fa-times-circle"></i></button>
+                            </div>
+                            <button id="btnToggleMissing" onclick="toggleMissingOnly()" class="w-12 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-300 shadow-sm flex items-center justify-center active:scale-95 transition-all">
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
+                            <button onclick="toggleOptions()" class="w-12 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[#002e5d] dark:text-blue-400 shadow-sm flex items-center justify-center active:scale-95 transition-all">
+                                <i class="fas fa-sliders"></i>
+                            </button>
                         </div>
-                        <button id="btnOrderFreq" onclick="toggleFrequencyOrder()" class="w-14 h-14 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center text-slate-300 shadow-sm border dark:border-slate-700 transition-all"><i class="fas fa-star text-lg"></i></button>
-                        <button onclick="toggleOptions()" class="w-14 h-14 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center text-[#002e5d] dark:text-blue-400 shadow-sm border dark:border-slate-700 active:scale-95"><i class="fas fa-sliders"></i></button>
+
+                        <div id="orgFilters" class="flex overflow-x-auto gap-2 no-scrollbar pb-1 fade-right select-none"></div>
+
+                        <div id="attendance-options" class="hidden mt-2 bg-white dark:bg-slate-800 p-4 rounded-3xl border dark:border-slate-700 shadow-lg animate-fade-in-down">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Contadores Manuais</span>
+                                <button onclick="toggleOptions()" class="text-slate-300 hover:text-red-500"><i class="fas fa-times"></i></button>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
+                                    <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300">Líderes</span>
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="updateCount('lideresCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button>
+                                        <span id="display-lideres" class="font-black text-sm text-[#002e5d] dark:text-white">0</span>
+                                        <button onclick="updateCount('lideresCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
+                                    <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300">Visitantes</span>
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="updateCount('visitantesCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button>
+                                        <span id="display-visitantes" class="font-black text-sm text-[#002e5d] dark:text-white">0</span>
+                                        <button onclick="updateCount('visitantesCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
+                                    <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300">Missionários</span>
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="updateCount('missionariosCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button>
+                                        <span id="display-missionarios" class="font-black text-sm text-[#002e5d] dark:text-white">0</span>
+                                        <button onclick="updateCount('missionariosCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="toggleFrequencyOrder()" id="btnOrderFreqInner" class="w-full mt-3 py-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase flex items-center justify-center gap-2">
+                                <i class="fas fa-sort-amount-down"></i> Ordenar por Frequência
+                            </button>
+                        </div>
                     </div>
 
-                    <div id="attendance-options" class="hidden space-y-6 p-6 bg-white dark:bg-slate-800 rounded-[32px] border dark:border-slate-700 shadow-sm">
-                        <div>
-                            <p class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2">Filtrar Lista</p>
-                            <div id="orgFilters" class="flex overflow-x-auto gap-2 no-scrollbar py-2 max-w-full fade-right"></div>
-                        </div>
-                        <div id="admin-counters" class="space-y-4 mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 text-left">
-                            <p class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest">Contadores Manuais</p>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-2xl flex justify-between items-center border dark:border-slate-600"><span class="text-[10px] font-bold text-slate-500 dark:text-slate-300">Líderes Estaca</span><div class="flex items-center gap-4"><button onclick="updateCount('lideresCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white dark:bg-slate-600 shadow-sm dark:text-white">-</button><span id="display-lideres" class="font-black text-[#002e5d] dark:text-blue-300">0</span><button onclick="updateCount('lideresCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] dark:bg-blue-600 text-white">+</button></div></div>
-                                <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-2xl flex justify-between items-center border dark:border-slate-600"><span class="text-[10px] font-bold text-slate-500 dark:text-slate-300">Visitantes Fora</span><div class="flex items-center gap-4"><button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white dark:bg-slate-600 shadow-sm dark:text-white">-</button><span id="display-visitantes" class="font-black text-[#002e5d] dark:text-blue-300">0</span><button onclick="updateCount('visitantesCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] dark:bg-blue-600 text-white">+</button></div></div>
-                                <div class="bg-slate-50 dark:bg-slate-700 p-4 rounded-2xl flex justify-between items-center border dark:border-slate-600"><span class="text-[10px] font-bold text-slate-500 dark:text-slate-300">Missionários</span><div class="flex items-center gap-4"><button onclick="updateCount('missionariosCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white dark:bg-slate-600 shadow-sm dark:text-white">-</button><span id="display-missionarios" class="font-black text-[#002e5d] dark:text-blue-300">0</span><button onclick="updateCount('missionariosCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] dark:bg-blue-600 text-white">+</button></div></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="memberList" class="space-y-2 mt-6"></div>
+                    <div id="memberList" class="flex-1 space-y-3 pb-20 mt-2 min-h-[300px]"></div>
                 </section>
 
                 <section id="view-reports" class="hidden space-y-8">
@@ -368,6 +371,7 @@
         let memberIdEditing = null; let userIdEditing = null; let memberIdJustifying = null;
         let orderByFrequency = false;
         let searchTimeout; // Debounce
+        let showMissingOnly = false; // Controle de filtro Ausentes
 
         // --- DARK MODE LOGIC ---
         window.toggleTheme = () => {
@@ -383,7 +387,7 @@
                 document.getElementById('theme-icon-desktop').className = "fas fa-sun";
                 document.getElementById('theme-text-desktop').innerText = "Modo Claro";
             }
-            updateCharts(); // Atualiza cores dos gráficos se necessário
+            updateCharts();
         };
 
         // Init Theme
@@ -470,19 +474,6 @@
             }
         };
 
-        window.toggleFrequencyOrder = () => {
-            orderByFrequency = !orderByFrequency;
-            const btn = document.getElementById('btnOrderFreq');
-            if (orderByFrequency) {
-                btn.classList.replace('text-slate-300', 'text-amber-500'); btn.classList.add('border-amber-200', 'bg-amber-50', 'dark:bg-amber-900/20');
-                showToast("Mais frequentes primeiro", "info");
-            } else {
-                btn.classList.remove('text-amber-500', 'border-amber-200', 'bg-amber-50', 'dark:bg-amber-900/20'); btn.classList.add('text-slate-300');
-                showToast("Ordem alfabética", "info");
-            }
-            renderAttendance();
-        };
-
         // --- AUTH ---
         window.checkLogin = async () => {
             const u = document.getElementById('login-user').value.toLowerCase().trim();
@@ -559,6 +550,44 @@
 
         window.getRealCategory = (m) => m.categoria || 'Membro';
 
+        // --- FUNÇÕES DE CONTROLE DE INTERFACE ---
+        window.toggleMissingOnly = () => {
+            showMissingOnly = !showMissingOnly;
+            const btn = document.getElementById('btnToggleMissing');
+            if(showMissingOnly) {
+                btn.classList.add('bg-orange-100', 'text-orange-600', 'border-orange-200', 'dark:bg-orange-900/40', 'dark:text-orange-400', 'dark:border-orange-700');
+                btn.classList.remove('bg-white', 'text-slate-400', 'dark:bg-slate-800');
+                showToast("Mostrando apenas ausentes", "info");
+            } else {
+                btn.classList.remove('bg-orange-100', 'text-orange-600', 'border-orange-200', 'dark:bg-orange-900/40', 'dark:text-orange-400', 'dark:border-orange-700');
+                btn.classList.add('bg-white', 'text-slate-400', 'dark:bg-slate-800');
+                showToast("Mostrando todos", "info");
+            }
+            renderAttendance();
+        };
+
+        window.toggleFrequencyOrder = () => {
+            orderByFrequency = !orderByFrequency;
+            const btn = document.getElementById('btnOrderFreq');
+            // Como o botão está escondido no painel agora, podemos dar feedback apenas via toast
+            if (orderByFrequency) showToast("Mais frequentes primeiro", "info");
+            else showToast("Ordem alfabética", "info");
+            renderAttendance();
+        };
+
+        // --- FUNÇÃO AUXILIAR DE CORES POR ORGANIZAÇÃO ---
+        const getOrgStyle = (org) => {
+            const styles = {
+                'Sociedade de Socorro': 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200 border-amber-200',
+                'Quórum de Élderes': 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 border-blue-200',
+                'Moças': 'bg-pink-100 text-pink-800 dark:bg-pink-900/50 dark:text-pink-200 border-pink-200',
+                'Rapazes': 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-200 border-orange-200',
+                'Primária': 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200 border-red-200'
+            };
+            return styles[org] || 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-700 dark:text-slate-300';
+        };
+
+        // --- RENDER ATTENDANCE (VISUAL NOVO) ---
         window.renderAttendance = () => {
             const list = document.getElementById('memberList'); if(!list) return;
             const search = document.getElementById('searchMember').value.toLowerCase();
@@ -566,11 +595,25 @@
 
             const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
             const curP = data.presents || []; const curO = data.online_ids || [];
-            list.innerHTML = ''; let mFis = 0; let mOnl = 0; let vFis = 0; let vOnl = 0; let totM = 0; let lastFam = "";
-
+            
+            // Atualiza contadores
             const visorL = document.getElementById('display-lideres'); const visorV = document.getElementById('display-visitantes'); const visorM = document.getElementById('display-missionarios');
             if(visorL) visorL.innerText = data.lideresCount || 0; if(visorV) visorV.innerText = data.visitantesCount || 0; if(visorM) visorM.innerText = data.missionariosCount || 0;
             
+            // Cálculos
+            let mFis = 0; let mOnl = 0; let vFis = 0; let vOnl = 0; let totM = 0;
+            members.forEach(m => {
+                const isP = curP.includes(m.id); const isOn = curO.includes(m.id);
+                const rCat = getRealCategory(m); if(rCat !== 'Visitante') { totM++; if(isP) isOn ? mOnl++ : mFis++; } else { if(isP) isOn ? vOnl++ : vFis++; }
+            });
+            document.getElementById('stats-present').innerText = mFis + mOnl + vFis + vOnl + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
+            document.getElementById('stats-total').innerText = totM;
+
+            // Renderização da Lista
+            list.innerHTML = ''; 
+            let lastFam = "";
+            let visibleCount = 0;
+
             const lastDom = Object.keys(attendanceHistory).sort().reverse().slice(0, 4);
             const sorted = [...members].sort((a, b) => {
                 if (orderByFrequency) {
@@ -583,33 +626,68 @@
             });
 
             let buffer = '';
+            
             sorted.forEach(m => {
                 const isP = curP.includes(m.id); const isOn = curO.includes(m.id);
-                const rCat = getRealCategory(m); if(rCat !== 'Visitante') { totM++; if(isP) isOn ? mOnl++ : mFis++; } else { if(isP) isOn ? vOnl++ : vFis++; }
+                
+                // Filtro Ausentes
+                if (showMissingOnly && isP) return;
 
                 if((m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) && (currentFilter === 'TODOS' || m.org === currentFilter)) {
-                    if (!orderByFrequency && m.familia !== lastFam && !search) { buffer += `<div class="family-divider">Família ${m.familia}</div>`; lastFam = m.familia; }
+                    
+                    visibleCount++;
+
+                    // Divisor
+                    if (!orderByFrequency && m.familia !== lastFam && !search) { 
+                        buffer += `<div class="family-divider flex items-center gap-2 mt-4 mb-2"><i class="fas fa-users text-xs opacity-50"></i> Família ${m.familia}</div>`; 
+                        lastFam = m.familia; 
+                    }
+                    
                     let star = 0; if(orderByFrequency) lastDom.forEach(d => { if (attendanceHistory[d]?.presents?.includes(m.id)) star++; });
                     
-                    // LÓGICA DE COR DO CARD ADAPTADA
-                    const bgClass = isP ? (isOn ? 'card-online' : 'card-presente') : 'card-ausente';
-                    const textClass = isP ? (isOn ? 'text-blue-900 dark:text-blue-200' : 'text-teal-900 dark:text-teal-100') : 'text-slate-800 dark:text-slate-200';
-                    const subTextClass = 'text-slate-500 dark:text-slate-400';
+                    // Lógica Visual
+                    const bgClass = isP ? (isOn ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20') : 'bg-white dark:bg-slate-800';
+                    const borderClass = isP ? (isOn ? 'border-blue-400' : 'border-emerald-400') : 'border-transparent';
+                    const shadowClass = isP ? 'shadow-md' : 'shadow-sm';
+                    
+                    const initial = m.name.charAt(0).toUpperCase();
+                    const avatarContent = isP ? `<i class="fas ${isOn ? 'fa-wifi' : 'fa-check'} text-lg"></i>` : `<span class="text-sm font-bold">${initial}</span>`;
+                    const avatarStyle = isP ? (isOn ? 'bg-blue-500 text-white shadow-blue-300' : 'bg-emerald-500 text-white shadow-emerald-300') : 'bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400';
+                    const orgBadge = getOrgStyle(m.org);
+                    const rCat = getRealCategory(m);
 
-                    buffer += `<div class="glass-card p-5 flex items-center gap-4 border-l-8 ${bgClass}"><div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name.replace(/'/g, "\\'")}')"` : ''} class="flex-1 flex items-start gap-4 cursor-pointer min-w-0"><div class="check-box mt-1 flex-shrink-0 ${isP ? (isOn ? 'check-online' : 'check-active') : ''}">${isP ? `<i class="fas ${isOn ? 'fa-wifi' : 'fa-check'} text-[10px]"></i>` : ''}</div><div class="flex-1 text-left min-w-0"><h4 class="font-bold text-sm ${textClass} break-words leading-tight uppercase italic">${m.name}${star > 0 ? ` <span class="text-amber-500 opacity-40 ml-1 text-[10px]">★${star}</span>`:''}</h4><p class="text-[9px] font-black uppercase ${subTextClass} mt-1">${m.org} • ${rCat}</p></div></div>${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="text-slate-300 p-2"><i class="fas fa-sticky-note text-sm"></i></button>` : ''}</div>`;
+                    buffer += `
+                    <div class="glass-card mb-3 p-3 flex items-center gap-3 border-l-[6px] transition-all duration-200 ${bgClass} ${borderClass} ${shadowClass}">
+                        <div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name.replace(/'/g, "\\'")}')"` : ''} class="flex-1 flex items-center gap-3 cursor-pointer select-none">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${avatarStyle}">${avatarContent}</div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-bold text-sm ${isP ? 'text-slate-900 dark:text-slate-100' : 'text-slate-700 dark:text-slate-300'} truncate">
+                                    ${m.name} ${star > 0 ? `<span class="text-amber-500 text-[10px] ml-1"><i class="fas fa-star"></i>${star}</span>`:''}
+                                </h4>
+                                <div class="flex flex-wrap gap-1.5 mt-1">
+                                    <span class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase border ${orgBadge}">${m.org.split(' ')[0]}</span> 
+                                    <span class="text-[8px] font-bold text-slate-400 uppercase self-center tracking-wider">${rCat}</span>
+                                </div>
+                            </div>
+                        </div>
+                        ${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="text-slate-300 dark:text-slate-600 hover:text-blue-500 p-2"><i class="fas fa-comment-dots text-sm"></i></button>` : ''}
+                    </div>`;
                 }
             });
-            list.innerHTML = buffer;
-            document.getElementById('stats-present').innerText = mFis + mOnl + vFis + vOnl + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
-            document.getElementById('stats-total').innerText = totM;
-            const card = document.getElementById('stats-present').parentElement; let old = card.querySelector('.detalhes-area'); if(old) old.remove();
-            let dHtml = `<div class="detalhes-area mt-2 pt-2 border-t dark:border-slate-600 text-left text-[11px] font-bold text-slate-500 dark:text-slate-400 space-y-1"><p class="text-green-600 dark:text-green-400 flex justify-between"><span>Ala: ${mFis+mOnl}</span>${mOnl > 0 ? `<span class="opacity-50">${mFis} F/ ${mOnl} O</span>`:''}</p>`;
-            if(vFis+vOnl>0) dHtml += `<p class="text-teal-600 dark:text-teal-400 flex justify-between"><span>Vis Local: ${vFis+vOnl}</span>${vOnl > 0 ? `<span class="opacity-50">${vFis} F/ ${vOnl} O</span>`:''}</p>`;
-            if(data.missionariosCount>0) dHtml += `<p class="text-indigo-600 dark:text-indigo-400">👔 Missionários: ${data.missionariosCount}</p>`;
-            if(data.lideresCount>0) dHtml += `<p class="text-amber-600 dark:text-amber-400">★ Líderes: ${data.lideresCount}</p>`;
-            if(data.visitantesCount>0) dHtml += `<p class="text-blue-500 dark:text-blue-400">🚶 Vist. Fora: ${data.visitantesCount}</p>`;
-            card.insertAdjacentHTML('beforeend', dHtml + `</div>`);
-            document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
+
+            if (visibleCount === 0) {
+                list.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-10 opacity-60">
+                        <div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas ${showMissingOnly ? 'fa-check-circle text-green-500' : 'fa-search text-slate-400'} text-3xl"></i>
+                        </div>
+                        <p class="font-bold text-slate-500 dark:text-slate-400 text-sm">
+                            ${showMissingOnly ? 'Todos os listados estão presentes!' : 'Nenhum membro encontrado.'}
+                        </p>
+                    </div>`;
+            } else {
+                list.innerHTML = buffer;
+            }
         };
 
         window.renderAdminUsers = () => {
