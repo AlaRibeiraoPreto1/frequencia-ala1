@@ -16,18 +16,21 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         body.status-login { height: 100vh !important; overflow: hidden !important; position: fixed; width: 100%; }
         body.status-app { height: auto !important; overflow-y: auto !important; position: relative; }
+        
         @media (min-width: 1024px) {
             .app-layout { display: flex !important; height: 100vh; overflow: hidden; }
             .sidebar { width: 300px !important; flex-shrink: 0; display: flex !important; background: white; border-right: 1px solid #e2e8f0; flex-direction: column; }
             .main-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
             .content-container { width: 100%; max-width: 1100px; padding: 40px; }
         }
+        
         @media (max-width: 1023px) {
             .sidebar { display: none !important; }
             .app-layout { display: block !important; }
             .content-container { padding: 20px; padding-bottom: 120px; }
             .sticky-search { position: sticky; top: 0; z-index: 100; background: var(--bg-soft); padding: 10px 0; }
         }
+
         .glass-card { background: white; border-radius: 28px; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.04); border: 1px solid #f1f5f9; }
         .nav-btn-active { background-color: #f0f7ff; color: var(--sacramental-blue) !important; font-weight: 800; border-right: 4px solid var(--sacramental-blue); }
         .check-box { width: 28px; height: 28px; border-radius: 10px; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
@@ -38,82 +41,73 @@
         .card-presente { background-color: #ecfdf5 !important; border-left: 8px solid #10b981 !important; }
         .card-ausente { background-color: #ffffff !important; border-left: 8px solid #f1f5f9 !important; }
         .justificativa-tag { font-size: 10px; background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 8px; margin-top: 6px; display: inline-block; border: 1px dashed #cbd5e1; font-weight: bold; }
-
-        /* Bloqueia qualquer tentativa de deslize lateral no site todo */
-        html, body {
-        max-width: 100vw;
-        overflow-x: hidden !important;
-        }
-
-        /* Garante que elementos flexíveis não empurrem a borda da tela */
-        * {
-        box-sizing: border-box;
-        }
-
-        /* Ajuste específico para a área de busca não vazar */
-        .sticky-search {
-        width: 100%;
-        margin-left: 0;
-        margin-right: 0;
-        }
-
+        
+        /* Estilo das Notificações Toasts */
+        @keyframes toastIn { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+        .toast-active { animation: toastIn 0.3s ease-out forwards; }
     </style>
 </head>
-
 <body class="antialiased status-login">
 
+    <!-- LOADING SCREEN -->
     <div id="loading-screen" class="fixed inset-0 bg-white z-[300] flex items-center justify-center">
         <div class="text-center space-y-4">
             <div class="w-12 h-12 border-4 border-slate-100 border-t-[#002e5d] rounded-full animate-spin mx-auto"></div>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center italic">Carregando...</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center italic tracking-widest">Sincronizando...</p>
         </div>
     </div>
 
-    <!-- TELA DE ACESSO -->
+    <!-- TELA DE LOGIN / PRIMEIRO ACESSO -->
     <div id="access-container" class="min-h-screen flex items-center justify-center bg-slate-50 p-6">
-        <section id="view-login" class="hidden glass-card p-10 w-full max-w-sm text-center space-y-8 shadow-2xl">
-            <img src="https://images-us-prod.cms.commerce.dynamics.com/cms/api/fswvqbgntk/imageFileData/MA2bhk?ver=9757" alt="Cristo" class="h-32 mx-auto object-contain mb-6">
-            <h2 class="text-2xl font-black text-slate-800 tracking-tighter uppercase italic leading-tight text-center">Ala <br>Ribeirão Preto 1</h2>
+        <section id="view-login" class="hidden glass-card p-10 w-full max-w-sm text-center space-y-8 shadow-2xl border border-white">
+            <img src="https://images-us-prod.cms.commerce.dynamics.com/cms/api/fswvqbgntk/imageFileData/MA2bhk?ver=9757" alt="Cristo" class="h-32 mx-auto object-contain mb-2">
+            <h2 class="text-2xl font-black text-slate-800 tracking-tighter uppercase italic leading-tight">Ala <br>Ribeirão Preto 1</h2>
             <div class="space-y-3">
                 <input type="text" id="login-user" placeholder="Usuário" class="w-full p-4 rounded-2xl bg-slate-100 border-none outline-none text-sm font-bold shadow-inner">
-                <input type="password" id="login-pass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none outline-none text-sm shadow-inner">
+                <input type="password" id="login-pass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none outline-none text-sm">
             </div>
-            <button onclick="checkLogin()" class="w-full bg-[#002e5d] text-white py-4 rounded-2xl font-bold shadow-xl active:scale-95 transition-all">ENTRAR</button>
+            <button onclick="checkLogin()" class="w-full bg-[#002e5d] text-white py-4 rounded-2xl font-black shadow-xl active:scale-95 transition-all text-xs tracking-widest uppercase">Entrar</button>
             <button onclick="switchTab('first-login')" class="text-xs font-bold text-slate-400 underline">Ativar Primeiro Acesso</button>
         </section>
 
-        <section id="view-first-login" class="hidden glass-card p-10 w-full max-w-sm text-center space-y-6 shadow-xl">
-            <h2 class="font-black text-xl italic uppercase text-[#002e5d]">Primeiro Acesso</h2>
+        <section id="view-first-login" class="hidden glass-card p-10 w-full max-w-sm text-center space-y-6 shadow-xl border border-white">
+            <h2 class="font-black text-xl italic uppercase text-[#002e5d]">Ativar Conta</h2>
+            <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-4">Crie sua senha pessoal</p>
             <div class="space-y-3">
-                <input type="text" id="first-user" placeholder="Login Autorizado" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm font-bold shadow-inner">
-                <input type="password" id="first-pass" placeholder="Crie uma Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm shadow-inner">
-                <input type="password" id="first-pass-confirm" placeholder="Confirme a Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm shadow-inner">
+                <input type="text" id="first-user" placeholder="Login Autorizado" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm font-bold">
+                <input type="password" id="first-pass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm">
+                <input type="password" id="first-pass-confirm" placeholder="Confirme Senha" class="w-full p-4 rounded-2xl bg-slate-100 border-none text-sm">
             </div>
-            <button onclick="processFirstLogin()" class="w-full bg-green-600 text-white p-5 rounded-2xl font-black uppercase text-xs shadow-lg active:scale-95 transition-all">Ativar</button>
-            <button onclick="switchTab('login')" class="text-xs text-slate-400 underline font-bold text-center">Voltar</button>
+            <button onclick="processFirstLogin()" class="w-full bg-green-600 text-white p-5 rounded-2xl font-black uppercase text-xs active:scale-95 transition-all">Ativar Conta</button>
+            <button onclick="switchTab('login')" class="text-xs text-slate-400 underline font-bold">Voltar para o Login</button>
         </section>
     </div>
 
-    <!-- MENU MOBILE DRAWER -->
+    <!-- DRAWER MOBILE -->
     <div id="mobile-menu-overlay" onclick="toggleMobileMenu()" class="hidden fixed inset-0 bg-black/50 z-[200] backdrop-blur-sm"></div>
-    <div id="mobile-menu-panel" class="fixed top-0 right-0 h-full w-64 bg-white z-[210] shadow-2xl translate-x-full transition-transform duration-300 flex flex-col">
+    <div id="mobile-menu-panel" class="fixed top-0 right-0 h-full w-64 bg-white z-[210] shadow-2xl translate-x-full flex flex-col">
         <div class="p-6 bg-[#002e5d] text-white">
             <p id="user-mobile-name" class="font-bold truncate text-sm">...</p>
             <p id="user-mobile-role" class="text-[9px] opacity-70 uppercase tracking-widest font-black"></p>
         </div>
         <div class="flex-1 p-4 space-y-2">
-            <button id="admin-mobile-btn" onclick="switchTab('admin-users'); toggleMobileMenu();" class="hidden w-full flex items-center gap-3 p-4 rounded-2xl text-slate-600 hover:bg-slate-50 font-bold text-xs uppercase"><i class="fas fa-users-cog text-[#002e5d]"></i> Gerenciar Logins</button>
+            <button id="admin-mobile-btn" onclick="switchTab('admin-users'); toggleMobileMenu();" class="hidden w-full flex items-center gap-3 p-4 rounded-2xl text-slate-600 hover:bg-slate-50 font-bold text-xs uppercase transition-colors">
+                <i class="fas fa-users-cog text-[#002e5d]"></i> Gerenciar Logins
+            </button>
             <hr class="border-slate-50">
-            <button onclick="logout()" class="w-full flex items-center gap-3 p-4 rounded-2xl text-red-500 hover:bg-red-50 font-bold text-xs uppercase"><i class="fas fa-power-off"></i> Sair do Sistema</button>
+            <button onclick="logout()" class="w-full flex items-center gap-3 p-4 rounded-2xl text-red-500 hover:bg-red-50 font-bold text-xs uppercase">
+                <i class="fas fa-power-off"></i> Sair do Sistema
+            </button>
         </div>
     </div>
 
-    <!-- APP LAYOUT -->
+    <!-- APP PRINCIPAL -->
     <div id="app-layout" class="hidden app-layout">
+        
         <aside class="sidebar p-8">
             <div class="flex items-center gap-3 mb-12 px-2">
                 <div class="w-10 h-10 bg-[#002e5d] rounded-2xl flex items-center justify-center text-white shadow-lg"><i class="fas fa-church text-lg"></i></div>
-                <h1 class="font-black text-xs uppercase text-[#002e5d] leading-none tracking-tighter">Ala<br>Ribeirão Preto 1</h1>
+                <h1 class="font-black text-xs uppercase text-[#002e5d] leading-none tracking-tighter text-left">Ala<br>Ribeirão Preto 1</h1>
             </div>
             <nav class="flex-1 space-y-1">
                 <button onclick="switchTab('dashboard')" id="side-dashboard" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left"><i class="fas fa-grid-2"></i> Dashboard</button>
@@ -125,18 +119,19 @@
                 <button id="admin-btn" onclick="switchTab('admin-users')" class="hidden w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all text-left"><i class="fas fa-users-cog"></i> Gerenciar Logins</button>
             </nav>
             <div class="bg-slate-50 p-6 rounded-[32px] mt-auto">
-                <p id="user-name-side" class="font-black text-[10px] uppercase text-slate-700 truncate tracking-tighter italic">...</p>
+                <p id="user-name-side" class="font-black text-[10px] uppercase text-slate-700 truncate italic">...</p>
                 <button onclick="logout()" class="text-[9px] font-bold text-red-400 mt-2 hover:underline uppercase tracking-widest text-left">Sair</button>
             </div>
         </aside>
 
         <main class="main-content">
+            <!-- CABEÇALHO CELULAR -->
             <header class="lg:hidden p-6 flex justify-between items-center bg-white border-b border-slate-100 sticky top-0 z-[150]">
                 <h2 id="mobile-page-title" class="font-black text-[#002e5d] text-lg italic uppercase tracking-tighter">Dashboard</h2>
                 <button onclick="toggleMobileMenu()" class="w-10 h-10 rounded-xl bg-slate-50 text-[#002e5d] flex items-center justify-center shadow-sm"><i class="fas fa-bars"></i></button>
             </header>
 
-            <!-- SELETOR DE DATA GLOBAL -->
+            <!-- BARRA DE DATA GLOBAL -->
             <div id="global-date-bar" class="w-full bg-white border-b border-slate-100 py-3 px-6 sticky top-[80px] lg:top-0 z-[140] flex justify-center">
                 <div class="glass-card flex items-center px-6 py-2 gap-4 bg-slate-50 border-slate-200 shadow-sm hover:border-[#002e5d] transition-all cursor-pointer">
                     <i class="fas fa-calendar-alt text-[#002e5d]"></i>
@@ -148,181 +143,148 @@
             </div>
 
             <div class="content-container w-full">
-                <!-- DASHBOARD -->
+                <!-- SEÇÃO DASHBOARD -->
                 <section id="view-dashboard" class="hidden space-y-8">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="glass-card p-8 border-l-[12px] border-green-500"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Presentes Hoje</p><p id="stats-present" class="text-5xl font-black text-slate-800 leading-tight">0</p></div>
-                        <div class="glass-card p-8 border-l-[12px] border-[#002e5d]"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Membros Ala</p><p id="stats-total" class="text-5xl font-black text-slate-800 leading-tight">0</p></div>
-                        <div class="glass-card p-8 border-l-[12px] border-orange-500"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resgate</p><p id="stats-rescue" class="text-5xl font-black text-slate-800 leading-tight">0</p></div>
+                        <div class="glass-card p-8 border-l-[12px] border-green-500">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Presentes Hoje</p>
+                            <p id="stats-present" class="text-5xl font-black text-slate-800 leading-tight">0</p>
+                        </div>
+                        <div class="glass-card p-8 border-l-[12px] border-[#002e5d]">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Membros Ala</p>
+                            <p id="stats-total" class="text-5xl font-black text-slate-800 leading-tight">0</p>
+                        </div>
+                        <div class="glass-card p-8 border-l-[12px] border-orange-500">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resgate</p>
+                            <p id="stats-rescue" class="text-5xl font-black text-slate-800 leading-tight">0</p>
+                        </div>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="glass-card p-8"><canvas id="heatmapChart" height="220"></canvas></div>
-                        <div class="glass-card p-8"><canvas id="attendanceChart" height="220"></canvas></div>
+                        <div class="glass-card p-8 text-center shadow-inner">
+                            <h3 class="font-black text-[10px] uppercase text-slate-400 tracking-widest mb-6">Frequência por Organização (%)</h3>
+                            <canvas id="heatmapChart" height="220"></canvas>
+                        </div>
+                        <div class="glass-card p-8 text-center shadow-inner">
+                            <h3 class="font-black text-[10px] uppercase text-slate-400 tracking-widest mb-6">Histórico Semanal</h3>
+                            <canvas id="attendanceChart" height="220"></canvas>
+                        </div>
                     </div>
                 </section>
 
-                <!-- REGISTRAR FREQUÊNCIA -->
-                <section id="view-attendance" class="hidden space-y-6 w-full overflow-x-hidden">
-                   <!-- NOVA ESTRUTURA DA BUSCA (MAIS SEGURA) -->
-                    <div class="sticky-search">
-                        <div class="flex gap-2 w-full px-1">
-                            <!-- BLOCO DE BUSCA ATUALIZADO COM BOTÃO DE LIMPAR -->
-<div class="relative flex-1">
-    <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
-    
-    <!-- Note que adicionei 'pr-12' na class abaixo -->
-    <input type="text" id="searchMember" oninput="renderAttendance()" placeholder="Buscar nome ou família..." 
-           class="w-full pl-12 pr-12 p-4 rounded-2xl bg-white border-none outline-none shadow-sm font-bold text-sm focus:ring-2 focus:ring-[#002e5d]">
-    
-    <!-- Botão de Limpar (X) -->
-    <button id="btnClearSearch" onclick="clearSearch()" class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 p-1 transition-colors">
-        <i class="fas fa-times-circle text-lg"></i>
-    </button>
-</div>
-                            <button onclick="toggleOptions()" class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#002e5d] shadow-sm border border-slate-100 flex-shrink-0">
-                                <i class="fas fa-sliders"></i>
-                            </button>
+                <!-- SEÇÃO REGISTRAR FREQUÊNCIA -->
+                <section id="view-attendance" class="hidden space-y-6">
+                    <div class="sticky-search flex gap-3">
+                        <div class="relative flex-1">
+                            <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                            <input type="text" id="searchMember" oninput="renderAttendance()" placeholder="Buscar nome ou família..." class="w-full pl-12 pr-12 p-4 rounded-2xl bg-white border-none outline-none shadow-sm font-bold text-sm focus:ring-2 focus:ring-[#002e5d]">
+                            <button id="btnClearSearch" onclick="clearSearch()" class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500"><i class="fas fa-times-circle"></i></button>
                         </div>
+                        <button id="btnOrderFreq" onclick="toggleFrequencyOrder()" class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-slate-300 shadow-sm border transition-all"><i class="fas fa-star text-lg"></i></button>
+                        <button onclick="toggleOptions()" class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#002e5d] shadow-sm border active:scale-95"><i class="fas fa-sliders"></i></button>
                     </div>
 
-                    <div id="attendance-options" class="hidden space-y-6 p-6 bg-white rounded-[32px] border shadow-sm text-left">
-                        <div class="space-y-2">
-                            <p class="text-[10px] font-black text-slate-400 uppercase ml-2">Filtros de Organização</p>
-                            <!-- Procure esta linha e garanta que ela esteja assim -->
+                    <div id="attendance-options" class="hidden space-y-6 p-6 bg-white rounded-[32px] border shadow-sm">
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2">Filtrar Lista</p>
                             <div id="orgFilters" class="flex overflow-x-auto gap-2 no-scrollbar py-2 max-w-full"></div>
                         </div>
-
-                        <div id="admin-counters" class="space-y-2 mt-4 pt-4 border-t border-slate-100">
+                        <div id="admin-counters" class="space-y-4 mt-4 pt-4 border-t border-slate-100 text-left">
                             <p class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest">Contadores Manuais</p>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100"><span class="text-[10px] font-bold text-slate-500 uppercase">Líderes Estaca</span><div class="flex items-center gap-4"><button onclick="updateCount('lideresCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button><span id="display-lideres" class="font-black text-[#002e5d]">0</span><button onclick="updateCount('lideresCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button></div></div>
-                                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100"><span class="text-[10px] font-bold text-slate-500 uppercase">Visitantes Fora</span><div class="flex items-center gap-4"><button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button><span id="display-visitantes" class="font-black text-[#002e5d]">0</span><button onclick="updateCount('visitantesCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button></div></div>
-                                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100"><span class="text-[10px] font-bold text-slate-500 uppercase">Missionários</span><div class="flex items-center gap-4"><button onclick="updateCount('missionariosCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white text-slate-400 shadow-sm">-</button><span id="display-missionarios" class="font-black text-[#002e5d]">0</span><button onclick="updateCount('missionariosCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white shadow-sm">+</button></div></div>
+                                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border"><span class="text-[10px] font-bold text-slate-500">Líderes Estaca</span><div class="flex items-center gap-4"><button onclick="updateCount('lideresCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm">-</button><span id="display-lideres" class="font-black text-[#002e5d]">0</span><button onclick="updateCount('lideresCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white">+</button></div></div>
+                                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border"><span class="text-[10px] font-bold text-slate-500">Visitantes Fora</span><div class="flex items-center gap-4"><button onclick="updateCount('visitantesCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm">-</button><span id="display-visitantes" class="font-black text-[#002e5d]">0</span><button onclick="updateCount('visitantesCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white">+</button></div></div>
+                                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border"><span class="text-[10px] font-bold text-slate-500">Missionários</span><div class="flex items-center gap-4"><button onclick="updateCount('missionariosCount', -1)" class="admin-only w-8 h-8 rounded-lg bg-white shadow-sm">-</button><span id="display-missionarios" class="font-black text-[#002e5d]">0</span><button onclick="updateCount('missionariosCount', 1)" class="admin-only w-8 h-8 rounded-lg bg-[#002e5d] text-white">+</button></div></div>
                             </div>
                         </div>
                     </div>
                     <div id="memberList" class="space-y-2 mt-6"></div>
                 </section>
 
-                <!-- RELATÓRIOS -->
-                <section id="view-reports" class="hidden space-y-8 text-left">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="glass-card p-8"><h3 class="font-black text-yellow-600 uppercase text-[10px] mb-4 tracking-widest border-b pb-2">Sinal Amarelo</h3><div id="report-yellow" class="space-y-3"></div></div>
-                        <div class="glass-card p-8"><h3 class="font-black text-blue-600 uppercase text-[10px] mb-4 tracking-widest border-b pb-2">Famílias Ausentes</h3><div id="report-family" class="space-y-3"></div></div>
-                        <div class="glass-card p-8 md:col-span-2"><h3 class="font-black text-green-600 uppercase text-[10px] mb-4 tracking-widest border-b pb-4">Retenção</h3><div id="report-retention" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div>
+                <!-- SEÇÃO RELATÓRIOS -->
+                <section id="view-reports" class="hidden space-y-8">
+                    <div class="glass-card p-8 border-l-[12px] border-slate-800 cursor-pointer hover:bg-slate-50 transition-all active:scale-95" onclick="switchTab('members-list')">
+                        <div class="flex items-center justify-between text-left">
+                            <div>
+                                <h3 class="font-black text-slate-800 uppercase text-[10px] mb-1">Painel Administrativo</h3>
+                                <p class="text-xl font-black text-[#002e5d] italic">Gestão da Unidade e Membros</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase mt-1 italic">Editar cadastros, nomes e chamados</p>
+                            </div>
+                            <i class="fas fa-users-viewfinder text-4xl text-slate-200"></i>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+                        <div class="glass-card p-8"><h3 class="font-black text-yellow-600 uppercase text-[10px] mb-4 border-b pb-2 tracking-widest">⚠️ Sinal Amarelo</h3><div id="report-yellow" class="space-y-3"></div></div>
+                        <div class="glass-card p-8"><h3 class="font-black text-blue-600 uppercase text-[10px] mb-4 border-b pb-2 tracking-widest">🏠 Famílias Ausentes (Hoje)</h3><div id="report-family" class="space-y-3"></div></div>
+                        <div class="glass-card p-8 md:col-span-2"><h3 class="font-black text-green-600 uppercase text-[10px] mb-4 border-b pb-2 tracking-widest">🌱 Acompanhamento de Novos Membros</h3><div id="report-retention" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div>
                     </div>
                 </section>
 
-                <!-- ABA DE MEMBROS (CADASTRO E GESTÃO) -->
+                <!-- SEÇÃO HUB MEMBROS (SUB-VIEWS FORM E LIST) -->
                 <section id="view-add" class="hidden space-y-6">
-                    <div class="flex gap-2 p-1 bg-slate-100 rounded-[24px] mb-6">
-                        <button onclick="toggleMemberView('form')" id="btn-show-form" class="flex-1 py-3 rounded-[20px] text-xs font-black uppercase transition-all bg-white shadow-sm text-[#002e5d]">Cadastrar Novo</button>
-                        <button onclick="toggleMemberView('list')" id="btn-show-list" class="flex-1 py-3 rounded-[20px] text-xs font-bold uppercase transition-all text-slate-500">Gerenciar Lista</button>
+                    <div class="flex gap-2 p-1 bg-slate-100 rounded-[24px] mb-6 shadow-inner max-w-xl mx-auto">
+                        <button onclick="toggleMemberView('form')" id="btn-show-form" class="flex-1 py-4 rounded-[20px] text-[11px] font-black uppercase transition-all bg-white shadow-sm text-[#002e5d]">Novo Cadastro</button>
+                        <button onclick="toggleMemberView('list')" id="btn-show-list" class="flex-1 py-4 rounded-[20px] text-[11px] font-bold uppercase transition-all text-slate-400">Ver e Editar</button>
                     </div>
-
-                    <div id="sub-view-form" class="space-y-4">
-                        <div class="glass-card p-8 w-full max-w-xl mx-auto space-y-6 text-left shadow-xl">
-                            <h3 class="text-xl font-black text-[#002e5d] uppercase text-center italic">Novo Cadastro</h3>
+                    <div id="sub-view-form" class="space-y-6 text-left max-w-2xl mx-auto">
+                        <div class="glass-card p-8 shadow-xl space-y-6">
+                            <h3 class="text-xl font-black text-[#002e5d] text-center italic uppercase tracking-tighter">Cadastro de Membro</h3>
                             <div class="space-y-4">
-                                <input type="text" id="newName" oninput="formatNameInput(this)" placeholder="Nome Completo" class="w-full p-4 bg-slate-50 border-none rounded-[20px] font-bold text-sm outline-none shadow-inner">
+                                <input type="text" id="newName" oninput="formatNameInput(this)" placeholder="Nome Completo" class="w-full p-5 bg-slate-50 border-none rounded-3xl font-bold text-sm shadow-inner outline-none">
                                 <div class="relative">
-                                    <input type="text" id="familySearch" oninput="handleFamilySearch(this.value)" placeholder="Sobrenome da Família" class="w-full p-4 bg-slate-50 border-none rounded-[20px] font-bold text-sm outline-none shadow-inner">
-                                    <div id="familySuggestions" class="hidden absolute left-0 right-0 top-[105%] bg-white rounded-2xl shadow-2xl z-[150] max-h-48 overflow-y-auto border text-left"></div>
-                                    <div id="headOfFamilyContainer" class="flex items-center gap-3 px-4 mt-2"><input type="checkbox" id="isHeadOfFamily" class="w-4 h-4 accent-[#002e5d]"><label class="text-xs font-bold text-slate-500 italic uppercase">Sou Chefe da família</label></div>
+                                    <input type="text" id="familySearch" oninput="handleFamilySearch(this.value)" placeholder="Sobrenome da Família" class="w-full p-5 bg-slate-50 border-none rounded-3xl font-bold text-sm shadow-inner outline-none">
+                                    <div id="familySuggestions" class="hidden absolute left-0 right-0 top-[105%] bg-white rounded-3xl shadow-2xl z-[150] max-h-48 overflow-y-auto border border-slate-100 text-left"></div>
+                                    <div id="headOfFamilyContainer" class="flex items-center gap-3 px-4 mt-2"><input type="checkbox" id="isHeadOfFamily" class="w-5 h-5 accent-[#002e5d] rounded"><label class="text-xs font-black text-slate-400 italic uppercase">Marcar como chefe da família</label></div>
                                 </div>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <select id="newOrg" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none"><option value="Quórum de Élderes">ÉLDERES</option><option value="Sociedade de Socorro">SOCORRO</option><option value="Moças">MOÇAS</option><option value="Rapazes">RAPAZES</option><option value="Primária">PRIMÁRIA</option></select>
-                                    <select id="newCat" onchange="toggleBaptismDate(this.value, 'baptismDateContainer')" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black uppercase tracking-widest outline-none"><option value="Membro">MEMBRO</option><option value="Recém-Converso">RECÉM-CONVERSO</option><option value="Novo Morador">NOVO MORADOR</option><option value="Visitante">VISITANTE</option></select>
+                                    <select id="newOrg" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black uppercase shadow-inner"><option value="Quórum de Élderes">ÉLDERES</option><option value="Sociedade de Socorro">SOCORRO</option><option value="Moças">MOÇAS</option><option value="Rapazes">RAPAZES</option><option value="Primária">PRIMÁRIA</option></select>
+                                    <select id="newCat" onchange="toggleBaptismDate(this.value, 'baptismDateContainer')" class="p-4 bg-slate-50 rounded-2xl text-[10px] font-black uppercase shadow-inner"><option value="Membro">MEMBRO</option><option value="Recém-Converso">RECÉM-CONVERSO</option><option value="Novo Morador">NOVO MORADOR</option><option value="Visitante">VISITANTE</option></select>
                                 </div>
-                                <div id="baptismDateContainer" class="hidden space-y-1">
-                                    <label class="text-[10px] font-black text-slate-400 uppercase px-4 italic">Data do Batismo</label>
-                                    <input type="date" id="newBaptismDate" class="w-full p-4 bg-slate-50 border-none rounded-[20px] font-bold text-sm outline-none">
-                                </div>
-                                <input type="tel" id="newPhone" oninput="formatPhone(this)" placeholder="WhatsApp (DDD)" class="w-full p-4 bg-slate-50 rounded-2xl font-bold text-sm border-none outline-none shadow-inner">
-                                <button onclick="saveNewMember()" class="w-full bg-[#002e5d] text-white p-6 rounded-[32px] font-black uppercase shadow-2xl active:scale-95 transition-all">Cadastrar</button>
+                                <div id="baptismDateContainer" class="hidden space-y-1"><label class="text-[9px] font-black text-slate-400 uppercase px-5">Data do Batismo</label><input type="date" id="newBaptismDate" class="w-full p-4 bg-white border border-slate-100 rounded-3xl text-sm font-bold shadow-inner"></div>
+                                <input type="tel" id="newPhone" oninput="formatPhone(this)" placeholder="WhatsApp (Somente números)" class="w-full p-5 bg-slate-50 border-none rounded-3xl font-bold text-sm shadow-inner outline-none">
+                                <button onclick="saveNewMember()" class="w-full bg-[#002e5d] text-white p-6 rounded-[32px] font-black uppercase text-sm shadow-xl active:scale-95 transition-all mt-6">Concluir Cadastro</button>
                             </div>
                         </div>
                     </div>
-
                     <div id="sub-view-list" class="hidden space-y-6 text-left">
-                        <div class="flex flex-col md:flex-row gap-4 bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm">
-                            <input type="text" id="searchManageMembers" oninput="renderMembersList()" placeholder="Buscar para editar..." class="flex-1 p-4 rounded-2xl bg-slate-50 outline-none text-sm font-bold border-none focus:ring-2 focus:ring-[#002e5d]">
-                            <select id="filterOrgList" onchange="renderMembersList()" class="p-3 bg-slate-50 rounded-xl text-[10px] font-bold uppercase border-none outline-none text-slate-500"><option value="TODOS">Todas Organizações</option><option value="Quórum de Élderes">Élderes</option><option value="Sociedade de Socorro">Socorro</option><option value="Moças">Moças</option><option value="Rapazes">Rapazes</option><option value="Primária">Primária</option></select>
+                        <div class="glass-card p-6 flex flex-col md:flex-row gap-4 border border-slate-50 shadow-inner">
+                            <input type="text" id="searchManageMembers" oninput="renderMembersList()" placeholder="Buscar nome ou família..." class="flex-1 p-4 rounded-2xl bg-white border border-slate-100 font-bold outline-none text-sm focus:ring-2 focus:ring-[#002e5d]">
+                            <select id="filterOrgList" onchange="renderMembersList()" class="p-3 bg-slate-50 rounded-2xl text-[11px] font-black uppercase border-none text-slate-600 outline-none"><option value="TODOS">Todas Organizações</option><option value="Quórum de Élderes">Élderes</option><option value="Sociedade de Socorro">Socorro</option><option value="Moças">Moças</option><option value="Rapazes">Rapazes</option><option value="Primária">Primária</option></select>
                         </div>
-                        <div id="manageMembersContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-10"></div>
+                        <div id="manageMembersContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
                     </div>
                 </section>
 
-                <!-- ADMIN USUÁRIOS -->
-                <section id="view-admin-users" class="hidden space-y-8 text-left">
-                    <div class="glass-card p-10 max-w-md mx-auto space-y-4 shadow-xl">
-                        <h4 class="font-black text-xs text-center uppercase tracking-widest text-slate-400">Autorizar Login</h4>
-                        <input type="text" id="admin-new-name" placeholder="Nome" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none font-bold">
-                        <input type="text" id="admin-new-user" placeholder="Login (Usuário)" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none font-bold">
-                        <select id="admin-new-role" class="w-full p-4 bg-slate-50 rounded-2xl text-sm border-none font-bold uppercase text-xs outline-none"><option value="user">Secretário</option><option value="admin">Administrador</option></select>
-                        <button onclick="adminCreateUser()" class="w-full bg-[#002e5d] text-white p-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg active:scale-95 transition-all">Autorizar</button>
+                <section id="view-members-list" class="hidden"><h1 class="font-bold text-xl mb-4">Esta seção agora faz parte de Membros</h1></section>
+                
+                <section id="view-admin-users" class="hidden space-y-10 text-left">
+                    <div class="glass-card p-10 max-w-lg mx-auto shadow-2xl space-y-8">
+                        <h4 class="font-black text-center uppercase tracking-widest text-[#002e5d]">Novo Login de Acesso</h4>
+                        <div class="space-y-4">
+                            <input type="text" id="admin-new-name" placeholder="Nome Completo" class="w-full p-4 bg-slate-100 rounded-3xl text-sm border-none font-bold">
+                            <input type="text" id="admin-new-user" placeholder="Nome de Usuário" class="w-full p-4 bg-slate-100 rounded-3xl text-sm border-none font-bold shadow-inner">
+                            <select id="admin-new-role" class="w-full p-4 bg-slate-100 rounded-3xl text-xs font-bold border-none uppercase"><option value="user">Secretário</option><option value="admin">Administrador</option></select>
+                            <button onclick="adminCreateUser()" class="w-full bg-[#002e5d] text-white p-5 rounded-full font-black text-xs shadow-xl tracking-[4px]">AUTORIZAR</button>
+                        </div>
                     </div>
-                    <div id="users-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                    <div id="users-list" class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto"></div>
                 </section>
-
-                <!-- RESGATE -->
-                <section id="view-analysis" class="hidden space-y-6">
-                    <div id="missingList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-left"></div>
-                </section>
+                <section id="view-analysis" class="hidden"><div id="missingList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div></section>
             </div>
-
-            <!-- NAVEGAÇÃO MOBILE -->
-            <nav id="mobile-nav" class="lg:hidden fixed bottom-6 left-6 right-6 h-20 glass-card flex justify-around items-center px-4 z-[200] border-2 border-white shadow-2xl">
-                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-home text-lg"></i></button>
-                <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-clipboard-check text-lg"></i></button>
-                <button onclick="switchTab('analysis')" id="nav-analysis" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-hand-holding-heart text-lg"></i></button>
-                <button onclick="switchTab('reports')" id="nav-reports" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-file-invoice text-lg"></i></button>
-                <button onclick="switchTab('add')" id="nav-add" class="flex flex-col items-center gap-1 text-slate-300 transition-all"><i class="fas fa-users text-lg"></i></button>
-            </nav>
         </main>
+
+        <nav id="mobile-nav" class="lg:hidden fixed bottom-6 left-6 right-6 h-20 glass-card flex justify-around items-center px-4 z-[200] border-2 border-white shadow-2xl">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center text-slate-300 transition-all"><i class="fas fa-home text-lg"></i></button>
+            <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center text-slate-300 transition-all"><i class="fas fa-clipboard-check text-lg"></i></button>
+            <button onclick="switchTab('analysis')" id="nav-analysis" class="flex flex-col items-center text-slate-300 transition-all"><i class="fas fa-hand-holding-heart text-lg"></i></button>
+            <button onclick="switchTab('reports')" id="nav-reports" class="flex flex-col items-center text-slate-300 transition-all"><i class="fas fa-file-invoice text-lg"></i></button>
+            <button onclick="switchTab('add')" id="nav-add" class="flex flex-col items-center text-slate-300 transition-all"><i class="fas fa-users text-lg"></i></button>
+        </nav>
     </div>
 
-    <!-- MODAIS -->
-    <div id="memberEditModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
-        <div class="glass-card w-full max-w-sm p-10 space-y-6">
-            <h3 class="font-black uppercase text-xs text-slate-400 border-b pb-2 tracking-widest">Editar Registro</h3>
-            <div class="space-y-4 text-left">
-                <input type="text" id="edit-member-name" oninput="formatNameInput(this)" class="w-full p-4 bg-slate-50 rounded-2xl uppercase text-sm font-bold border-none outline-none shadow-inner">
-                <input type="text" id="edit-member-family" class="w-full p-4 bg-slate-50 rounded-2xl uppercase text-sm font-bold border-none outline-none shadow-inner">
-                <select id="edit-member-org" class="w-full p-4 bg-slate-50 rounded-2xl text-xs font-bold border-none outline-none shadow-inner"><option value="Quórum de Élderes">Quórum de Élderes</option><option value="Sociedade de Socorro">Sociedade de Socorro</option><option value="Moças">Moças</option><option value="Rapazes">Rapazes</option><option value="Primária">Primária</option><option value="Visitante">Visitante</option></select>
-                <select id="edit-member-cat" onchange="toggleBaptismDate(this.value, 'editBaptismDateContainer')" class="w-full p-4 bg-slate-50 rounded-2xl text-xs font-bold border-none outline-none shadow-inner"><option value="Membro">Membro</option><option value="Recém-Converso">Recém-Converso</option><option value="Novo Morador">Novo Morador</option><option value="Visitante">Visitante</option></select>
-                <div id="editBaptismDateContainer" class="hidden space-y-1">
-                    <label class="text-[10px] font-black text-slate-400 uppercase ml-2 italic">Data do Batismo</label>
-                    <input type="date" id="edit-member-baptismDate" class="w-full p-4 bg-slate-100 rounded-2xl text-sm font-bold border-none outline-none shadow-inner">
-                </div>
-                <input type="tel" id="edit-member-phone" oninput="formatPhone(this)" class="w-full p-4 bg-slate-50 rounded-2xl text-sm font-bold border-none outline-none shadow-inner" placeholder="WhatsApp">
-                <div class="flex items-center gap-3 px-4"><input type="checkbox" id="edit-member-isHead" class="w-4 h-4 accent-[#002e5d]"><label class="text-xs font-bold text-slate-500 italic uppercase">Chefe da Família</label></div>
-            </div>
-            <div class="flex gap-4 pt-4 border-t"><button onclick="deleteMemberAction()" class="flex-1 text-red-400 font-bold text-[10px] uppercase underline">Excluir</button><button onclick="saveMemberAction()" class="flex-[2] py-4 bg-[#002e5d] text-white rounded-2xl font-black text-xs shadow-lg">Gravar</button></div>
-            <button onclick="closeMemberEdit()" class="w-full text-[10px] text-slate-300 font-bold uppercase">Cancelar</button>
-        </div>
-    </div>
+    <!-- TELA PARA NOTIFICAÇÕES (TOASTS) -->
+    <div id="toast-container" class="fixed top-8 left-1/2 -translate-x-1/2 z-[1000] flex flex-col gap-3 pointer-events-none w-full max-w-xs px-4"></div>
 
-    <div id="userEditModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
-        <div class="glass-card w-full max-w-sm p-10 space-y-6 text-center shadow-2xl">
-            <h3 class="font-black uppercase text-xs text-slate-400 border-b pb-2 tracking-widest text-center">Editar Acesso</h3>
-            <input type="text" id="edit-user-name" class="w-full p-4 bg-slate-50 rounded-2xl text-sm font-bold border-none outline-none" placeholder="Nome">
-            <input type="password" id="edit-user-pass" class="w-full p-4 bg-slate-50 rounded-2xl text-sm outline-none" placeholder="Nova Senha (opcional)">
-            <select id="edit-user-role" class="w-full p-4 bg-slate-50 rounded-2xl text-xs font-bold border-none uppercase outline-none"><option value="user">Secretário</option><option value="admin">Administrador</option></select>
-            <div class="flex gap-4"><button onclick="deleteUserAction()" class="text-red-400 font-bold text-[10px] uppercase underline leading-none">Excluir</button><button onclick="saveUserUpdate()" class="flex-1 py-4 bg-[#002e5d] text-white rounded-2xl font-black text-xs shadow-lg uppercase">Salvar</button></div>
-            <button onclick="document.getElementById('userEditModal').classList.add('hidden')" class="w-full text-xs text-slate-300 font-bold">CANCELAR</button>
-        </div>
-    </div>
-
-    <div id="justificationModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
-        <div class="glass-card w-full max-w-sm p-10 space-y-6 shadow-2xl">
-            <div class="flex justify-between items-center border-b pb-4"><h3 class="font-black uppercase text-xs text-slate-400 tracking-widest">Justificar Ausência</h3><button onclick="closeJustify()"><i class="fas fa-times text-slate-300"></i></button></div>
-            <div class="space-y-4 text-left"><p id="justify-member-name" class="font-bold text-slate-700 text-sm italic"></p><textarea id="justify-text" rows="3" placeholder="Ex: Doente, Viajando, Trabalho..." class="w-full p-4 bg-slate-50 rounded-2xl text-sm outline-none border shadow-inner"></textarea></div>
-            <button onclick="saveJustification()" class="w-full py-4 bg-[#002e5d] text-white rounded-2xl font-black text-xs shadow-lg">SALVAR NOTA</button>
-            <button onclick="closeJustify()" class="w-full text-[10px] text-slate-300 font-bold uppercase">Cancelar</button>
-        </div>
-    </div>
-
+    <!-- FIREBASE MODULE SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy, setDoc, deleteDoc, getDocs, where, arrayUnion, arrayRemove, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -339,80 +301,51 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // GLOBALS
         let members = []; let attendanceHistory = {}; let allUsersList = [];
         let currentUser = JSON.parse(localStorage.getItem('user_data')) || null;
         let selectedDate = new Date().toISOString().split('T')[0];
         let currentFilter = 'TODOS';
         let hChart = null; let aChart = null;
         let memberIdEditing = null; let userIdEditing = null; let memberIdJustifying = null;
+        let orderByFrequency = false;
 
-        // --- NOVO CÁLCULO DE DOMINGOS (LOCAL E SEGURO) ---
-        const dSelect = document.getElementById('dateSelectGlobal');
-        const domingosISO = [];
-        let dataAux = new Date(); // Pega a data de agora (local)
+        // TOASTS REPLACEMENT FOR ALERT
+        window.showToast = (msg, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const colors = { success: 'bg-emerald-500 shadow-emerald-900/20', error: 'bg-rose-500 shadow-rose-900/20', info: 'bg-[#002e5d] shadow-blue-900/20' };
+            const icons = { success: 'fa-check-circle', error: 'fa-triangle-exclamation', info: 'fa-circle-info' };
+            toast.className = `${colors[type]} text-white px-8 py-5 rounded-[24px] shadow-2xl flex items-center gap-4 transition-all duration-300 transform toast-active pointer-events-auto w-full scale-100 opacity-100 border border-white/20`;
+            toast.innerHTML = `<i class="fas ${icons[type]} text-lg"></i> <span class="text-xs font-black uppercase tracking-widest">${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { 
+                toast.style.opacity = '0'; toast.style.transform = 'translate(-50%, -20px) scale(0.9)';
+                setTimeout(() => toast.remove(), 400); 
+            }, 3000);
+        };
 
-        // Se hoje não for domingo, volta para o domingo mais próximo
-        while (dataAux.getDay() !== 0) {
-            dataAux.setDate(dataAux.getDate() - 1);
-        }
+        // --- CÁLCULO DE DOMINGOS (LOCAL E SEGURO) ---
+        const dSelectGlobal = document.getElementById('dateSelectGlobal');
+        let dataAux = new Date();
+        while (dataAux.getDay() !== 0) dataAux.setDate(dataAux.getDate() - 1);
 
-        // Gera os últimos 12 domingos
         for(let i=0; i<12; i++) {
             let ano = dataAux.getFullYear();
             let mes = String(dataAux.getMonth() + 1).padStart(2, '0');
             let dia = String(dataAux.getDate()).padStart(2, '0');
-            let iso = `${ano}-${mes}-${dia}`; // Formato YYYY-MM-DD (Padrão ouro de banco de dados)
-            
-            domingosISO.push(iso);
-            
-            let label = dataAux.toLocaleDateString('pt-BR');
-            if(dSelect) {
-                dSelect.innerHTML += `<option value="${iso}">${i==0 ? 'DOMINGO HOJE ('+label+')' : 'DOMINGO '+label}</option>`;
-            }
-            
-            // Pula para o domingo anterior
+            let iso = `${ano}-${mes}-${dia}`;
+            if(dSelectGlobal) dSelectGlobal.innerHTML += `<option value="${iso}">${i==0 ? 'DOMINGO HOJE ('+dataAux.toLocaleDateString('pt-BR')+')' : 'DOMINGO, '+dataAux.toLocaleDateString('pt-BR')}</option>`;
             dataAux.setDate(dataAux.getDate() - 7);
         }
-
-        // TRAVA: Define a data selecionada EXATAMENTE pelo que está no seletor
-        if(dSelect) {
-            selectedDate = dSelect.value; 
-            dSelect.addEventListener('change', (e) => {
-                selectedDate = e.target.value; // A variável só muda se você clicar
-                renderAll(); 
-            });
+        if(dSelectGlobal) {
+            selectedDate = dSelectGlobal.value;
+            dSelectGlobal.addEventListener('change', (e) => { selectedDate = e.target.value; renderAll(); });
         }
 
-        // AUTH
-        window.checkLogin = async () => {
-            const u = document.getElementById('login-user').value.toLowerCase().trim();
-            const p = document.getElementById('login-pass').value.trim();
-            if(!u || !p) return;
-            const q = query(collection(db, "usuarios"), where("username", "==", u), where("password", "==", p));
-            const snap = await getDocs(q);
-            if (!snap.empty) {
-                const d = snap.docs[0].data(); d.id = snap.docs[0].id;
-                localStorage.setItem('user_data', JSON.stringify(d));
-                location.reload();
-            } else alert("Usuário ou senha incorretos.");
-        };
-        window.processFirstLogin = async () => {
-            const u = document.getElementById('first-user').value.toLowerCase().trim();
-            const p1 = document.getElementById('first-pass').value.trim();
-            const p2 = document.getElementById('first-pass-confirm').value.trim();
-            if(!u || p1 !== p2) return alert("Senhas não coincidem.");
-            const q = query(collection(db, "usuarios"), where("username", "==", u));
-            const snap = await getDocs(q);
-            if(snap.empty) return alert("Não autorizado.");
-            await updateDoc(doc(db, "usuarios", snap.docs[0].id), { password: p1 });
-            alert("Sucesso!"); switchTab('login');
-        };
-        window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
-
-        // NAVIGATION
+        // NAVIGATION LOGIC
         window.switchTab = (tab) => {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-            const view = document.getElementById(`view-${tab}`);
             if (tab === 'login' || tab === 'first-login') {
                 document.getElementById('app-layout').classList.add('hidden');
                 document.getElementById('access-container').classList.remove('hidden');
@@ -422,22 +355,24 @@
                 document.getElementById('access-container').classList.add('hidden');
                 document.body.className = "antialiased status-app";
             }
-            if(view) view.classList.remove('hidden');
+            const targetView = document.getElementById(`view-${tab}`);
+            if(targetView) targetView.classList.remove('hidden');
+            
             document.querySelectorAll('aside button, nav button').forEach(b => b.classList.remove('nav-btn-active', 'text-[#002e5d]', 'scale-125'));
             if(document.getElementById(`side-${tab}`)) document.getElementById(`side-${tab}`).classList.add('nav-btn-active');
             if(document.getElementById(`nav-${tab}`)) document.getElementById(`nav-${tab}`).classList.add('text-[#002e5d]', 'scale-125');
-            const titles = {'dashboard':'Painel Geral','attendance':'Registrar Frequência','analysis':'Resgate','reports':'Relatórios Estratégicos','add':'Membros', 'admin-users': 'Gerenciar Logins'};
-            const headerTitle = document.getElementById('mobile-page-title');
-            if(headerTitle) headerTitle.innerText = titles[tab] || 'Ala';
+
+            const titles = {'dashboard':'Painel Geral','attendance':'Frequência Sacramental','analysis':'Acompanhamento Resgate','reports':'Análise Estratégica','add':'Hub de Membros', 'members-list':'Gestão','admin-users':'Controle de Logins'};
+            if(document.getElementById('mobile-page-title')) document.getElementById('mobile-page-title').innerText = titles[tab] || 'Ala';
+
             if(tab === 'members-list') renderMembersList();
-            if(tab === 'admin-users') renderAdminUsers();
             if(tab === 'reports' || tab === 'dashboard') renderAll();
             window.scrollTo(0,0);
         };
 
         window.toggleMobileMenu = () => {
-            const overlay = document.getElementById('mobile-menu-overlay');
             const panel = document.getElementById('mobile-menu-panel');
+            const overlay = document.getElementById('mobile-menu-overlay');
             if (overlay.classList.contains('hidden')) {
                 overlay.classList.remove('hidden'); panel.classList.remove('translate-x-full');
             } else {
@@ -445,27 +380,44 @@
             }
         };
 
-        window.toggleMemberView = (view) => {
-            document.getElementById('sub-view-form').classList.toggle('hidden', view !== 'form');
-            document.getElementById('sub-view-list').classList.toggle('hidden', view !== 'list');
-            document.getElementById('btn-show-form').className = view === 'form' ? "flex-1 py-3 rounded-[20px] text-xs font-black uppercase bg-white shadow-sm text-[#002e5d]" : "flex-1 py-3 rounded-[20px] text-xs font-bold uppercase transition-all text-slate-500";
-            document.getElementById('btn-show-list').className = view === 'list' ? "flex-1 py-3 rounded-[20px] text-xs font-black uppercase bg-white shadow-sm text-[#002e5d]" : "flex-1 py-3 rounded-[20px] text-xs font-bold uppercase transition-all text-slate-500";
-            if(view === 'list') renderMembersList();
+        window.toggleFrequencyOrder = () => {
+            orderByFrequency = !orderByFrequency;
+            const btn = document.getElementById('btnOrderFreq');
+            if (orderByFrequency) {
+                btn.classList.replace('text-slate-300', 'text-amber-500'); btn.classList.add('border-amber-200', 'bg-amber-50');
+                showToast("Mais frequentes primeiro", "info");
+            } else {
+                btn.classList.remove('text-amber-500', 'border-amber-200', 'bg-amber-50'); btn.classList.add('text-slate-300');
+                showToast("Ordem alfabética", "info");
+            }
+            renderAttendance();
         };
 
-        // BAPTISM HELPERS
-        window.getRealCategory = (member) => {
-            if (member.categoria !== 'Recém-Converso' || !member.dataBatismo) return member.categoria;
-            const dB = new Date(member.dataBatismo); const h = new Date();
-            const diff = (h.getFullYear() - dB.getFullYear()) * 12 + (h.getMonth() - dB.getMonth());
-            return (diff >= 12) ? "Membro" : "Recém-Converso";
+        // --- AUTH ---
+        window.checkLogin = async () => {
+            const u = document.getElementById('login-user').value.toLowerCase().trim();
+            const p = document.getElementById('login-pass').value.trim();
+            const q = query(collection(db, "usuarios"), where("username", "==", u), where("password", "==", p));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+                localStorage.setItem('user_data', JSON.stringify({id: snap.docs[0].id, ...snap.docs[0].data()}));
+                location.reload();
+            } else showToast("Usuário ou senha incorretos", "error");
         };
-        window.toggleBaptismDate = (val, id) => { 
-            const el = document.getElementById(id);
-            if(el) el.classList.toggle('hidden', val !== 'Recém-Converso'); 
+        window.processFirstLogin = async () => {
+            const u = document.getElementById('first-user').value.toLowerCase().trim();
+            const p1 = document.getElementById('first-pass').value.trim();
+            const p2 = document.getElementById('first-pass-confirm').value.trim();
+            if(!u || p1 !== p2) return showToast("Senhas não coincidem", "error");
+            const q = query(collection(db, "usuarios"), where("username", "==", u));
+            const snap = await getDocs(q);
+            if(snap.empty) return showToast("Acesso não autorizado", "error");
+            await updateDoc(doc(db, "usuarios", snap.docs[0].id), { password: p1 });
+            showToast("Conta ativada com sucesso!", "success"); switchTab('login');
         };
+        window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
 
-        // DATA SYNC
+        // SYNC
         function listenData() {
             onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => {
                 members = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAll();
@@ -480,397 +432,143 @@
             document.getElementById('loading-screen').classList.add('hidden');
         }
 
-        window.updateCount = async (tipo, delta) => {
-    // 1. Verificação de Segurança
-    if (!currentUser || currentUser.role !== 'admin') return alert("Acesso negado.");
-    
-    // 2. Trava de Segurança da Data (Usa a data selecionada no topo)
-    if (!selectedDate) return alert("Erro: Nenhuma data selecionada.");
-
-    // 3. Pega o valor que já existe no banco para aquela data específica
-    let valorAtual = attendanceHistory[selectedDate]?.[tipo] || 0;
-    
-    // 4. Calcula o novo valor (não deixa ser menor que zero)
-    let novoValor = valorAtual + delta;
-    if (novoValor < 0) novoValor = 0;
-
-    // 5. Salva no Google (Firebase) usando a data selecionada como chave
-    const hRef = doc(db, "historico", selectedDate);
-    try {
-        await setDoc(hRef, { [tipo]: novoValor }, { merge: true });
-    } catch (e) {
-        console.error("Erro ao salvar contagem:", e);
-        alert("Falha na conexão. O dado não foi salvo.");
-    }
-};
-
         window.togglePresence = async (memberId, memberName) => {
-    if (!currentUser || currentUser.role !== 'admin' || !selectedDate) return;
+            if (currentUser.role !== 'admin' || !selectedDate) return;
+            const batch = writeBatch(db);
+            const hRef = doc(db, "historico", selectedDate);
+            const mRef = doc(db, "membros", memberId);
+            const data = attendanceHistory[selectedDate] || {};
+            const presents = data.presents || []; const online = data.online_ids || [];
 
-    const batch = writeBatch(db);
-    const histRef = doc(db, "historico", selectedDate);
-    const membRef = doc(db, "membros", memberId);
-
-    const dataHoje = attendanceHistory[selectedDate] || {};
-    const presents = dataHoje.presents || [];
-    const online = dataHoje.online_ids || [];
-
-    try {
-        if (!presents.includes(memberId)) {
-            // ESTADO 0 -> 1: Físico (Adiciona em ambos)
-            batch.set(histRef, { presents: arrayUnion(memberId) }, { merge: true });
-            batch.update(membRef, { 
-                attendanceLog: arrayUnion(selectedDate),
-                lastAttended: selectedDate 
-            });
-        } 
-        else if (!online.includes(memberId)) {
-            // ESTADO 1 -> 2: Online (Apenas histórico do dia muda o status)
-            batch.set(histRef, { online_ids: arrayUnion(memberId) }, { merge: true });
-        } 
-        else {
-            // ESTADO 2 -> 0: Ausente (Remove de ambos por segurança de integridade)
-            if (!confirm(`Remover presença de ${memberName}?`)) return;
-            batch.set(histRef, { 
-                presents: arrayRemove(memberId), 
-                online_ids: arrayRemove(memberId) 
-            }, { merge: true });
-            batch.update(membRef, { 
-                attendanceLog: arrayRemove(selectedDate) 
-            });
-        }
-
-        await batch.commit();
-    } catch (error) {
-        console.error("Erro na transação atômica:", error);
-        alert("Erro crítico de sincronização. Tente novamente.");
-    }
-};
-
-        window.openJustify = (id, name) => {
-            memberIdJustifying = id; document.getElementById('justify-member-name').innerText = name;
-            document.getElementById('justify-text').value = attendanceHistory[selectedDate]?.justifications?.[id] || '';
-            document.getElementById('justificationModal').classList.remove('hidden');
+            if (!presents.includes(memberId)) {
+                batch.set(hRef, { presents: arrayUnion(memberId) }, { merge: true });
+                batch.update(mRef, { attendanceLog: arrayUnion(selectedDate), lastAttended: selectedDate });
+            } else if (!online.includes(memberId)) {
+                batch.set(hRef, { online_ids: arrayUnion(memberId) }, { merge: true });
+            } else {
+                if(!confirm(`Remover presença de ${memberName}?`)) return;
+                batch.set(hRef, { presents: arrayRemove(memberId), online_ids: arrayRemove(memberId) }, { merge: true });
+                batch.update(mRef, { attendanceLog: arrayRemove(selectedDate) });
+            }
+            await batch.commit();
         };
-        window.closeJustify = () => document.getElementById('justificationModal').classList.add('hidden');
-        window.saveJustification = async () => {
-            const text = document.getElementById('justify-text').value.trim();
-            let justifications = attendanceHistory[selectedDate]?.justifications || {};
-            if(text === "") delete justifications[memberIdJustifying]; else justifications[memberIdJustifying] = text;
-            await setDoc(doc(db, "historico", selectedDate), { justifications }, { merge: true });
-            closeJustify();
-        };
-
-        function renderAll() { renderAttendance(); renderRescue(); renderReports(); updateCharts(); }
 
         window.renderAttendance = () => {
-    const list = document.getElementById('memberList');
-    if (!list) return;
-    const search = document.getElementById('searchMember').value.toLowerCase();
-    
-    // Gerencia visibilidade do botão de limpar busca
-    const btnClear = document.getElementById('btnClearSearch');
-    if (btnClear) {
-        search.length > 0 ? btnClear.classList.remove('hidden') : btnClear.classList.add('hidden');
-    }
+            const list = document.getElementById('memberList'); if(!list) return;
+            const search = document.getElementById('searchMember').value.toLowerCase();
+            const btnClr = document.getElementById('btnClearSearch'); if(btnClr) search.length > 0 ? btnClr.classList.remove('hidden') : btnClr.classList.add('hidden');
 
-    // Puxa dados do histórico para a data selecionada
-    const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], justifications: {}, lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
-    const curP = data.presents || []; 
-    const onlP = data.online_ids || []; 
-    const notes = data.justifications || {};
+            const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
+            const curP = data.presents || []; const curO = data.online_ids || [];
+            list.innerHTML = ''; let mFis = 0; let mOnl = 0; let vFis = 0; let vOnl = 0; let totM = 0; let lastFam = "";
 
-    let htmlBuffer = ''; // Otimização de Performance: Buffer de string
-    let mFis = 0, mOnl = 0, vFis = 0, vOnl = 0, totAla = 0, lastFamily = "";
-
-    // Atualiza visores numéricos manuais
-    document.getElementById('display-lideres').innerText = data.lideresCount || 0;
-    document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
-    document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
-
-    // Ordenação alfabética por Família > Nome
-    const sorted = [...members].sort((a, b) => {
-        const famA = (a.familia || "Z-SEM").toUpperCase(); 
-        const famB = (b.familia || "Z-SEM").toUpperCase();
-        return famA === famB ? a.name.localeCompare(b.name) : famA.localeCompare(famB);
-    });
-
-    sorted.forEach(m => {
-        const isP = curP.includes(m.id); 
-        const isOn = onlP.includes(m.id); 
-        const note = notes[m.id] || "";
-        const realCat = getRealCategory(m); // Regra dos 12 meses
-        const isVist = (realCat === 'Visitante');
-
-        // Lógica de Contagem para Dashboard
-        if (!isVist) { 
-            totAla++; 
-            if (isP) isOn ? mOnl++ : mFis++; 
-        } else {
-            if (isP) isOn ? vOnl++ : vFis++;
-        }
-
-        // Filtros de busca e organização
-        if ((m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) && (currentFilter === 'TODOS' || m.org === currentFilter)) {
+            const visorL = document.getElementById('display-lideres'); const visorV = document.getElementById('display-visitantes'); const visorM = document.getElementById('display-missionarios');
+            if(visorL) visorL.innerText = data.lideresCount || 0; if(visorV) visorV.innerText = data.visitantesCount || 0; if(visorM) visorM.innerText = data.missionariosCount || 0;
             
-            // Inserção de divisor de família
-            if (m.familia !== lastFamily && !search) { 
-                htmlBuffer += `<div class="family-divider">Família ${m.familia}</div>`; 
-                lastFamily = m.familia; 
-            }
+            const lastDom = Object.keys(attendanceHistory).sort().reverse().slice(0, 4);
+            const sorted = [...members].sort((a, b) => {
+                if (orderByFrequency) {
+                    let sA = 0; let sB = 0;
+                    lastDom.forEach(d => { if (attendanceHistory[d]?.presents?.includes(a.id)) sA++; if (attendanceHistory[d]?.presents?.includes(b.id)) sB++; });
+                    if(sB !== sA) return sB - sA;
+                }
+                const fA = (a.familia || "Z-SEM").toUpperCase(); const fB = (b.familia || "Z-SEM").toUpperCase();
+                return fA === fB ? a.name.localeCompare(b.name) : fA.localeCompare(fB);
+            });
 
-            // Construção do Card com Correção de UI para nomes longos
-            htmlBuffer += `
-                <div class="glass-card p-5 flex items-center justify-between border-l-8 ${isP ? (isOn ? 'card-online' : 'card-presente') : 'card-ausente'} transition-all">
-                    
-                    <!-- Área de Clique (Info do Membro) -->
-                    <div onclick="togglePresence('${m.id}', '${m.name}')" class="flex-1 flex items-start gap-4 cursor-pointer min-w-0">
-                        <!-- Checkbox: flex-shrink-0 impede que o quadrado suma -->
-                        <div class="check-box mt-1 flex-shrink-0 ${isP ? (isOn ? 'check-online' : 'check-active') : ''}">
-                            <i class="fas ${isOn ? 'fa-wifi' : 'fa-check'} text-[10px] ${isP ? '' : 'hidden'}"></i>
-                        </div>
-                        
-                        <!-- Conteúdo de Texto: min-w-0 permite que os filhos respeitem o container flex -->
-                        <div class="min-w-0">
-                            <h4 class="font-bold text-sm ${isP ? (isOn ? 'text-blue-900' : 'text-teal-900') : 'text-slate-800'} break-words whitespace-normal leading-tight">
-                                ${m.name}
-                            </h4>
-                            <p class="text-[9px] font-black uppercase text-slate-400 mt-1 tracking-wider">${m.org} • ${realCat}</p>
-                            
-                            <!-- Exibição de Justificativa -->
-                            ${note ? `<div class="justificativa-tag italic"><i class="fas fa-comment-dots mr-1"></i>${note}</div>` : ''}
-                        </div>
-                    </div>
+            let buffer = '';
+            sorted.forEach(m => {
+                const isP = curP.includes(m.id); const isOn = curO.includes(m.id);
+                const rCat = getRealCategory(m); if(rCat !== 'Visitante') { totM++; if(isP) isOn ? mOnl++ : mFis++; } else { if(isP) isOn ? vOnl++ : vFis++; }
 
-                    <!-- Botão de Justificativa: flex-shrink-0 garante que o ícone nunca suma -->
-                    ${!isP && currentUser.role === 'admin' ? `
-                        <button onclick="openJustify('${m.id}', '${m.name}')" class="text-slate-300 hover:text-blue-900 p-2 ml-2 flex-shrink-0 transition-colors">
-                            <i class="fas fa-sticky-note text-sm"></i>
-                        </button>
-                    ` : ''}
-                </div>`;
-        }
-    });
-
-    // Injeção Atômica no DOM (Alta Performance)
-    list.innerHTML = htmlBuffer;
-
-    // Atualização de Totais e Detalhamento no Dashboard
-    const lC = data.lideresCount || 0; 
-    const viC = data.visitantesCount || 0; 
-    const msC = data.missionariosCount || 0;
-    const somaPresentes = mFis + mOnl + vFis + vOnl + lC + viC + msC;
-
-    document.getElementById('stats-present').innerText = somaPresentes;
-    document.getElementById('stats-total').innerText = totAla;
-
-    let det = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1">`;
-    det += `<p class="text-green-600 flex justify-between"><span>✓ Membros Ala: ${mFis + mOnl}</span> ${mOnl > 0 ? `<span class="opacity-60 font-normal">(${mFis} F/ ${mOnl} O)</span>`:''}</p>`;
-    if(vFis + vOnl > 0) det += `<p class="text-teal-600 flex justify-between"><span>👤 Visitantes Locais: ${vFis + vOnl}</span> ${vOnl > 0 ? `<span class="opacity-60 font-normal">(${vFis} F/ ${vOnl} O)</span>`:''}</p>`;
-    if(msC > 0) det += `<p class="text-indigo-600 flex justify-between">👔 Missionários: ${msC}</p>`;
-    if(lC > 0) det += `<p class="text-amber-600 flex justify-between">★ Líderes Estaca: ${lC}</p>`;
-    if(viC > 0) det += `<p class="text-blue-500 flex justify-between">🚶 Visitantes Fora: ${viC}</p>`;
-    
-    const card = document.getElementById('stats-present').parentElement;
-    const old = card.querySelector('.detalhes-area'); if(old) old.remove();
-    card.insertAdjacentHTML('beforeend', det + `</div>`);
-
-    // Sincroniza estado de botões administrativos
-    document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
-};
-        
-        window.renderMembersList = () => {
-            const container = document.getElementById('manageMembersContainer'); container.innerHTML = '';
-            members.forEach(m => {
-                const search = document.getElementById('searchManageMembers').value.toLowerCase();
-                const orgFilter = document.getElementById('filterOrgList').value;
-                if((m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) && (orgFilter === 'TODOS' || m.org === orgFilter)) {
-                    container.innerHTML += `<div class="glass-card p-6 flex justify-between items-center border-l-8 border-slate-200"><div><h4 class="font-bold text-sm">${m.name}</h4><p class="text-[9px] font-black uppercase text-slate-400">${m.org} • ${getRealCategory(m)}</p><p class="text-[9px] font-bold text-blue-900 uppercase">Família ${m.familia}</p></div>${currentUser.role === 'admin' ? `<button onclick="openMemberEdit('${m.id}')" class="w-10 h-10 bg-slate-50 text-slate-300 rounded-xl flex items-center justify-center border hover:bg-blue-900 hover:text-white transition-all"><i class="fas fa-pen-to-square text-xs"></i></button>` : ''}</div>`;
+                if((m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) && (currentFilter === 'TODOS' || m.org === currentFilter)) {
+                    if (!orderByFrequency && m.familia !== lastFam && !search) { buffer += `<div class="family-divider">Família ${m.familia}</div>`; lastFam = m.familia; }
+                    let star = 0; if(orderByFrequency) lastDom.forEach(d => { if (attendanceHistory[d]?.presents?.includes(m.id)) star++; });
+                    buffer += `<div class="glass-card p-5 flex items-center gap-4 border-l-8 ${isP ? (isOn ? 'card-online' : 'card-presente') : 'card-ausente'}"><div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name.replace(/'/g, "\\'")}')"` : ''} class="flex-1 flex items-start gap-4 cursor-pointer min-w-0"><div class="check-box mt-1 flex-shrink-0 ${isP ? (isOn ? 'check-online' : 'check-active') : ''}">${isP ? `<i class="fas ${isOn ? 'fa-wifi' : 'fa-check'} text-[10px]"></i>` : ''}</div><div class="flex-1 text-left min-w-0"><h4 class="font-bold text-sm ${isP ? (isOn ? 'text-blue-900' : 'text-teal-900') : 'text-slate-800'} break-words leading-tight uppercase italic">${m.name}${star > 0 ? ` <span class="text-amber-500 opacity-40 ml-1 text-[10px]">★${star}</span>`:''}</h4><p class="text-[9px] font-black uppercase text-slate-400 mt-1">${m.org} • ${rCat}</p></div></div>${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="text-slate-300 p-2"><i class="fas fa-sticky-note text-sm"></i></button>` : ''}</div>`;
                 }
             });
+            list.innerHTML = buffer;
+            document.getElementById('stats-present').innerText = mFis + mOnl + vFis + vOnl + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
+            document.getElementById('stats-total').innerText = totM;
+            const card = document.getElementById('stats-present').parentElement; let old = card.querySelector('.detalhes-area'); if(old) old.remove();
+            let dHtml = `<div class="detalhes-area mt-2 pt-2 border-t text-left text-[11px] font-bold text-slate-500 space-y-1"><p class="text-green-600 flex justify-between"><span>Ala: ${mFis+mOnl}</span>${mOnl > 0 ? `<span class="opacity-50">${mFis} F/ ${mOnl} O</span>`:''}</p>`;
+            if(vFis+vOnl>0) dHtml += `<p class="text-teal-600 flex justify-between"><span>Vis Local: ${vFis+vOnl}</span>${vOnl > 0 ? `<span class="opacity-50">${vFis} F/ ${vOnl} O</span>`:''}</p>`;
+            if(data.missionariosCount>0) dHtml += `<p class="text-indigo-600">👔 Missionários: ${data.missionariosCount}</p>`;
+            if(data.lideresCount>0) dHtml += `<p class="text-amber-600">★ Líderes: ${data.lideresCount}</p>`;
+            if(data.visitantesCount>0) dHtml += `<p class="text-blue-500">🚶 Vist. Fora: ${data.visitantesCount}</p>`;
+            card.insertAdjacentHTML('beforeend', dHtml + `</div>`);
+            document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
         };
 
+        // RENDER ADMIN
         window.renderAdminUsers = () => {
             const l = document.getElementById('users-list'); if(!l) return; l.innerHTML = '';
-            allUsersList.forEach(u => {
-                l.innerHTML += `<div class="bg-white p-5 rounded-3xl flex justify-between items-center text-xs border shadow-sm text-left"><div><p class="font-black uppercase text-[#002e5d]">${u.name}</p><p class="opacity-40 font-bold uppercase text-[9px] tracking-wider">${u.username} • ${u.role}</p></div><div class="flex items-center gap-2"><button onclick="openEditUser({id:'${u.id}', name:'${u.name}', role:'${u.role}'})" class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-[#002e5d] hover:text-white transition-all"><i class="fas fa-cog text-xs"></i></button><div class="w-2 h-2 rounded-full ${u.password?'bg-green-400':'bg-yellow-400'}"></div></div></div>`;
+            allUsersList.forEach(u => { l.innerHTML += `<div class="bg-white p-5 rounded-3xl flex justify-between items-center text-xs border"><div><p class="font-black uppercase text-[#002e5d]">${u.name}</p><p class="opacity-40 uppercase text-[9px] font-bold">${u.username}</p></div><button onclick="openEditUser({id:'${u.id}', name:'${u.name}', role:'${u.role}'})" class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center"><i class="fas fa-cog text-slate-400"></i></button></div>`; });
+        };
+        window.renderMembersList = () => {
+            const container = document.getElementById('manageMembersContainer'); if(!container) return; container.innerHTML = '';
+            members.forEach(m => {
+                container.innerHTML += `<div class="glass-card p-6 flex justify-between items-center border-l-8 border-slate-100 shadow-sm"><div class="text-left"><h4 class="font-black text-sm uppercase">${m.name}</h4><p class="text-[9px] font-black uppercase text-slate-400">${m.org} • ${getRealCategory(m)}</p></div>${currentUser.role === 'admin' ? `<button onclick="openMemberEdit('${m.id}')" class="w-10 h-10 bg-slate-50 text-slate-300 rounded-xl flex items-center justify-center hover:bg-[#002e5d] hover:text-white transition-all"><i class="fas fa-pen-to-square"></i></button>` : ''}</div>`;
             });
         };
 
-        window.toggleOptions = () => document.getElementById('attendance-options').classList.toggle('hidden');
-        // Função para limpar a busca
-window.clearSearch = () => {
-    const input = document.getElementById('searchMember');
-    input.value = ''; // Limpa o texto
-    renderAttendance(); // Redesenha a lista completa
-    input.focus(); // Deixa o cursor pronto para digitar de novo se necessário
-};
-        window.formatNameInput = (el) => el.value = el.value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        // OTHER FUNCTIONS
+        window.clearSearch = () => { document.getElementById('searchMember').value = ''; renderAttendance(); };
+        window.formatNameInput = (el) => { el.value = el.value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' '); };
         window.formatPhone = (el) => { let v = el.value.replace(/\D/g,''); v = v.replace(/^(\d{2})(\d)/g,"($1) $2"); v = v.replace(/(\d)(\d{4})$/,"$1-$2"); el.value = v; };
-        window.handleFamilySearch = (query) => {
-    const sug = document.getElementById('familySuggestions');
-    const headBox = document.getElementById('headOfFamilyContainer');
-    
-    // Limpeza inicial: menos de 2 caracteres esconde a lista e mostra o checkbox de chefe
-    if (query.length < 2) {
-        sug.classList.add('hidden');
-        if(headBox) headBox.classList.remove('hidden');
-        return;
-    }
-
-    const queryUpper = query.trim().toUpperCase();
-    
-    // Filtra no banco apenas membros que são chefes de família (isHead: true)
-    const existingHeads = members.filter(m => 
-        m.isHead && m.familia.toLowerCase().includes(query.toLowerCase())
-    );
-
-    sug.classList.remove('hidden');
-
-    // ITEM 1: Opção de "Nova Família" baseada no que o usuário está digitando
-    let html = `
-        <div onclick="selectFamily('${queryUpper.replace(/'/g, "\\'")}', true)" class="p-4 bg-blue-50 hover:bg-blue-100 border-b border-blue-200 cursor-pointer transition-colors group">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1">
-                        <i class="fas fa-plus-circle mr-1"></i> Criar Nova
-                    </p>
-                    <p class="text-sm font-black text-slate-800 uppercase tracking-tight">Família ${queryUpper}</p>
-                </div>
-                <i class="fas fa-chevron-right text-blue-300 group-hover:translate-x-1 transition-transform"></i>
-            </div>
-        </div>
-    `;
-
-    // ITEM 2: Lista de famílias que já existem no banco
-    if (existingHeads.length > 0) {
-        html += existingHeads.map(h => `
-            <div onclick="selectFamily('${h.familia}', false)" class="p-4 hover:bg-slate-50 border-b border-slate-100 cursor-pointer transition-colors group">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Família Existente</p>
-                        <p class="text-sm font-bold text-slate-700 uppercase tracking-tight">${h.familia}</p>
-                        <p class="text-[9px] text-slate-400 font-medium uppercase italic">Chefe: ${h.name}</p>
-                    </div>
-                    <i class="fas fa-arrow-turn-down -rotate-90 text-slate-200 group-hover:text-[#002e5d] transition-colors"></i>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    sug.innerHTML = html;
-};
-        window.selectFamily = (family, isNew) => {
-    const input = document.getElementById('familySearch');
-    const sug = document.getElementById('familySuggestions');
-    const headBox = document.getElementById('headOfFamilyContainer');
-    const checkbox = document.getElementById('isHeadOfFamily');
-
-    input.value = family;
-    sug.classList.add('hidden');
-
-    if (isNew) {
-        // Se for nova, mostra o checkbox e sugere marcar como chefe
-        headBox.classList.remove('hidden');
-        checkbox.checked = true;
-    } else {
-        // Se selecionou uma existente, esconde o checkbox e desmarca
-        headBox.classList.add('hidden');
-        checkbox.checked = false;
-    }
-};
-        
-        window.saveNewMember = async () => {
-            const n = document.getElementById('newName').value; const f = document.getElementById('familySearch').value;
-            if(!n || !f) return alert("Nome e Família.");
+        window.handleFamilySearch = (q) => { 
+            const sug = document.getElementById('familySuggestions'); const box = document.getElementById('headOfFamilyContainer'); if(q.length<2) { sug.classList.add('hidden'); box.classList.remove('hidden'); return; }
+            sug.classList.remove('hidden'); const heads = members.filter(m => m.isHead && m.familia.toLowerCase().includes(q.toLowerCase()));
+            let h = `<div onclick="selectFamily('${q.trim().toUpperCase()}', true)" class="p-4 bg-blue-50 cursor-pointer font-bold text-xs uppercase">+ Nova Família ${q}</div>`;
+            if(heads.length > 0) h += heads.map(m => `<div onclick="selectFamily('${m.familia}', false)" class="p-4 border-t hover:bg-slate-50 cursor-pointer font-bold text-xs uppercase">${m.familia}</div>`).join('');
+            sug.innerHTML = h;
+        };
+        window.selectFamily = (f, isNew) => { document.getElementById('familySearch').value = f; document.getElementById('familySuggestions').classList.add('hidden'); document.getElementById('headOfFamilyContainer').classList.toggle('hidden', !isNew); document.getElementById('isHeadOfFamily').checked = isNew; };
+        window.saveNewMember = async () => { 
+            const n = document.getElementById('newName').value; const f = document.getElementById('familySearch').value.toUpperCase(); if(!n || !f) return showToast("Preencha Nome e Família", "error");
             await addDoc(collection(db, "membros"), { name: n, familia: f, org: document.getElementById('newOrg').value, categoria: document.getElementById('newCat').value, telefone: document.getElementById('newPhone').value || '', isHead: document.getElementById('isHeadOfFamily').checked, lastAttended: "2024-01-01", dataBatismo: document.getElementById('newBaptismDate').value });
-            alert("Cadastrado!"); document.getElementById('newName').value = ''; document.getElementById('familySearch').value = '';
+            showToast("Membro cadastrado!", "success"); document.getElementById('newName').value = ''; document.getElementById('familySearch').value = ''; document.getElementById('newPhone').value = ''; document.getElementById('isHeadOfFamily').checked = false;
         };
-
-        window.openMemberEdit = (id) => {
-            const m = members.find(x => x.id === id); memberIdEditing = id;
-            document.getElementById('edit-member-name').value = m.name; document.getElementById('edit-member-family').value = m.familia;
-            document.getElementById('edit-member-org').value = m.org; document.getElementById('edit-member-cat').value = m.categoria;
-            document.getElementById('edit-member-phone').value = m.telefone || ''; document.getElementById('edit-member-isHead').checked = m.isHead || false;
-            document.getElementById('edit-member-baptismDate').value = m.dataBatismo || '';
-            toggleBaptismDate(m.categoria, 'editBaptismDateContainer');
-            document.getElementById('memberEditModal').classList.remove('hidden');
-        };
+        window.toggleOptions = () => document.getElementById('attendance-options').classList.toggle('hidden');
+        window.openMemberEdit = (id) => { const m = members.find(x => x.id === id); memberIdEditing = id; document.getElementById('edit-member-name').value = m.name; document.getElementById('edit-member-family').value = m.familia; document.getElementById('edit-member-org').value = m.org; document.getElementById('edit-member-cat').value = m.categoria || 'Membro'; document.getElementById('edit-member-phone').value = m.telefone || ''; document.getElementById('edit-member-isHead').checked = m.isHead || false; document.getElementById('edit-member-baptismDate').value = m.dataBatismo || ''; window.toggleBaptismDate(m.categoria, 'editBaptismDateContainer'); document.getElementById('memberEditModal').classList.remove('hidden'); };
         window.closeMemberEdit = () => document.getElementById('memberEditModal').classList.add('hidden');
-        window.saveMemberAction = async () => {
-            await updateDoc(doc(db, "membros", memberIdEditing), { name: document.getElementById('edit-member-name').value, familia: document.getElementById('edit-member-family').value, org: document.getElementById('edit-member-org').value, categoria: document.getElementById('edit-member-cat').value, telefone: document.getElementById('edit-member-phone').value, isHead: document.getElementById('edit-member-isHead').checked, dataBatismo: document.getElementById('edit-member-baptismDate').value });
-            closeMemberEdit();
-        };
-        window.deleteMemberAction = async () => { if(confirm("Excluir?")) { await deleteDoc(doc(db, "membros", memberIdEditing)); closeMemberEdit(); } };
+        window.saveMemberAction = async () => { await updateDoc(doc(db, "membros", memberIdEditing), { name: document.getElementById('edit-member-name').value, familia: document.getElementById('edit-member-family').value.toUpperCase(), org: document.getElementById('edit-member-org').value, categoria: document.getElementById('edit-member-cat').value, telefone: document.getElementById('edit-member-phone').value, isHead: document.getElementById('edit-member-isHead').checked, dataBatismo: document.getElementById('edit-member-baptismDate').value }); showToast("Alterado!", "success"); closeMemberEdit(); };
+        window.deleteMemberAction = async () => { if(confirm("Excluir?")) { await deleteDoc(doc(db, "membros", memberIdEditing)); showToast("Excluído!", "success"); closeMemberEdit(); } };
+        window.adminCreateUser = async () => { const n = document.getElementById('admin-new-name').value; const u = document.getElementById('admin-new-user').value.toLowerCase().trim(); const r = document.getElementById('admin-new-role').value; if(!n || !u) return showToast("Preencha!", "error"); await addDoc(collection(db, "usuarios"), { name: n, username: u, password: "", role: r }); showToast("Login autorizado!", "success"); document.getElementById('admin-new-name').value = ''; document.getElementById('admin-new-user').value = ''; };
+        window.openEditUser = (u) => { userIdEditing = u.id; document.getElementById('edit-user-name').value = u.name; document.getElementById('edit-user-role').value = u.role; document.getElementById('edit-user-pass').value = ''; document.getElementById('userEditModal').classList.remove('hidden'); };
+        window.saveUserUpdate = async () => { const n = document.getElementById('edit-user-name').value; const r = document.getElementById('edit-user-role').value; const p = document.getElementById('edit-user-pass').value; const u = { name: n, role: r }; if(p) u.password = p; await updateDoc(doc(db, "usuarios", userIdEditing), u); showToast("Atualizado!", "success"); document.getElementById('userEditModal').classList.add('hidden'); };
+        window.deleteUserAction = async () => { if(confirm("Remover login?")) { await deleteDoc(doc(db, "usuarios", userIdEditing)); showToast("Removido!", "info"); document.getElementById('userEditModal').classList.add('hidden'); } };
+        window.openJustify = (id, name) => { memberIdJustifying = id; document.getElementById('justify-member-name').innerText = "Justificar: " + name; document.getElementById('justify-text').value = attendanceHistory[selectedDate]?.justifications?.[id] || ''; document.getElementById('justificationModal').classList.remove('hidden'); };
+        window.closeJustify = () => document.getElementById('justificationModal').classList.add('hidden');
+        window.saveJustification = async () => { const txt = document.getElementById('justify-text').value.trim(); let jst = attendanceHistory[selectedDate]?.justifications || {}; if(txt==="") delete jst[memberIdJustifying]; else jst[memberIdJustifying]=txt; await setDoc(doc(db, "historico", selectedDate), { justifications: jst }, { merge: true }); showToast("Salvo!", "success"); closeJustify(); };
 
-        window.openEditUser = (u) => { userIdEditing = u.id; document.getElementById('edit-user-name').value = u.name; document.getElementById('edit-user-role').value = u.role; document.getElementById('userEditModal').classList.remove('hidden'); };
-        window.saveUserUpdate = async () => { const up = { name: document.getElementById('edit-user-name').value, role: document.getElementById('edit-user-role').value }; if(document.getElementById('edit-user-pass').value) up.password = document.getElementById('edit-user-pass').value; await updateDoc(doc(db, "usuarios", userIdEditing), up); document.getElementById('userEditModal').classList.add('hidden'); };
-        window.deleteUserAction = async () => { if(confirm("Excluir login?")) { await deleteDoc(doc(db, "usuarios", userIdEditing)); document.getElementById('userEditModal').classList.add('hidden'); } };
-
-        window.adminCreateUser = async () => {
-            const n = document.getElementById('admin-new-name').value; const u = document.getElementById('admin-new-user').value.toLowerCase().trim();
-            if(!n || !u) return alert("Preencha!");
-            await addDoc(collection(db, "usuarios"), { name: n, username: u, password: "", role: document.getElementById('admin-new-role').value });
-            alert("Autorizado!");
-        };
-
-        function renderRescue() {
+        // CORE RUNNER
+        function renderRescue() { 
             const list = document.getElementById('missingList'); if(!list) return; list.innerHTML = '';
-            members.forEach(m => {
-                if(getRealCategory(m) === 'Visitante') return;
-                const diff = Math.floor((new Date() - new Date(m.lastAttended)) / (1000*60*60*24));
-                if(diff >= 21) list.innerHTML += `<div class="glass-card p-6 border-t-8 border-orange-500 text-left"><div><p class="text-[9px] font-black text-orange-500 uppercase tracking-widest">${Math.floor(diff/7)} SEMANAS</p><h4 class="font-black text-slate-800 text-sm uppercase">${m.name}</h4></div><a href="https://wa.me/${m.telefone || ''}?text=Olá, sentimos sua falta!" target="_blank" class="block mt-4 bg-teal-600 text-white p-3 rounded-xl text-center font-black text-[10px] uppercase shadow-lg">WhatsApp</a></div>`;
-            });
+            members.forEach(m => { if(getRealCategory(m)!=='Visitante') { const diff = Math.floor((new Date()-new Date(m.lastAttended))/(1000*60*60*24)); if(diff>=21) list.innerHTML += `<div class="glass-card p-6 border-t-8 border-orange-500"><div><p class="text-[9px] font-black text-orange-500 uppercase">${Math.floor(diff/7)} SEMANAS</p><h4 class="font-black text-slate-800 text-xs">${m.name}</h4></div><a href="https://wa.me/${m.telefone || ''}?text=Olá!" target="_blank" class="block mt-4 bg-teal-600 text-white p-3 rounded-xl text-center text-[10px] uppercase font-bold">WhatsApp</a></div>`; } }); 
             if(document.getElementById('stats-rescue')) document.getElementById('stats-rescue').innerText = list.children.length;
-        }
-
-        function renderReports() {
-            const yl = document.getElementById('report-yellow'); const fl = document.getElementById('report-family'); const rl = document.getElementById('report-retention');
-            if(!yl) return; yl.innerHTML = ''; fl.innerHTML = ''; rl.innerHTML = ''; const fams = {};
-            members.forEach(m => {
-                const realCat = getRealCategory(m); if(realCat === 'Visitante') return;
-                let fq = domingosISO.slice(0, 4).filter(d => (attendanceHistory[d]?.presents || []).includes(m.id)).length;
-                if(fq === 1) yl.innerHTML += `<div class="p-3 bg-yellow-50 rounded-xl text-[10px] font-bold text-yellow-700 uppercase text-left">⚠️ ${m.name}</div>`;
-                const f = m.familia || 'S/ FAM'; if(!fams[f]) fams[f] = { t: 0, p: 0 }; fams[f].t++; if((attendanceHistory[selectedDate]?.presents || []).includes(m.id)) fams[f].p++;
-                if(realCat !== 'Membro') {
-                    const isP = (attendanceHistory[selectedDate]?.presents || []).includes(m.id);
-                    rl.innerHTML += `<div class="p-3 rounded-xl border text-[10px] uppercase font-bold flex justify-between text-left ${isP?'bg-green-50 text-green-700':'bg-red-50 text-red-700'}"><span>${m.name} (${realCat})</span> <i class="fas ${isP?'fa-check':'fa-times'}"></i></div>`;
-                }
-            });
-            Object.keys(fams).forEach(f => { if(fams[f].p === 0) fl.innerHTML += `<div class="p-3 bg-blue-50 rounded-xl text-[10px] font-black uppercase text-blue-700 text-left">Família ${f} Ausente</div>`; });
         }
 
         function updateCharts() {
             const ctx1 = document.getElementById('heatmapChart'); if(!ctx1) return;
-            const stats = ['Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária'].map(o => {
-                const tot = members.filter(m => m.org === o).length;
-                const prs = members.filter(m => m.org === o && (attendanceHistory[selectedDate]?.presents || []).includes(m.id)).length;
-                return tot > 0 ? Math.round((prs/tot)*100) : 0;
-            });
-            if(hChart) hChart.destroy();
-            hChart = new Chart(ctx1.getContext('2d'), { type: 'bar', data: { labels: ['ÉLD', 'SOC', 'MOÇ', 'RAP', 'PRI'], datasets: [{ data: stats, backgroundColor: '#002e5d', borderRadius: 8 }] }, options: { indexAxis: 'y', plugins: { legend: false }, scales: { x: { max: 100 } } } });
+            const orgs = ['Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária'];
+            const st = orgs.map(o => { const tot = members.filter(m => m.org === o).length; const prs = members.filter(m => m.org === o && (attendanceHistory[selectedDate]?.presents || []).includes(m.id)).length; return tot>0 ? Math.round((prs/tot)*100) : 0; });
+            if(hChart) hChart.destroy(); hChart = new Chart(ctx1.getContext('2d'), { type: 'bar', data: { labels: ['ÉLD','SOC','MOÇ','RAP','PRI'], datasets: [{ data: st, backgroundColor: '#002e5d', borderRadius: 8 }] }, options: { indexAxis: 'y', plugins: { legend: false }, scales: { x: { max: 100 } } } });
             const ctx2 = document.getElementById('attendanceChart'); if(!ctx2) return;
             const cts = domingosISO.slice(0, 5).reverse().map(d => (attendanceHistory[d]?.presents || []).length);
-            if(aChart) aChart.destroy();
-            aChart = new Chart(ctx2.getContext('2d'), { type: 'line', data: { labels: domingosISO.slice(0, 5).reverse().map(d=>d.split('-')[2]), datasets: [{ data: cts, borderColor: '#002e5d', fill: true, tension: 0.5 }] }, options: { plugins: { legend: false } } });
+            if(aChart) aChart.destroy(); aChart = new Chart(ctx2.getContext('2d'), { type: 'line', data: { labels: domingosISO.slice(0, 5).reverse().map(d=>d.split('-')[2]+'/'+d.split('-')[1]), datasets: [{ data: cts, borderColor: '#002e5d', fill: true, tension: 0.5 }] }, options: { plugins: { legend: false } } });
         }
 
         if(currentUser) {
             document.getElementById('user-name-side').innerText = currentUser.name;
             document.getElementById('user-mobile-name').innerText = currentUser.name;
-            document.getElementById('user-mobile-role').innerText = currentUser.role === 'admin' ? 'Administrador' : 'Secretário';
+            document.getElementById('user-mobile-role').innerText = currentUser.role;
             if(currentUser.role === 'admin') { document.getElementById('admin-btn').classList.remove('hidden'); document.getElementById('admin-mobile-btn').classList.remove('hidden'); }
             const fArea = document.getElementById('orgFilters');
-            ['TODOS', 'Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária'].forEach(o => {
-                const id = o.replace(/\s+/g, '');
-                fArea.innerHTML += `<button onclick="setFilter('${o}')" class="filter-pill ${o=='TODOS' ? 'active' : ''} glass-card px-6 py-3 whitespace-nowrap text-[10px] font-black uppercase tracking-widest border border-slate-100 shadow-sm" id="pill-${id}">${o}</button>`;
-            });
+            ['TODOS', 'Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária'].forEach(o => { const id = o.replace(/\s+/g, ''); fArea.innerHTML += `<button onclick="setFilter('${o}')" class="filter-pill ${o=='TODOS'?'active':''} glass-card px-6 py-2 whitespace-nowrap text-[9px] font-black uppercase tracking-widest border border-slate-100" id="pill-${id}">${o}</button>`; });
             window.setFilter = (f) => { currentFilter = f; document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active', 'bg-[#002e5d]', 'text-white')); const el = document.getElementById('pill-'+f.replace(/\s+/g, '')); if(el) el.classList.add('active', 'bg-[#002e5d]', 'text-white'); renderAttendance(); };
             listenData(); switchTab('dashboard');
-        } else { 
-            switchTab('login');
-            document.getElementById('loading-screen').classList.add('hidden'); 
-        }
+        } else { switchTab('login'); document.getElementById('loading-screen').classList.add('hidden'); }
     </script>
 </body>
 </html>
