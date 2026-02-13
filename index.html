@@ -14,7 +14,7 @@
                 extend: {
                     colors: { sacramental: '#002e5d' },
                     animation: {
-                        'pop-up': 'popUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                        'pop-up': 'popUp 0.25s cubic-bezier(0.19, 1, 0.22, 1) forwards',
                         'fade-in': 'fadeIn 0.2s ease-out forwards'
                     },
                     keyframes: {
@@ -56,8 +56,8 @@
         @media (max-width: 1023px) {
             .sidebar { display: none; }
             .app-layout { display: block; }
+            /* Padding inferior para o menu flutuante não tapar o fim */
             .content-container { padding: 20px; padding-bottom: 160px; overflow-x: hidden; }
-            .sticky-search { position: sticky; top: 0; z-index: 100; padding: 10px 0; }
         }
 
         /* Glass Card */
@@ -165,58 +165,26 @@
            <div id="global-top-bar" class="w-full sticky top-0 z-[140] bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors duration-300">
                 
                 <div class="flex items-center justify-between gap-2 px-4 py-3 h-[60px]">
-                    <h2 id="dynamic-page-title" class="w-[30%] font-black text-[#002e5d] dark:text-white text-xs uppercase leading-tight break-words whitespace-normal">
+                    <h2 id="dynamic-page-title" class="w-[30%] font-black text-[#002e5d] dark:text-white text-sm uppercase leading-tight break-words whitespace-normal">
                         Página Inicial
                     </h2>
 
                     <div id="date-controls-wrapper" class="w-[70%] flex items-center justify-end gap-1 hidden">
                         <button onclick="navigateDate(1)" class="w-9 h-9 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-90 transition-all border border-slate-200 dark:border-slate-700 shadow-sm flex-shrink-0"><i class="fas fa-chevron-left text-xs"></i></button>
+                        
                         <div class="glass-card flex items-center px-2 py-1 gap-2 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-sm flex-1 min-w-0 justify-center h-9">
                             <i class="fas fa-calendar-alt text-[#002e5d] dark:text-blue-400 text-xs"></i>
                             <select id="dateSelectGlobal" class="bg-transparent font-bold text-sm uppercase tracking-tighter outline-none border-none cursor-pointer text-slate-700 dark:text-white w-full dark:bg-slate-900 p-0 text-center"></select>
                         </div>
-                        <button onclick="navigateDate(-1)" class="w-9 h-9 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-90 transition-all border border-slate-200 dark:border-slate-700 shadow-sm flex-shrink-0"><i class="fas fa-chevron-right text-xs"></i></button>
-                    </div>
-                </div>
 
-                <div id="sticky-search-container" class="hidden px-4 pb-3 pt-0">
-                    <div class="flex gap-2">
-                        <div class="relative flex-1 group">
-                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            <input type="text" id="searchMember" oninput="debounceSearch()" placeholder="Buscar membro..." class="w-full pl-10 pr-10 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-[#002e5d] dark:focus:ring-blue-500 dark:text-white shadow-sm transition-all">
-                            <button id="btnClearSearch" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-red-500 p-1"><i class="fas fa-times-circle"></i></button>
-                        </div>
-                        <button id="btnToggleMissing" onclick="toggleMissingOnly()" class="w-12 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-300 shadow-sm flex items-center justify-center active:scale-95 transition-all"><i class="fas fa-eye-slash"></i></button>
-                        <button onclick="toggleOptions()" class="w-12 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[#002e5d] dark:text-blue-400 shadow-sm flex items-center justify-center active:scale-95 transition-all"><i class="fas fa-sliders"></i></button>
-                    </div>
-                    
-                    <div id="attendance-options" class="hidden mt-3 bg-white dark:bg-slate-800 p-4 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-lg">
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Contadores Manuais</span>
-                            <button onclick="toggleOptions()" class="text-slate-300 hover:text-red-500"><i class="fas fa-times"></i></button>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2">
-                            <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
-                                <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300">Líderes</span>
-                                <div class="flex items-center gap-2"><button onclick="updateCount('lideresCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button><span id="display-lideres" class="font-black text-sm text-[#002e5d] dark:text-white">0</span><button onclick="updateCount('lideresCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button></div>
-                            </div>
-                            <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
-                                <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300">Visitantes</span>
-                                <div class="flex items-center gap-2"><button onclick="updateCount('visitantesCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button><span id="display-visitantes" class="font-black text-sm text-[#002e5d] dark:text-white">0</span><button onclick="updateCount('visitantesCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button></div>
-                            </div>
-                            <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
-                                <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300">Missionários</span>
-                                <div class="flex items-center gap-2"><button onclick="updateCount('missionariosCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button><span id="display-missionarios" class="font-black text-sm text-[#002e5d] dark:text-white">0</span><button onclick="updateCount('missionariosCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button></div>
-                            </div>
-                        </div>
-                        <button onclick="toggleFrequencyOrder()" id="btnOrderFreqInner" class="w-full mt-3 py-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase flex items-center justify-center gap-2"><i class="fas fa-sort-amount-down"></i> Ordenar por Frequência</button>
+                        <button onclick="navigateDate(-1)" class="w-9 h-9 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-90 transition-all border border-slate-200 dark:border-slate-700 shadow-sm flex-shrink-0"><i class="fas fa-chevron-right text-xs"></i></button>
                     </div>
                 </div>
             </div>
 
-            <div class="content-container w-full overflow-x-hidden pt-4">
+            <div class="content-container w-full overflow-x-hidden pt-0">
                 
-                <section id="view-dashboard" class="hidden space-y-8">
+                <section id="view-dashboard" class="hidden space-y-8 mt-4">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="glass-card p-8 border-l-[12px] border-green-500">
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Presentes Hoje</p>
@@ -238,10 +206,42 @@
                 </section>
 
                 <section id="view-attendance" class="hidden flex flex-col h-full">
+                    <div class="sticky top-[60px] z-30 bg-slate-50 dark:bg-slate-900 pb-2 pt-2 px-1 transition-colors duration-300 shadow-sm border-b border-slate-100 dark:border-slate-800">
+                        <div class="flex gap-2 mb-1">
+                            <div class="relative flex-1 group">
+                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                <input type="text" id="searchMember" oninput="debounceSearch()" placeholder="Buscar membro..." class="w-full pl-10 pr-10 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-[#002e5d] dark:focus:ring-blue-500 dark:text-white shadow-sm transition-all">
+                                <button id="btnClearSearch" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-red-500 p-1"><i class="fas fa-times-circle"></i></button>
+                            </div>
+                            <button id="btnToggleMissing" onclick="toggleMissingOnly()" class="w-12 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-300 shadow-sm flex items-center justify-center active:scale-95 transition-all"><i class="fas fa-eye-slash"></i></button>
+                            <button onclick="toggleOptions()" class="w-12 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[#002e5d] dark:text-blue-400 shadow-sm flex items-center justify-center active:scale-95 transition-all"><i class="fas fa-sliders"></i></button>
+                        </div>
+                        <div id="attendance-options" class="hidden mt-2 bg-white dark:bg-slate-800 p-4 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-lg">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Contadores Manuais</span>
+                                <button onclick="toggleOptions()" class="text-slate-300 hover:text-red-500"><i class="fas fa-times"></i></button>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
+                                    <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300">Líderes</span>
+                                    <div class="flex items-center gap-2"><button onclick="updateCount('lideresCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button><span id="display-lideres" class="font-black text-sm text-[#002e5d] dark:text-white">0</span><button onclick="updateCount('lideresCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button></div>
+                                </div>
+                                <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
+                                    <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300">Visitantes</span>
+                                    <div class="flex items-center gap-2"><button onclick="updateCount('visitantesCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button><span id="display-visitantes" class="font-black text-sm text-[#002e5d] dark:text-white">0</span><button onclick="updateCount('visitantesCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button></div>
+                                </div>
+                                <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
+                                    <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300">Missionários</span>
+                                    <div class="flex items-center gap-2"><button onclick="updateCount('missionariosCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button><span id="display-missionarios" class="font-black text-sm text-[#002e5d] dark:text-white">0</span><button onclick="updateCount('missionariosCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button></div>
+                                </div>
+                            </div>
+                            <button onclick="toggleFrequencyOrder()" id="btnOrderFreqInner" class="w-full mt-3 py-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase flex items-center justify-center gap-2"><i class="fas fa-sort-amount-down"></i> Ordenar por Frequência</button>
+                        </div>
+                    </div>
                     <div id="memberList" class="flex-1 space-y-3 pb-32 mt-2 min-h-[300px] px-1"></div>
                 </section>
 
-                <section id="view-reports" class="hidden space-y-8">
+                <section id="view-reports" class="hidden space-y-8 mt-4">
                     <div class="glass-card p-8 border-l-[12px] border-slate-800 dark:border-slate-600 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95" onclick="switchTab('members-list')">
                         <div class="flex items-center justify-between text-left">
                             <div><h3 class="font-black text-slate-800 dark:text-white uppercase text-[10px] mb-1">Painel Administrativo</h3><p class="text-xl font-black text-[#002e5d] dark:text-blue-400 italic">Gestão da Unidade e Membros</p><p class="text-[10px] text-slate-400 font-bold uppercase mt-1 italic">Editar cadastros, nomes e chamados</p></div><i class="fas fa-users-viewfinder text-4xl text-slate-200 dark:text-slate-600"></i>
@@ -254,7 +254,7 @@
                     </div>
                 </section>
 
-                <section id="view-add" class="hidden space-y-6">
+                <section id="view-add" class="hidden space-y-6 mt-4">
                     <div class="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-[24px] mb-6 shadow-inner max-w-xl mx-auto">
                         <button onclick="toggleMemberView('form')" id="btn-show-form" class="flex-1 py-4 rounded-[20px] text-[11px] font-black uppercase transition-all bg-white dark:bg-slate-700 shadow-sm text-[#002e5d] dark:text-white">Novo Cadastro</button>
                         <button onclick="toggleMemberView('list')" id="btn-show-list" class="flex-1 py-4 rounded-[20px] text-[11px] font-bold uppercase transition-all text-slate-400">Ver e Editar</button>
@@ -290,7 +290,7 @@
 
                 <section id="view-members-list" class="hidden"><h1 class="font-bold text-xl mb-4">Esta seção agora faz parte de Membros</h1></section>
                 
-                <section id="view-admin-users" class="hidden space-y-10 text-left">
+                <section id="view-admin-users" class="hidden space-y-10 text-left mt-4">
                     <div class="glass-card p-10 max-w-lg mx-auto shadow-2xl space-y-8">
                         <h4 class="font-black text-center uppercase tracking-widest text-[#002e5d] dark:text-blue-400">Novo Login de Acesso</h4>
                         <div class="space-y-4">
@@ -302,7 +302,7 @@
                     </div>
                     <div id="users-list" class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto"></div>
                 </section>
-                <section id="view-analysis" class="hidden"><div id="missingList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div></section>
+                <section id="view-analysis" class="hidden mt-4"><div id="missingList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div></section>
             </div>
 
             <div id="justificationModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
@@ -317,28 +317,28 @@
                 </div>
             </div>
 
-            <div id="more-menu-overlay" onclick="toggleMoreMenu()" class="hidden fixed inset-0 bg-black/30 z-[190] backdrop-blur-sm transition-opacity"></div>
+            <div id="more-menu-overlay" onclick="toggleMoreMenu()" class="hidden fixed inset-0 bg-black/40 z-[190] backdrop-blur-sm transition-opacity"></div>
             
             <div id="more-menu-content" class="hidden fixed bottom-28 left-1/2 -translate-x-1/2 w-[85%] max-w-sm liquid-glass p-6 z-[195] rounded-3xl animate-pop-up origin-bottom">
                 <h3 class="text-xs font-black uppercase text-slate-500 dark:text-slate-300 tracking-widest mb-4 text-center">Mais Opções</h3>
                 <div class="grid grid-cols-3 gap-4">
-                    <button onclick="switchTab('analysis')" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
+                    <button onclick="switchTab('analysis'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
                         <div class="w-12 h-12 rounded-2xl bg-orange-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-heart-pulse text-lg"></i></div>
                         <span class="text-[10px] font-bold text-slate-700 dark:text-white">Resgate</span>
                     </button>
-                    <button onclick="switchTab('reports')" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
+                    <button onclick="switchTab('reports'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
                         <div class="w-12 h-12 rounded-2xl bg-blue-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-file-invoice text-lg"></i></div>
                         <span class="text-[10px] font-bold text-slate-700 dark:text-white">Relatórios</span>
                     </button>
-                    <button onclick="switchTab('add')" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
+                    <button onclick="switchTab('add'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
                         <div class="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-users text-lg"></i></div>
                         <span class="text-[10px] font-bold text-slate-700 dark:text-white">Membros</span>
                     </button>
-                    <button onclick="switchTab('admin-users')" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
+                    <button onclick="switchTab('admin-users'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
                         <div class="w-12 h-12 rounded-2xl bg-slate-800 text-white flex items-center justify-center shadow-lg"><i class="fas fa-users-cog text-lg"></i></div>
                         <span class="text-[10px] font-bold text-slate-700 dark:text-white">Admin</span>
                     </button>
-                    <button onclick="toggleTheme()" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
+                    <button onclick="toggleTheme(); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
                         <div class="w-12 h-12 rounded-2xl bg-yellow-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-adjust text-lg"></i></div>
                         <span class="text-[10px] font-bold text-slate-700 dark:text-white">Tema</span>
                     </button>
@@ -460,7 +460,7 @@
                 document.getElementById('nav-more').classList.remove('nav-btn-active'); // Force inactive state
             }
 
-            document.querySelectorAll('#nav-dashboard, #nav-attendance, #nav-more').forEach(b => b.classList.remove('nav-btn-active', 'scale-110'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-btn-active'));
             
             const titles = {
                 'dashboard': 'Página Inicial',
@@ -486,15 +486,15 @@
                 titleEl.classList.add('w-full');
             }
 
-            if(tab === 'dashboard') document.getElementById('nav-dashboard').classList.add('nav-btn-active', 'scale-110');
-            if(tab === 'attendance') document.getElementById('nav-attendance').classList.add('nav-btn-active', 'scale-110');
+            if(tab === 'dashboard') document.getElementById('nav-dashboard').classList.add('nav-btn-active');
+            if(tab === 'attendance') document.getElementById('nav-attendance').classList.add('nav-btn-active');
 
             if(tab === 'members-list') renderMembersList();
             if(tab === 'reports' || tab === 'dashboard') renderAll();
             window.scrollTo(0,0);
         };
 
-        window.toggleMobileMenu = () => { }; 
+        window.toggleMobileMenu = () => { }; // Deprecated
 
         window.toggleMoreMenu = () => {
             const overlay = document.getElementById('more-menu-overlay');
@@ -504,23 +504,23 @@
             if(menu.classList.contains('hidden')) {
                 menu.classList.remove('hidden');
                 overlay.classList.remove('hidden');
-                btn.classList.add('nav-btn-active', 'scale-110');
+                btn.classList.add('nav-btn-active');
             } else {
                 menu.classList.add('hidden');
                 overlay.classList.add('hidden');
-                btn.classList.remove('nav-btn-active', 'scale-110');
+                btn.classList.remove('nav-btn-active');
             }
         };
 
-        // AUTH & SYNC (Standard)
-        window.checkLogin = async () => { /* ... existing logic ... */ 
+        // AUTH
+        window.checkLogin = async () => {
             const u = document.getElementById('login-user').value.toLowerCase().trim();
             const p = document.getElementById('login-pass').value.trim();
             const snap = await getDocs(query(collection(db, "usuarios"), where("username", "==", u), where("password", "==", p)));
             if (!snap.empty) { localStorage.setItem('user_data', JSON.stringify({id: snap.docs[0].id, ...snap.docs[0].data()})); location.reload(); } 
             else showToast("Usuário ou senha incorretos", "error");
         };
-        window.processFirstLogin = async () => { /* ... existing logic ... */ 
+        window.processFirstLogin = async () => {
             const u = document.getElementById('first-user').value.toLowerCase().trim();
             const p1 = document.getElementById('first-pass').value.trim();
             const p2 = document.getElementById('first-pass-confirm').value.trim();
@@ -532,6 +532,7 @@
         };
         window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
 
+        // SYNC
         function listenData() {
             onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => {
                 members = snap.docs.map(d => ({id: d.id, ...d.data()})); 
@@ -548,8 +549,9 @@
             document.getElementById('loading-screen').classList.add('hidden');
         }
 
+        // LOGIC
         window.togglePresence = async (memberId, memberName) => {
-             if (currentUser.role !== 'admin' || !selectedDate) return;
+            if (currentUser.role !== 'admin' || !selectedDate) return;
             const batch = writeBatch(db);
             const hRef = doc(db, "historico", selectedDate);
             const mRef = doc(db, "membros", memberId);
@@ -573,8 +575,9 @@
         };
 
         window.getRealCategory = (m) => m.categoria || 'Membro';
-        
-        window.markFamilyPresent = async (familyName) => { /* ... existing logic ... */
+
+        // NEW RENDER LOGIC
+        window.markFamilyPresent = async (familyName) => {
             if(!confirm(`Marcar PRESENÇA para toda a Família ${familyName}?`)) return;
             if (currentUser.role !== 'admin' || !selectedDate) return;
             const familyMembers = members.filter(m => m.familia === familyName);
@@ -591,7 +594,7 @@
             catch (error) { console.error(error); showToast("Erro ao marcar família", "error"); }
         };
 
-        window.toggleMissingOnly = () => { /* ... existing logic ... */ 
+        window.toggleMissingOnly = () => {
             showMissingOnly = !showMissingOnly;
             const btn = document.getElementById('btnToggleMissing');
             if(showMissingOnly) {
@@ -605,8 +608,9 @@
             }
             renderAttendance();
         };
+
         window.toggleFrequencyOrder = () => {
-             orderByFrequency = !orderByFrequency;
+            orderByFrequency = !orderByFrequency;
             if (orderByFrequency) showToast("Mais frequentes primeiro", "info"); else showToast("Ordem alfabética", "info");
             renderAttendance();
         };
@@ -636,12 +640,12 @@
 
             const card = document.getElementById('stats-present').parentElement;
             let old = card.querySelector('.detalhes-area'); if(old) old.remove();
-            let dHtml = `<div class="detalhes-area mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 text-left space-y-3">
-                <div class="flex justify-between items-center"><span class="text-sm font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2">🏰 Membros Ala</span><span class="text-lg font-black text-slate-800 dark:text-white">${mFis + mOnl}</span></div>
-                ${(mOnl) > 0 ? `<div class="flex justify-between items-center"><span class="text-sm font-bold text-blue-500 flex items-center gap-2">🔴 Online</span><span class="text-lg font-black text-blue-600 dark:text-blue-400">${mOnl}</span></div>` : ''}
-                ${(vFis+vOnl) > 0 ? `<div class="flex justify-between items-center"><span class="text-sm font-bold text-teal-600 dark:text-teal-400 flex items-center gap-2">🤝 Visitantes</span><span class="text-lg font-black text-teal-700 dark:text-teal-300">${vFis+vOnl}</span></div>` : ''}
-                ${data.lideresCount > 0 ? `<div class="flex justify-between items-center"><span class="text-sm font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">👔 Líderes</span><span class="text-lg font-black text-amber-700 dark:text-amber-300">${data.lideresCount}</span></div>` : ''}
-                ${data.missionariosCount > 0 ? `<div class="flex justify-between items-center"><span class="text-sm font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">🏷️ Missionários</span><span class="text-lg font-black text-indigo-700 dark:text-indigo-300">${data.missionariosCount}</span></div>` : ''}
+            let dHtml = `<div class="detalhes-area mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 text-left text-sm font-bold text-slate-500 dark:text-slate-400 space-y-3">
+                <p class="flex justify-between items-center text-green-600 dark:text-green-400"><span>🏰 Membros Ala</span> <span class="text-lg">${mFis + mOnl}</span></p>
+                ${(mOnl) > 0 ? `<p class="flex justify-between items-center pl-2 opacity-70"><span>🔴 Online</span> <span class="text-lg">${mOnl}</span></p>` : ''}
+                ${(vFis+vOnl) > 0 ? `<p class="flex justify-between items-center text-teal-600 dark:text-teal-400"><span>🤝 Visitantes</span> <span class="text-lg">${vFis+vOnl}</span></p>` : ''}
+                ${data.lideresCount > 0 ? `<p class="flex justify-between items-center text-amber-600 dark:text-amber-400"><span>👔 Líderes</span> <span class="text-lg">${data.lideresCount}</span></p>` : ''}
+                ${data.missionariosCount > 0 ? `<p class="flex justify-between items-center text-indigo-600 dark:text-indigo-400"><span>🏷️ Missionários</span> <span class="text-lg">${data.missionariosCount}</span></p>` : ''}
             </div>`;
             card.insertAdjacentHTML('beforeend', dHtml);
 
@@ -769,19 +773,19 @@
             closeJustify(); 
         };
         
-        // --- FUNÇÃO CORRIGIDA PARA EXCLUIR ---
         window.deleteJustification = async () => {
             if(!confirm("Excluir esta nota?")) return;
             const currentData = attendanceHistory[selectedDate] || {};
             let jst = { ...(currentData.justifications || {}) }; 
             delete jst[memberIdJustifying]; 
             
-            // Atualiza Banco (updateDoc força a substituição)
             await updateDoc(doc(db, "historico", selectedDate), { justifications: jst }); 
+            
+            if(attendanceHistory[selectedDate]) attendanceHistory[selectedDate].justifications = jst;
             
             showToast("Nota excluída", "info"); 
             closeJustify();
-            // Aguarda um pequeno delay para garantir sincronia, embora onSnapshot deva pegar
+            renderAttendance(); 
         };
 
         window.updateCount = async (field, val) => { const ref = doc(db, "historico", selectedDate); const data = attendanceHistory[selectedDate] || {}; const current = data[field] || 0; const newValue = Math.max(0, current + val); await setDoc(ref, { [field]: newValue }, { merge: true }); };
