@@ -553,6 +553,43 @@
             return styles[org] || 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-700 dark:text-slate-300';
         };
 
+        // --- NOVA FUNÇÃO: MARCAR FAMÍLIA EM LOTE ---
+        window.markFamilyPresent = async (familyName) => {
+            // 1. Confirmação de segurança
+            if(!confirm(`Deseja marcar PRESENÇA para todos da Família ${familyName}?`)) return;
+
+            if (currentUser.role !== 'admin' || !selectedDate) return;
+
+            // 2. Encontrar todos os membros dessa família
+            const familyMembers = members.filter(m => m.familia === familyName);
+            const idsToMark = familyMembers.map(m => m.id);
+
+            if(idsToMark.length === 0) return;
+
+            // 3. Preparar atualização no Banco de Dados
+            const batch = writeBatch(db);
+            const hRef = doc(db, "historico", selectedDate);
+            
+            // Adiciona todos os IDs ao array de presentes de uma vez
+            batch.set(hRef, { presents: arrayUnion(...idsToMark) }, { merge: true });
+
+            // Atualiza o histórico individual de cada um
+            idsToMark.forEach(id => {
+                const mRef = doc(db, "membros", id);
+                batch.update(mRef, { attendanceLog: arrayUnion(selectedDate), lastAttended: selectedDate });
+            });
+
+            try {
+                await batch.commit();
+                if ("vibrate" in navigator) navigator.vibrate([50, 50, 50]); // Vibração dupla para confirmar lote
+                showToast(`${familyName}: Presença registrada!`, "success");
+            } catch (error) {
+                console.error(error);
+                showToast("Erro ao marcar família", "error");
+            }
+        };
+
+       // --- RENDER ATTENDANCE (VISUAL CLEAN + FAMÍLIA EM LOTE) ---
         window.renderAttendance = () => {
             const list = document.getElementById('memberList'); if(!list) return;
             const search = document.getElementById('searchMember').value.toLowerCase();
@@ -561,10 +598,14 @@
             const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
             const curP = data.presents || []; const curO = data.online_ids || [];
             
-            const visorL = document.getElementById('display-lideres'); if(visorL) visorL.innerText = data.lideresCount || 0;
-            const visorV = document.getElementById('display-visitantes'); if(visorV) visorV.innerText = data.visitantesCount || 0;
-            const visorM = document.getElementById('display-missionarios'); if(visorM) visorM.innerText = data.missionariosCount || 0;
+            // Atualiza contadores do topo
+            if(document.getElementById('display-lideres')) {
+                document.getElementById('display-lideres').innerText = data.lideresCount || 0;
+                document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
+                document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
+            }
             
+            // Totais
             let mFis = 0; let mOnl = 0; let vFis = 0; let vOnl = 0; let totM = 0;
             members.forEach(m => {
                 const isP = curP.includes(m.id); const isOn = curO.includes(m.id);
@@ -573,6 +614,7 @@
             document.getElementById('stats-present').innerText = mFis + mOnl + vFis + vOnl + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
             document.getElementById('stats-total').innerText = totM;
 
+            // Renderização da Lista
             list.innerHTML = ''; 
             let lastFam = "";
             let visibleCount = 0;
@@ -595,38 +637,52 @@
 
                 if((m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) && (currentFilter === 'TODOS' || m.org === currentFilter)) {
                     visibleCount++;
+                    
+                    // --- CABEÇALHO DE FAMÍLIA INTERATIVO ---
                     if (!orderByFrequency && m.familia !== lastFam && !search) { 
-                        buffer += `<div class="family-divider flex items-center gap-2 mt-4 mb-2"><i class="fas fa-users text-xs opacity-50"></i> Família ${m.familia}</div>`; 
+                        buffer += `
+                        <div onclick="markFamilyPresent('${m.familia}')" class="family-divider flex justify-between items-center mt-5 mb-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors group">
+                            <span class="flex items-center gap-2"><i class="fas fa-users opacity-50"></i> Família ${m.familia}</span>
+                            <span class="text-[9px] text-slate-400 group-hover:text-[#002e5d] dark:group-hover:text-blue-400 uppercase font-bold tracking-wider">Marcar Todos <i class="fas fa-check-double ml-1"></i></span>
+                        </div>`; 
                         lastFam = m.familia; 
                     }
                     
                     let star = 0; if(orderByFrequency) lastDom.forEach(d => { if (attendanceHistory[d]?.presents?.includes(m.id)) star++; });
                     
+                    // --- VISUAL CLEAN (SEM BADGES COLORIDAS) ---
+                    const initial = m.name.charAt(0).toUpperCase();
+                    
+                    // Cores de Status (Só mudam se estiver presente)
                     const bgClass = isP ? (isOn ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20') : 'bg-white dark:bg-slate-800';
                     const borderClass = isP ? (isOn ? 'border-blue-400' : 'border-emerald-400') : 'border-transparent';
-                    const shadowClass = isP ? 'shadow-md' : 'shadow-sm';
-                    const initial = m.name.charAt(0).toUpperCase();
+                    
+                    // Avatar
                     const avatarContent = isP ? `<i class="fas ${isOn ? 'fa-wifi' : 'fa-check'} text-lg"></i>` : `<span class="text-sm font-bold">${initial}</span>`;
-                    const avatarStyle = isP ? (isOn ? 'bg-blue-500 text-white shadow-blue-300' : 'bg-emerald-500 text-white shadow-emerald-300') : 'bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400';
-                    const orgBadge = getOrgStyle(m.org);
+                    const avatarStyle = isP ? (isOn ? 'bg-blue-500 text-white' : 'bg-emerald-500 text-white') : 'bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-500';
+
                     const rCat = getRealCategory(m);
 
                     buffer += `
-                    <div class="glass-card mb-3 p-3 flex items-center gap-3 border-l-[6px] transition-all duration-200 ${bgClass} ${borderClass} ${shadowClass}">
+                    <div class="glass-card mb-3 p-3 flex items-center gap-3 border-l-[6px] transition-all duration-200 ${bgClass} ${borderClass} shadow-sm">
                         <div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name.replace(/'/g, "\\'")}')"` : ''} class="flex-1 flex items-center gap-3 cursor-pointer select-none">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${avatarStyle}">${avatarContent}</div>
+                            
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${avatarStyle}">
+                                ${avatarContent}
+                            </div>
+
                             <div class="flex-1 min-w-0">
-                                <h4 class="font-bold text-sm ${isP ? 'text-slate-900 dark:text-slate-100' : 'text-slate-700 dark:text-slate-300'} truncate">
+                                <h4 class="font-bold text-sm ${isP ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-300'} truncate">
                                     ${m.name} ${star > 0 ? `<span class="text-amber-500 text-[10px] ml-1"><i class="fas fa-star"></i>${star}</span>`:''}
                                 </h4>
-                                <div class="flex flex-wrap gap-1.5 mt-1">
-                                    <span class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase border ${orgBadge}">${m.org.split(' ')[0]}</span> 
-                                    <span class="text-[8px] font-bold text-slate-400 uppercase self-center tracking-wider">${rCat}</span>
-                                </div>
+                                
+                                <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mt-0.5 tracking-wide">
+                                    ${m.org} • ${rCat}
+                                </p>
                             </div>
                         </div>
-                       
-                ${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="text-slate-300 dark:text-slate-500 hover:text-[#002e5d] dark:hover:text-blue-400 p-3 transition-colors"><i class="fas fa-sticky-note text-lg"></i></button>` : ''}
+                        
+                        ${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="text-slate-300 dark:text-slate-600 hover:text-[#002e5d] dark:hover:text-blue-400 p-3 transition-colors"><i class="fas fa-sticky-note text-lg"></i></button>` : ''}
                     </div>`;
                 }
             });
@@ -636,8 +692,8 @@
             } else {
                 list.innerHTML = buffer;
             }
-        };
-
+        }; 
+       
         window.renderAdminUsers = () => {
             const l = document.getElementById('users-list'); if(!l) return; l.innerHTML = '';
             allUsersList.forEach(u => { l.innerHTML += `<div class="bg-white dark:bg-slate-700 p-5 rounded-3xl flex justify-between items-center text-xs border dark:border-slate-600"><div><p class="font-black uppercase text-[#002e5d] dark:text-white">${u.name}</p><p class="opacity-40 uppercase text-[9px] font-bold dark:text-slate-300">${u.username}</p></div><button onclick="openEditUser({id:'${u.id}', name:'${u.name}', role:'${u.role}'})" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-600 flex items-center justify-center"><i class="fas fa-cog text-slate-400 dark:text-slate-200"></i></button></div>`; });
