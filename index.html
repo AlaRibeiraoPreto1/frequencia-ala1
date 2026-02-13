@@ -572,52 +572,36 @@
             }
         };
 
-        // --- 2. FUNÇÃO PRINCIPAL: RENDERIZAR LISTA (VISUAL LIMPO) ---
+        // --- RENDER ATTENDANCE (VISUAL COM DIVISÓRIA ORGANIZADA) ---
         window.renderAttendance = () => {
             const list = document.getElementById('memberList'); if(!list) return;
             const search = document.getElementById('searchMember').value.toLowerCase();
-            
-            // Controle do botão "X" da busca
-            const btnClr = document.getElementById('btnClearSearch'); 
-            if(btnClr) search.length > 0 ? btnClr.classList.remove('hidden') : btnClr.classList.add('hidden');
+            const btnClr = document.getElementById('btnClearSearch'); if(btnClr) search.length > 0 ? btnClr.classList.remove('hidden') : btnClr.classList.add('hidden');
 
-            // Pega dados do histórico
             const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
-            const curP = data.presents || []; 
-            const curO = data.online_ids || [];
+            const curP = data.presents || []; const curO = data.online_ids || [];
             
-            // Atualiza os contadores manuais (Líderes, Visitantes, etc)
+            // Atualiza contadores
             if(document.getElementById('display-lideres')) {
                 document.getElementById('display-lideres').innerText = data.lideresCount || 0;
                 document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
                 document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
             }
             
-            // Cálculos de Totais (Físico vs Online)
-            let mFis = 0; let mOnl = 0; let totM = 0;
+            // Totais
+            let mFis = 0; let mOnl = 0; let vFis = 0; let vOnl = 0; let totM = 0;
             members.forEach(m => {
-                const isP = curP.includes(m.id); 
-                const isOn = curO.includes(m.id);
-                const rCat = m.categoria || 'Membro';
-                
-                // Só conta para estatística se não for Visitante avulso
-                if(rCat !== 'Visitante') { 
-                    totM++; 
-                    if(isP) isOn ? mOnl++ : mFis++; 
-                } 
+                const isP = curP.includes(m.id); const isOn = curO.includes(m.id);
+                const rCat = getRealCategory(m); if(rCat !== 'Visitante') { totM++; if(isP) isOn ? mOnl++ : mFis++; } else { if(isP) isOn ? vOnl++ : vFis++; }
             });
+            document.getElementById('stats-present').innerText = mFis + mOnl + vFis + vOnl + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
+            document.getElementById('stats-total').innerText = totM;
 
-            // Atualiza Dashboard do Topo
-            const totalGeral = mFis + mOnl + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
-            if(document.getElementById('stats-present')) document.getElementById('stats-present').innerText = totalGeral;
-            if(document.getElementById('stats-total')) document.getElementById('stats-total').innerText = totM;
-
-            // --- INÍCIO DA MONTAGEM DA LISTA ---
+            // Renderização
             list.innerHTML = ''; 
             let lastFam = "";
             let visibleCount = 0;
 
-            // Ordenação (Frequência ou Alfabética)
             const lastDom = Object.keys(attendanceHistory).sort().reverse().slice(0, 4);
             const sorted = [...members].sort((a, b) => {
                 if (orderByFrequency) {
@@ -634,51 +618,35 @@
             sorted.forEach(m => {
                 const isP = curP.includes(m.id); 
                 const isOn = curO.includes(m.id);
-                
-                // Filtro 1: Se o botão "Olho Cortado" estiver ativo, esconde quem está presente
                 if (showMissingOnly && isP) return;
 
-                // Filtro 2: Busca por texto (Nome ou Família)
-                // (Removemos o filtro de organização para limpar a tela)
-                if(m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) {
+                if((m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) && (currentFilter === 'TODOS' || m.org === currentFilter)) {
                     
                     visibleCount++;
 
-                    // --- CABEÇALHO DE FAMÍLIA (Clicável) ---
-                    // Só mostra se não estiver ordenado por frequência e se a família mudou
+                    // --- NOVA DIVISÓRIA DE FAMÍLIA (DESIGN "CARD HEADER") ---
                     if (!orderByFrequency && m.familia !== lastFam && !search) { 
                         buffer += `
-                        <div onclick="markFamilyPresent('${m.familia}')" class="family-divider flex justify-between items-center mt-5 mb-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors group select-none">
-                            <span class="flex items-center gap-2 font-bold text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider">
-                                <i class="fas fa-users text-xs opacity-50"></i> Família ${m.familia}
+                        <div onclick="markFamilyPresent('${m.familia}')" class="family-divider mt-6 mb-3 p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex justify-between items-center cursor-pointer hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all group select-none relative overflow-hidden">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#002e5d] dark:bg-blue-500"></div>
+                            
+                            <span class="flex items-center gap-3 font-black text-slate-700 dark:text-slate-200 text-xs uppercase tracking-widest pl-3">
+                                <i class="fas fa-users text-[#002e5d] dark:text-blue-400 opacity-80"></i> ${m.familia}
                             </span>
-                            <span class="text-[9px] text-slate-300 group-hover:text-[#002e5d] dark:group-hover:text-blue-400 uppercase font-bold tracking-wider transition-colors">
+                            
+                            <span class="text-[9px] font-bold bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg text-slate-400 group-hover:text-[#002e5d] dark:group-hover:text-blue-400 shadow-sm transition-colors border border-slate-200 dark:border-slate-600">
                                 Marcar Todos <i class="fas fa-check-double ml-1"></i>
                             </span>
                         </div>`; 
                         lastFam = m.familia; 
                     }
                     
-                    // Estrelinhas de frequência (para ordenação)
                     let star = 0; if(orderByFrequency) lastDom.forEach(d => { if (attendanceHistory[d]?.presents?.includes(m.id)) star++; });
                     
-                    // --- DEFINIÇÃO DO VISUAL DO CARD ---
+                    // Lógica do Card
+                    const bgClass = isP ? (isOn ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20') : 'bg-white dark:bg-slate-800';
+                    const borderClass = isP ? (isOn ? 'border-blue-400' : 'border-emerald-400') : 'border-transparent';
                     
-                    // Cores do Fundo e Borda (Imersivo)
-                    let bgClass = "bg-white dark:bg-slate-800"; // Padrão
-                    let borderClass = "border-transparent";
-                    
-                    if(isP) {
-                        if(isOn) {
-                            bgClass = "bg-blue-50 dark:bg-blue-900/20"; // Online
-                            borderClass = "border-blue-400";
-                        } else {
-                            bgClass = "bg-emerald-50 dark:bg-emerald-900/20"; // Presente Físico
-                            borderClass = "border-emerald-400";
-                        }
-                    }
-
-                    // Avatar (Círculo com Inicial ou Check)
                     const initial = m.name.charAt(0).toUpperCase();
                     const avatarContent = isP 
                         ? `<i class="fas ${isOn ? 'fa-wifi' : 'fa-check'} text-lg"></i>` 
@@ -688,49 +656,30 @@
                         ? (isOn ? 'bg-blue-500 text-white shadow-blue-300' : 'bg-emerald-500 text-white shadow-emerald-300') 
                         : 'bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-500';
 
-                    const rCat = m.categoria || 'Membro';
+                    const rCat = getRealCategory(m);
 
-                    // --- HTML DO CARD ---
                     buffer += `
-                    <div class="glass-card mb-3 p-3 flex items-center gap-3 border-l-[6px] transition-all duration-200 ${bgClass} ${borderClass} shadow-sm">
-                        
+                    <div class="glass-card mb-2 p-3 flex items-center gap-3 border-l-[6px] transition-all duration-200 ${bgClass} ${borderClass} shadow-sm">
                         <div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name.replace(/'/g, "\\'")}')"` : ''} class="flex-1 flex items-center gap-3 cursor-pointer select-none">
-                            
                             <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${avatarStyle}">
                                 ${avatarContent}
                             </div>
-
                             <div class="flex-1 min-w-0">
                                 <h4 class="font-bold text-sm ${isP ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-300'} truncate">
                                     ${m.name} ${star > 0 ? `<span class="text-amber-500 text-[10px] ml-1"><i class="fas fa-star"></i>${star}</span>`:''}
                                 </h4>
-                                
                                 <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mt-0.5 tracking-wide">
                                     ${m.org} • ${rCat}
                                 </p>
                             </div>
                         </div>
-                        
-                        ${!isP && currentUser.role === 'admin' ? 
-                            `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="text-slate-300 dark:text-slate-600 hover:text-[#002e5d] dark:hover:text-blue-400 p-3 transition-colors">
-                                <i class="fas fa-sticky-note text-lg"></i>
-                            </button>` 
-                        : ''}
+                        ${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="text-slate-300 dark:text-slate-600 hover:text-[#002e5d] dark:hover:text-blue-400 p-3 transition-colors"><i class="fas fa-sticky-note text-lg"></i></button>` : ''}
                     </div>`;
                 }
             });
 
-            // Empty State (Se não achar ninguém)
             if (visibleCount === 0) {
-                list.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-10 opacity-60">
-                        <div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
-                            <i class="fas ${showMissingOnly ? 'fa-check-circle text-green-500' : 'fa-search text-slate-400'} text-3xl"></i>
-                        </div>
-                        <p class="font-bold text-slate-500 dark:text-slate-400 text-sm">
-                            ${showMissingOnly ? 'Todos os listados estão presentes!' : 'Nenhum membro encontrado.'}
-                        </p>
-                    </div>`;
+                list.innerHTML = `<div class="flex flex-col items-center justify-center py-10 opacity-60"><div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4"><i class="fas ${showMissingOnly ? 'fa-check-circle text-green-500' : 'fa-search text-slate-400'} text-3xl"></i></div><p class="font-bold text-slate-500 dark:text-slate-400 text-sm">${showMissingOnly ? 'Todos os listados estão presentes!' : 'Nenhum membro encontrado.'}</p></div>`;
             } else {
                 list.innerHTML = buffer;
             }
