@@ -59,10 +59,10 @@
         .nav-btn-active { background-color: #f0f7ff; color: var(--sacramental-blue) !important; font-weight: 800; border-right: 4px solid var(--sacramental-blue); }
         html.dark .nav-btn-active { background-color: #1e293b; color: #60a5fa !important; border-right: 4px solid #60a5fa; }
 
-        /* Correção da Centralização da Mensagem */
+        /* CORREÇÃO: Removemos o -50% daqui para não brigar com o container */
         @keyframes toastIn { 
-            from { opacity: 0; transform: translate(-50%, -20px); } 
-            to { opacity: 1; transform: translate(-50%, 0); } 
+            from { opacity: 0; transform: translateY(-20px); } 
+            to { opacity: 1; transform: translateY(0); } 
         }
         .toast-active { animation: toastIn 0.3s ease-out forwards; }
     </style>
