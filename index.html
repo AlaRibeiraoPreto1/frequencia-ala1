@@ -12,9 +12,7 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    colors: {
-                        sacramental: '#002e5d',
-                    }
+                    colors: { sacramental: '#002e5d' }
                 }
             }
         }
@@ -25,13 +23,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        :root { --sacramental-blue: #002e5d; --healing-teal: #0d9488; --rescue-orange: #ea580c; --bg-soft: #f1f5f9; }
-        
         body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s, color 0.3s; }
         .hidden { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Layout */
         body.status-login { height: 100vh !important; overflow: hidden !important; position: fixed; width: 100%; }
         body.status-app { height: auto !important; overflow-y: auto !important; position: relative; }
         
@@ -48,22 +43,17 @@
             .sticky-search { position: sticky; top: 0; z-index: 100; padding: 10px 0; }
         }
 
-        /* Glass Cards (Adaptado para Dark Mode) */
         .glass-card { background: white; border-radius: 28px; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.04); border: 1px solid #f1f5f9; transition: all 0.3s; }
         html.dark .glass-card { background: #1e293b; border-color: #334155; box-shadow: none; }
-        
-        /* Dark Mode Sidebar */
         html.dark .sidebar { background: #0f172a; border-right-color: #334155; }
+        html.dark body { background-color: #0f172a; color: #f1f5f9; }
+        html.dark .sticky-search { background: #0f172a; }
 
-        /* Botões de Navegação */
         .nav-btn-active { background-color: #f0f7ff; color: var(--sacramental-blue) !important; font-weight: 800; border-right: 4px solid var(--sacramental-blue); }
         html.dark .nav-btn-active { background-color: #1e293b; color: #60a5fa !important; border-right: 4px solid #60a5fa; }
 
-        /* CORREÇÃO: Removemos o -50% daqui para não brigar com o container */
-        @keyframes toastIn { 
-            from { opacity: 0; transform: translateY(-20px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
+        /* Animation Corrected */
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         .toast-active { animation: toastIn 0.3s ease-out forwards; }
     </style>
 </head>
@@ -72,7 +62,7 @@
     <div id="loading-screen" class="fixed inset-0 bg-white dark:bg-slate-900 z-[300] flex items-center justify-center">
         <div class="text-center space-y-4">
             <div class="w-12 h-12 border-4 border-slate-100 dark:border-slate-700 border-t-[#002e5d] dark:border-t-blue-500 rounded-full animate-spin mx-auto"></div>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center italic">Carregando Sistema...</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center italic">Carregando...</p>
         </div>
     </div>
 
@@ -135,7 +125,6 @@
                 <button onclick="switchTab('add')" id="side-add" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-left"><i class="fas fa-users"></i> Membros</button>
                 <hr class="border-slate-50 dark:border-slate-800 my-6">
                 <button id="admin-btn" onclick="switchTab('admin-users')" class="hidden w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-left"><i class="fas fa-users-cog"></i> Gerenciar Logins</button>
-                
                 <button onclick="toggleTheme()" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-left mt-2">
                     <i id="theme-icon-desktop" class="fas fa-moon"></i> <span id="theme-text-desktop">Modo Escuro</span>
                 </button>
@@ -153,10 +142,7 @@
             </header>
 
            <div id="global-date-bar" class="w-full bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 py-3 px-6 sticky top-[80px] lg:top-0 z-[140] flex items-center justify-center gap-2">
-                <button onclick="navigateDate(1)" class="w-12 h-12 flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-300 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-90 transition-all border border-slate-100 dark:border-slate-700 shadow-sm">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-
+                <button onclick="navigateDate(1)" class="w-12 h-12 flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-300 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-90 transition-all border border-slate-100 dark:border-slate-700 shadow-sm"><i class="fas fa-chevron-left"></i></button>
                 <div class="glass-card flex items-center px-4 py-2 gap-3 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm min-w-[180px] sm:min-w-[220px]">
                     <i class="fas fa-calendar-alt text-[#002e5d] dark:text-blue-400"></i>
                     <div class="flex flex-col flex-1 text-left">
@@ -164,10 +150,7 @@
                         <select id="dateSelectGlobal" class="bg-transparent font-black text-xs uppercase tracking-tighter outline-none border-none cursor-pointer text-slate-700 dark:text-white w-full dark:bg-slate-900"></select>
                     </div>
                 </div>
-
-                <button onclick="navigateDate(-1)" class="w-12 h-12 flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-300 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-90 transition-all border border-slate-100 dark:border-slate-700 shadow-sm">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
+                <button onclick="navigateDate(-1)" class="w-12 h-12 flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-300 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-90 transition-all border border-slate-100 dark:border-slate-700 shadow-sm"><i class="fas fa-chevron-right"></i></button>
             </div>
 
             <div class="content-container w-full">
@@ -188,37 +171,23 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="glass-card p-8 text-center shadow-inner">
-                            <h3 class="font-black text-[10px] uppercase text-slate-400 tracking-widest mb-6">Frequência por Organização (%)</h3>
-                            <canvas id="heatmapChart" height="220"></canvas>
-                        </div>
-                        <div class="glass-card p-8 text-center shadow-inner">
-                            <h3 class="font-black text-[10px] uppercase text-slate-400 tracking-widest mb-6">Histórico Semanal</h3>
-                            <canvas id="attendanceChart" height="220"></canvas>
-                        </div>
+                        <div class="glass-card p-8 text-center shadow-inner"><h3 class="font-black text-[10px] uppercase text-slate-400 tracking-widest mb-6">Frequência por Organização (%)</h3><canvas id="heatmapChart" height="220"></canvas></div>
+                        <div class="glass-card p-8 text-center shadow-inner"><h3 class="font-black text-[10px] uppercase text-slate-400 tracking-widest mb-6">Histórico Semanal</h3><canvas id="attendanceChart" height="220"></canvas></div>
                     </div>
                 </section>
 
                 <section id="view-attendance" class="hidden flex flex-col h-full">
-                    
                     <div class="sticky top-0 z-30 bg-slate-50 dark:bg-slate-900 pb-2 pt-1 transition-colors duration-300">
-                        <div class="flex gap-2 mb-1 px-1"> <div class="relative flex-1 group">
+                        <div class="flex gap-2 mb-3">
+                            <div class="relative flex-1 group">
                                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                                <input type="text" id="searchMember" oninput="debounceSearch()" placeholder="Buscar membro..." 
-                                    class="w-full pl-10 pr-10 py-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-[#002e5d] dark:focus:ring-blue-500 dark:text-white shadow-sm transition-all">
+                                <input type="text" id="searchMember" oninput="debounceSearch()" placeholder="Buscar membro..." class="w-full pl-10 pr-10 py-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-[#002e5d] dark:focus:ring-blue-500 dark:text-white shadow-sm transition-all">
                                 <button id="btnClearSearch" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 hover:text-red-500 p-1"><i class="fas fa-times-circle"></i></button>
                             </div>
-                            
-                            <button id="btnToggleMissing" onclick="toggleMissingOnly()" class="w-12 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-300 shadow-sm flex items-center justify-center active:scale-95 transition-all">
-                                <i class="fas fa-eye-slash"></i>
-                            </button>
-                            
-                            <button onclick="toggleOptions()" class="w-12 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[#002e5d] dark:text-blue-400 shadow-sm flex items-center justify-center active:scale-95 transition-all">
-                                <i class="fas fa-sliders"></i>
-                            </button>
+                            <button id="btnToggleMissing" onclick="toggleMissingOnly()" class="w-12 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-300 shadow-sm flex items-center justify-center active:scale-95 transition-all"><i class="fas fa-eye-slash"></i></button>
+                            <button onclick="toggleOptions()" class="w-12 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[#002e5d] dark:text-blue-400 shadow-sm flex items-center justify-center active:scale-95 transition-all"><i class="fas fa-sliders"></i></button>
                         </div>
-
-                        <div id="attendance-options" class="hidden mt-2 bg-white dark:bg-slate-800 p-4 rounded-3xl border dark:border-slate-700 shadow-lg mx-1 relative z-50">
+                        <div id="attendance-options" class="hidden mt-2 bg-white dark:bg-slate-800 p-4 rounded-3xl border dark:border-slate-700 shadow-lg">
                             <div class="flex justify-between items-center mb-3">
                                 <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Contadores Manuais</span>
                                 <button onclick="toggleOptions()" class="text-slate-300 hover:text-red-500"><i class="fas fa-times"></i></button>
@@ -240,18 +209,13 @@
                             <button onclick="toggleFrequencyOrder()" id="btnOrderFreqInner" class="w-full mt-3 py-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase flex items-center justify-center gap-2"><i class="fas fa-sort-amount-down"></i> Ordenar por Frequência</button>
                         </div>
                     </div>
-                    <div id="memberList" class="flex-1 space-y-3 pb-24 mt-2 min-h-[300px] px-1"></div>
+                    <div id="memberList" class="flex-1 space-y-3 pb-20 mt-2 min-h-[300px]"></div>
                 </section>
 
                 <section id="view-reports" class="hidden space-y-8">
                     <div class="glass-card p-8 border-l-[12px] border-slate-800 dark:border-slate-600 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95" onclick="switchTab('members-list')">
                         <div class="flex items-center justify-between text-left">
-                            <div>
-                                <h3 class="font-black text-slate-800 dark:text-white uppercase text-[10px] mb-1">Painel Administrativo</h3>
-                                <p class="text-xl font-black text-[#002e5d] dark:text-blue-400 italic">Gestão da Unidade e Membros</p>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase mt-1 italic">Editar cadastros, nomes e chamados</p>
-                            </div>
-                            <i class="fas fa-users-viewfinder text-4xl text-slate-200 dark:text-slate-600"></i>
+                            <div><h3 class="font-black text-slate-800 dark:text-white uppercase text-[10px] mb-1">Painel Administrativo</h3><p class="text-xl font-black text-[#002e5d] dark:text-blue-400 italic">Gestão da Unidade e Membros</p><p class="text-[10px] text-slate-400 font-bold uppercase mt-1 italic">Editar cadastros, nomes e chamados</p></div><i class="fas fa-users-viewfinder text-4xl text-slate-200 dark:text-slate-600"></i>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
@@ -313,17 +277,15 @@
             </div>
 
             <div id="justificationModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-        <div class="glass-card w-full max-w-sm p-6 space-y-4 shadow-2xl bg-white dark:bg-slate-800">
-            <h3 id="justify-member-name" class="font-black text-[#002e5d] dark:text-white text-lg uppercase text-center tracking-tight">Justificar Ausência</h3>
-            <textarea id="justify-text" rows="3" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-700 dark:text-white border border-slate-100 dark:border-slate-600 font-bold text-sm outline-none resize-none shadow-inner" placeholder="Digite o motivo aqui..."></textarea>
-            <div class="flex gap-2">
-                <button onclick="closeJustify()" class="flex-1 py-3 rounded-xl bg-slate-100 dark:bg-slate-600 font-bold text-slate-500 dark:text-slate-300 text-xs uppercase">Cancelar</button>
-                <button onclick="saveJustification()" class="flex-1 py-3 rounded-xl bg-[#002e5d] dark:bg-blue-600 font-black text-white text-xs uppercase shadow-lg active:scale-95 transition-transform">Salvar Nota</button>
+                <div class="glass-card w-full max-w-sm p-6 space-y-4 shadow-2xl bg-white dark:bg-slate-800">
+                    <h3 id="justify-member-name" class="font-black text-[#002e5d] dark:text-white text-lg uppercase text-center tracking-tight">Justificar Ausência</h3>
+                    <textarea id="justify-text" rows="3" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-700 dark:text-white border border-slate-100 dark:border-slate-600 font-bold text-sm outline-none resize-none shadow-inner" placeholder="Digite o motivo aqui..."></textarea>
+                    <div class="flex gap-2">
+                        <button onclick="closeJustify()" class="flex-1 py-3 rounded-xl bg-slate-100 dark:bg-slate-600 font-bold text-slate-500 dark:text-slate-300 text-xs uppercase">Cancelar</button>
+                        <button onclick="saveJustification()" class="flex-1 py-3 rounded-xl bg-[#002e5d] dark:bg-blue-600 font-black text-white text-xs uppercase shadow-lg active:scale-95 transition-transform">Salvar Nota</button>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-
-            
         </main>
 
         <nav id="mobile-nav" class="lg:hidden fixed bottom-6 left-6 right-6 h-20 glass-card flex justify-around items-center px-4 z-[200] border-2 border-white dark:border-slate-600 shadow-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur">
@@ -353,7 +315,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- GLOBAIS ---
+        // GLOBALS
         let members = []; 
         let attendanceHistory = {}; 
         let allUsersList = [];
@@ -365,43 +327,9 @@
         let memberIdEditing = null; let userIdEditing = null; let memberIdJustifying = null;
         let orderByFrequency = false;
         let searchTimeout;
-        let showMissingOnly = false; // VARIAVEL NOVA
+        let showMissingOnly = false;
 
-        // --- THEME ---
-        window.toggleTheme = () => {
-            const html = document.documentElement;
-            if(html.classList.contains('dark')) {
-                html.classList.remove('dark'); localStorage.setItem('theme', 'light');
-                document.getElementById('theme-icon-desktop').className = "fas fa-moon";
-                document.getElementById('theme-text-desktop').innerText = "Modo Escuro";
-            } else {
-                html.classList.add('dark'); localStorage.setItem('theme', 'dark');
-                document.getElementById('theme-icon-desktop').className = "fas fa-sun";
-                document.getElementById('theme-text-desktop').innerText = "Modo Claro";
-            }
-            updateCharts();
-        };
-        const savedTheme = localStorage.getItem('theme');
-        if(savedTheme === 'dark') {
-            document.documentElement.classList.add('dark');
-            const icon = document.getElementById('theme-icon-desktop');
-            if(icon) { icon.className = "fas fa-sun"; document.getElementById('theme-text-desktop').innerText = "Modo Claro"; }
-        }
-
-        // --- UTILS ---
-        window.showToast = (msg, type = 'success') => {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            const colors = { success: 'bg-emerald-500 shadow-emerald-900/20', error: 'bg-rose-500 shadow-rose-900/20', info: 'bg-[#002e5d] dark:bg-blue-600 shadow-blue-900/20' };
-            const icons = { success: 'fa-check-circle', error: 'fa-triangle-exclamation', info: 'fa-circle-info' };
-            toast.className = `${colors[type]} text-white px-8 py-5 rounded-[24px] shadow-2xl flex items-center gap-4 transition-all duration-300 transform toast-active pointer-events-auto w-full scale-100 opacity-100 border border-white/20`;
-            toast.innerHTML = `<i class="fas ${icons[type]} text-lg"></i> <span class="text-xs font-black uppercase tracking-widest">${msg}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translate(-50%, -20px) scale(0.9)'; setTimeout(() => toast.remove(), 400); }, 3000);
-        };
-
-        window.renderAll = () => { renderAttendance(); renderRescue(); updateCharts(); };
-
+        // DATE INIT
         const dSelectGlobal = document.getElementById('dateSelectGlobal');
         let dataAux = new Date();
         while (dataAux.getDay() !== 0) dataAux.setDate(dataAux.getDate() - 1);
@@ -413,6 +341,41 @@
         }
         if(dSelectGlobal) { selectedDate = dSelectGlobal.value; dSelectGlobal.addEventListener('change', (e) => { selectedDate = e.target.value; renderAll(); }); }
 
+        // THEME
+        window.toggleTheme = () => {
+            const html = document.documentElement;
+            if(html.classList.contains('dark')) {
+                html.classList.remove('dark'); localStorage.setItem('theme', 'light');
+                document.getElementById('theme-icon-desktop').className = "fas fa-moon";
+                document.getElementById('theme-text-desktop').innerText = "Modo Escuro";
+            } else {
+                html.classList.add('dark'); localStorage.setItem('theme', 'dark');
+                document.getElementById('theme-icon-desktop').className = "fas fa-sun";
+                document.getElementById('theme-text-desktop').innerText = "Modo Claro";
+            }
+            if(members.length > 0) window.updateCharts();
+        };
+        if(localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+            const icon = document.getElementById('theme-icon-desktop');
+            if(icon) { icon.className = "fas fa-sun"; document.getElementById('theme-text-desktop').innerText = "Modo Claro"; }
+        }
+
+        // UTILS
+        window.showToast = (msg, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const colors = { success: 'bg-emerald-500 shadow-emerald-900/20', error: 'bg-rose-500 shadow-rose-900/20', info: 'bg-[#002e5d] dark:bg-blue-600 shadow-blue-900/20' };
+            const icons = { success: 'fa-check-circle', error: 'fa-triangle-exclamation', info: 'fa-circle-info' };
+            toast.className = `${colors[type]} text-white px-8 py-5 rounded-[24px] shadow-2xl flex items-center gap-4 transition-all duration-300 transform toast-active pointer-events-auto w-full scale-100 opacity-100 border border-white/20`;
+            toast.innerHTML = `<i class="fas ${icons[type]} text-lg"></i> <span class="text-xs font-black uppercase tracking-widest">${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(-20px) scale(0.9)'; setTimeout(() => toast.remove(), 400); }, 3000);
+        };
+
+        window.renderAll = () => { renderAttendance(); renderRescue(); updateCharts(); };
+
+        // NAVIGATION
         window.switchTab = (tab) => {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             if (tab === 'login' || tab === 'first-login') {
@@ -426,11 +389,14 @@
             }
             const targetView = document.getElementById(`view-${tab}`);
             if(targetView) targetView.classList.remove('hidden');
+            
             document.querySelectorAll('aside button, nav button').forEach(b => b.classList.remove('nav-btn-active', 'text-[#002e5d]', 'dark:text-blue-400', 'scale-125'));
             if(document.getElementById(`side-${tab}`)) document.getElementById(`side-${tab}`).classList.add('nav-btn-active');
             if(document.getElementById(`nav-${tab}`)) document.getElementById(`nav-${tab}`).classList.add('text-[#002e5d]', 'dark:text-blue-400', 'scale-125');
+
             const titles = {'dashboard':'Painel Geral','attendance':'Frequência Sacramental','analysis':'Acompanhamento Resgate','reports':'Análise Estratégica','add':'Hub de Membros', 'members-list':'Gestão','admin-users':'Controle de Logins'};
             if(document.getElementById('mobile-page-title')) document.getElementById('mobile-page-title').innerText = titles[tab] || 'Ala';
+
             if(tab === 'members-list') renderMembersList();
             if(tab === 'reports' || tab === 'dashboard') renderAll();
             window.scrollTo(0,0);
@@ -443,6 +409,7 @@
             else { panel.classList.add('translate-x-full'); setTimeout(() => overlay.classList.add('hidden'), 300); }
         };
 
+        // AUTH
         window.checkLogin = async () => {
             const u = document.getElementById('login-user').value.toLowerCase().trim();
             const p = document.getElementById('login-pass').value.trim();
@@ -462,19 +429,24 @@
         };
         window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
 
-        window.debounceSearch = () => {
-            const btnClr = document.getElementById('btnClearSearch');
-            if(btnClr) document.getElementById('searchMember').value.length > 0 ? btnClr.classList.remove('hidden') : btnClr.classList.add('hidden');
-            clearTimeout(searchTimeout); searchTimeout = setTimeout(() => { renderAttendance(); }, 300);
-        };
-
+        // SYNC
         function listenData() {
-            onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => { members = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAll(); });
-            onSnapshot(collection(db, "historico"), (snap) => { attendanceHistory = {}; snap.docs.forEach(d => { attendanceHistory[d.id] = d.data(); }); renderAll(); });
-            onSnapshot(collection(db, "usuarios"), (snap) => { allUsersList = snap.docs.map(d => ({id: d.id, ...d.data()})); if(currentUser && currentUser.role === 'admin') renderAdminUsers(); });
+            onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => {
+                members = snap.docs.map(d => ({id: d.id, ...d.data()})); 
+                renderAll(); 
+            });
+            onSnapshot(collection(db, "historico"), (snap) => {
+                attendanceHistory = {}; snap.docs.forEach(d => { attendanceHistory[d.id] = d.data(); }); 
+                renderAll(); 
+            });
+            onSnapshot(collection(db, "usuarios"), (snap) => {
+                allUsersList = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                if(currentUser && currentUser.role === 'admin') renderAdminUsers();
+            });
             document.getElementById('loading-screen').classList.add('hidden');
         }
 
+        // LOGIC
         window.togglePresence = async (memberId, memberName) => {
             if (currentUser.role !== 'admin' || !selectedDate) return;
             const batch = writeBatch(db);
@@ -501,7 +473,24 @@
 
         window.getRealCategory = (m) => m.categoria || 'Membro';
 
-        // --- NOVAS FUNÇÕES (Attendance Otimizado) ---
+        // NEW RENDER LOGIC
+        window.markFamilyPresent = async (familyName) => {
+            if(!confirm(`Marcar PRESENÇA para toda a Família ${familyName}?`)) return;
+            if (currentUser.role !== 'admin' || !selectedDate) return;
+            const familyMembers = members.filter(m => m.familia === familyName);
+            const idsToMark = familyMembers.map(m => m.id);
+            if(idsToMark.length === 0) return;
+            const batch = writeBatch(db);
+            const hRef = doc(db, "historico", selectedDate);
+            batch.set(hRef, { presents: arrayUnion(...idsToMark) }, { merge: true });
+            idsToMark.forEach(id => {
+                const mRef = doc(db, "membros", id);
+                batch.update(mRef, { attendanceLog: arrayUnion(selectedDate), lastAttended: selectedDate });
+            });
+            try { await batch.commit(); if ("vibrate" in navigator) navigator.vibrate([50, 50, 50]); showToast(`${familyName}: Presença registrada!`, "success"); } 
+            catch (error) { console.error(error); showToast("Erro ao marcar família", "error"); }
+        };
+
         window.toggleMissingOnly = () => {
             showMissingOnly = !showMissingOnly;
             const btn = document.getElementById('btnToggleMissing');
@@ -519,60 +508,10 @@
 
         window.toggleFrequencyOrder = () => {
             orderByFrequency = !orderByFrequency;
-            if (orderByFrequency) showToast("Mais frequentes primeiro", "info");
-            else showToast("Ordem alfabética", "info");
+            if (orderByFrequency) showToast("Mais frequentes primeiro", "info"); else showToast("Ordem alfabética", "info");
             renderAttendance();
         };
 
-        const getOrgStyle = (org) => {
-            const styles = {
-                'Sociedade de Socorro': 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200 border-amber-200',
-                'Quórum de Élderes': 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 border-blue-200',
-                'Moças': 'bg-pink-100 text-pink-800 dark:bg-pink-900/50 dark:text-pink-200 border-pink-200',
-                'Rapazes': 'bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-200 border-orange-200',
-                'Primária': 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200 border-red-200'
-            };
-            return styles[org] || 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-700 dark:text-slate-300';
-        };
-
-       // --- 1. FUNÇÃO AUXILIAR: MARCAR FAMÍLIA INTEIRA ---
-        window.markFamilyPresent = async (familyName) => {
-            // Pergunta de segurança
-            if(!confirm(`Marcar PRESENÇA para toda a Família ${familyName}?`)) return;
-
-            if (currentUser.role !== 'admin' || !selectedDate) return;
-
-            // Filtra membros da família
-            const familyMembers = members.filter(m => m.familia === familyName);
-            const idsToMark = familyMembers.map(m => m.id);
-
-            if(idsToMark.length === 0) return;
-
-            // Prepara gravação em lote no banco
-            const batch = writeBatch(db);
-            const hRef = doc(db, "historico", selectedDate);
-            
-            // Adiciona todos os IDs
-            batch.set(hRef, { presents: arrayUnion(...idsToMark) }, { merge: true });
-
-            // Atualiza histórico individual
-            idsToMark.forEach(id => {
-                const mRef = doc(db, "membros", id);
-                batch.update(mRef, { attendanceLog: arrayUnion(selectedDate), lastAttended: selectedDate });
-            });
-
-            try {
-                await batch.commit();
-                // Vibração dupla para confirmar
-                if ("vibrate" in navigator) navigator.vibrate([50, 50, 50]); 
-                showToast(`${familyName}: Presença registrada!`, "success");
-            } catch (error) {
-                console.error(error);
-                showToast("Erro ao marcar família", "error");
-            }
-        };
-
-        // --- RENDER ATTENDANCE (VISUAL COM DIVISÓRIA ORGANIZADA) ---
         window.renderAttendance = () => {
             const list = document.getElementById('memberList'); if(!list) return;
             const search = document.getElementById('searchMember').value.toLowerCase();
@@ -581,14 +520,12 @@
             const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
             const curP = data.presents || []; const curO = data.online_ids || [];
             
-            // Atualiza contadores
             if(document.getElementById('display-lideres')) {
                 document.getElementById('display-lideres').innerText = data.lideresCount || 0;
                 document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
                 document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
             }
             
-            // Totais
             let mFis = 0; let mOnl = 0; let vFis = 0; let vOnl = 0; let totM = 0;
             members.forEach(m => {
                 const isP = curP.includes(m.id); const isOn = curO.includes(m.id);
@@ -597,11 +534,7 @@
             document.getElementById('stats-present').innerText = mFis + mOnl + vFis + vOnl + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
             document.getElementById('stats-total').innerText = totM;
 
-            // Renderização
-            list.innerHTML = ''; 
-            let lastFam = "";
-            let visibleCount = 0;
-
+            list.innerHTML = ''; let lastFam = ""; let visibleCount = 0;
             const lastDom = Object.keys(attendanceHistory).sort().reverse().slice(0, 4);
             const sorted = [...members].sort((a, b) => {
                 if (orderByFrequency) {
@@ -614,77 +547,31 @@
             });
 
             let buffer = '';
-            
             sorted.forEach(m => {
-                const isP = curP.includes(m.id); 
-                const isOn = curO.includes(m.id);
+                const isP = curP.includes(m.id); const isOn = curO.includes(m.id);
                 if (showMissingOnly && isP) return;
 
                 if((m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) && (currentFilter === 'TODOS' || m.org === currentFilter)) {
-                    
                     visibleCount++;
-
-                    // --- NOVA DIVISÓRIA DE FAMÍLIA (DESIGN "CARD HEADER") ---
                     if (!orderByFrequency && m.familia !== lastFam && !search) { 
-                        buffer += `
-                        <div onclick="markFamilyPresent('${m.familia}')" class="family-divider mt-6 mb-3 p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex justify-between items-center cursor-pointer hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all group select-none relative overflow-hidden">
-                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#002e5d] dark:bg-blue-500"></div>
-                            
-                            <span class="flex items-center gap-3 font-black text-slate-700 dark:text-slate-200 text-xs uppercase tracking-widest pl-3">
-                                <i class="fas fa-users text-[#002e5d] dark:text-blue-400 opacity-80"></i> ${m.familia}
-                            </span>
-                            
-                            <span class="text-[9px] font-bold bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg text-slate-400 group-hover:text-[#002e5d] dark:group-hover:text-blue-400 shadow-sm transition-colors border border-slate-200 dark:border-slate-600">
-                                Marcar Todos <i class="fas fa-check-double ml-1"></i>
-                            </span>
-                        </div>`; 
+                        buffer += `<div onclick="markFamilyPresent('${m.familia}')" class="family-divider mt-6 mb-3 p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex justify-between items-center cursor-pointer hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all group select-none relative overflow-hidden"><div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#002e5d] dark:bg-blue-500"></div><span class="flex items-center gap-3 font-black text-slate-700 dark:text-slate-200 text-xs uppercase tracking-widest pl-3"><i class="fas fa-users text-[#002e5d] dark:text-blue-400 opacity-80"></i> ${m.familia}</span><span class="text-[9px] font-bold bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg text-slate-400 group-hover:text-[#002e5d] dark:group-hover:text-blue-400 shadow-sm transition-colors border border-slate-200 dark:border-slate-600">Marcar Todos <i class="fas fa-check-double ml-1"></i></span></div>`; 
                         lastFam = m.familia; 
                     }
-                    
                     let star = 0; if(orderByFrequency) lastDom.forEach(d => { if (attendanceHistory[d]?.presents?.includes(m.id)) star++; });
                     
-                    // Lógica do Card
                     const bgClass = isP ? (isOn ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20') : 'bg-white dark:bg-slate-800';
                     const borderClass = isP ? (isOn ? 'border-blue-400' : 'border-emerald-400') : 'border-transparent';
-                    
                     const initial = m.name.charAt(0).toUpperCase();
-                    const avatarContent = isP 
-                        ? `<i class="fas ${isOn ? 'fa-wifi' : 'fa-check'} text-lg"></i>` 
-                        : `<span class="text-sm font-bold">${initial}</span>`;
-                    
-                    const avatarStyle = isP 
-                        ? (isOn ? 'bg-blue-500 text-white shadow-blue-300' : 'bg-emerald-500 text-white shadow-emerald-300') 
-                        : 'bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-500';
-
+                    const avatarContent = isP ? `<i class="fas ${isOn ? 'fa-wifi' : 'fa-check'} text-lg"></i>` : `<span class="text-sm font-bold">${initial}</span>`;
+                    const avatarStyle = isP ? (isOn ? 'bg-blue-500 text-white shadow-blue-300' : 'bg-emerald-500 text-white shadow-emerald-300') : 'bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-500';
                     const rCat = getRealCategory(m);
 
-                    buffer += `
-                    <div class="glass-card mb-2 p-3 flex items-center gap-3 border-l-[6px] transition-all duration-200 ${bgClass} ${borderClass} shadow-sm">
-                        <div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name.replace(/'/g, "\\'")}')"` : ''} class="flex-1 flex items-center gap-3 cursor-pointer select-none">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${avatarStyle}">
-                                ${avatarContent}
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <h4 class="font-bold text-sm ${isP ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-300'} truncate">
-                                    ${m.name} ${star > 0 ? `<span class="text-amber-500 text-[10px] ml-1"><i class="fas fa-star"></i>${star}</span>`:''}
-                                </h4>
-                                <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mt-0.5 tracking-wide">
-                                    ${m.org} • ${rCat}
-                                </p>
-                            </div>
-                        </div>
-                        ${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="text-slate-300 dark:text-slate-600 hover:text-[#002e5d] dark:hover:text-blue-400 p-3 transition-colors"><i class="fas fa-sticky-note text-lg"></i></button>` : ''}
-                    </div>`;
+                    buffer += `<div class="glass-card mb-2 p-3 flex items-center gap-3 border-l-[6px] transition-all duration-200 ${bgClass} ${borderClass} shadow-sm"><div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name.replace(/'/g, "\\'")}')"` : ''} class="flex-1 flex items-center gap-3 cursor-pointer select-none"><div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${avatarStyle}">${avatarContent}</div><div class="flex-1 min-w-0"><h4 class="font-bold text-sm ${isP ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-300'} truncate">${m.name} ${star > 0 ? `<span class="text-amber-500 text-[10px] ml-1"><i class="fas fa-star"></i>${star}</span>`:''}</h4><p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mt-0.5 tracking-wide">${m.org} • ${rCat}</p></div></div>${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="text-slate-300 dark:text-slate-600 hover:text-[#002e5d] dark:hover:text-blue-400 p-3 transition-colors"><i class="fas fa-sticky-note text-lg"></i></button>` : ''}</div>`;
                 }
             });
-
-            if (visibleCount === 0) {
-                list.innerHTML = `<div class="flex flex-col items-center justify-center py-10 opacity-60"><div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4"><i class="fas ${showMissingOnly ? 'fa-check-circle text-green-500' : 'fa-search text-slate-400'} text-3xl"></i></div><p class="font-bold text-slate-500 dark:text-slate-400 text-sm">${showMissingOnly ? 'Todos os listados estão presentes!' : 'Nenhum membro encontrado.'}</p></div>`;
-            } else {
-                list.innerHTML = buffer;
-            }
+            list.innerHTML = visibleCount === 0 ? `<div class="flex flex-col items-center justify-center py-10 opacity-60"><div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4"><i class="fas ${showMissingOnly ? 'fa-check-circle text-green-500' : 'fa-search text-slate-400'} text-3xl"></i></div><p class="font-bold text-slate-500 dark:text-slate-400 text-sm">${showMissingOnly ? 'Todos os listados estão presentes!' : 'Nenhum membro encontrado.'}</p></div>` : buffer;
         };
-       
+
         window.renderAdminUsers = () => {
             const l = document.getElementById('users-list'); if(!l) return; l.innerHTML = '';
             allUsersList.forEach(u => { l.innerHTML += `<div class="bg-white dark:bg-slate-700 p-5 rounded-3xl flex justify-between items-center text-xs border dark:border-slate-600"><div><p class="font-black uppercase text-[#002e5d] dark:text-white">${u.name}</p><p class="opacity-40 uppercase text-[9px] font-bold dark:text-slate-300">${u.username}</p></div><button onclick="openEditUser({id:'${u.id}', name:'${u.name}', role:'${u.role}'})" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-600 flex items-center justify-center"><i class="fas fa-cog text-slate-400 dark:text-slate-200"></i></button></div>`; });
@@ -713,10 +600,7 @@
             showToast("Membro cadastrado!", "success"); document.getElementById('newName').value = ''; document.getElementById('familySearch').value = ''; document.getElementById('newPhone').value = ''; document.getElementById('isHeadOfFamily').checked = false;
         };
         window.toggleOptions = () => document.getElementById('attendance-options').classList.toggle('hidden');
-        window.toggleBaptismDate = (val, containerId) => {
-            const container = document.getElementById(containerId);
-            if(val === 'Recém-Converso') container.classList.remove('hidden'); else container.classList.add('hidden');
-        };
+        window.toggleBaptismDate = (val, containerId) => { const container = document.getElementById(containerId); if(val === 'Recém-Converso') container.classList.remove('hidden'); else container.classList.add('hidden'); };
         window.openMemberEdit = (id) => { const m = members.find(x => x.id === id); memberIdEditing = id; document.getElementById('edit-member-name').value = m.name; document.getElementById('edit-member-family').value = m.familia; document.getElementById('edit-member-org').value = m.org; document.getElementById('edit-member-cat').value = m.categoria || 'Membro'; document.getElementById('edit-member-phone').value = m.telefone || ''; document.getElementById('edit-member-isHead').checked = m.isHead || false; document.getElementById('edit-member-baptismDate').value = m.dataBatismo || ''; window.toggleBaptismDate(m.categoria, 'editBaptismDateContainer'); document.getElementById('memberEditModal').classList.remove('hidden'); };
         window.closeMemberEdit = () => document.getElementById('memberEditModal').classList.add('hidden');
         window.saveMemberAction = async () => { await updateDoc(doc(db, "membros", memberIdEditing), { name: document.getElementById('edit-member-name').value, familia: document.getElementById('edit-member-family').value.toUpperCase(), org: document.getElementById('edit-member-org').value, categoria: document.getElementById('edit-member-cat').value, telefone: document.getElementById('edit-member-phone').value, isHead: document.getElementById('edit-member-isHead').checked, dataBatismo: document.getElementById('edit-member-baptismDate').value }); showToast("Alterado!", "success"); closeMemberEdit(); };
@@ -728,22 +612,11 @@
         window.openJustify = (id, name) => { memberIdJustifying = id; document.getElementById('justify-member-name').innerText = "Justificar: " + name; document.getElementById('justify-text').value = attendanceHistory[selectedDate]?.justifications?.[id] || ''; document.getElementById('justificationModal').classList.remove('hidden'); };
         window.closeJustify = () => document.getElementById('justificationModal').classList.add('hidden');
         window.saveJustification = async () => { const txt = document.getElementById('justify-text').value.trim(); let jst = attendanceHistory[selectedDate]?.justifications || {}; if(txt==="") delete jst[memberIdJustifying]; else jst[memberIdJustifying]=txt; await setDoc(doc(db, "historico", selectedDate), { justifications: jst }, { merge: true }); showToast("Salvo!", "success"); closeJustify(); };
+        window.updateCount = async (field, val) => { const ref = doc(db, "historico", selectedDate); const data = attendanceHistory[selectedDate] || {}; const current = data[field] || 0; const newValue = Math.max(0, current + val); await setDoc(ref, { [field]: newValue }, { merge: true }); };
+        window.renderRescue = () => { const list = document.getElementById('missingList'); if(!list) return; list.innerHTML = ''; members.forEach(m => { if(getRealCategory(m)!=='Visitante') { const diff = Math.floor((new Date()-new Date(m.lastAttended))/(1000*60*60*24)); if(diff>=21) list.innerHTML += `<div class="glass-card p-6 border-t-8 border-orange-500"><div><p class="text-[9px] font-black text-orange-500 uppercase">${Math.floor(diff/7)} SEMANAS</p><h4 class="font-black text-slate-800 dark:text-white text-xs">${m.name}</h4></div><a href="https://wa.me/${m.telefone || ''}?text=Olá!" target="_blank" class="block mt-4 bg-teal-600 text-white p-3 rounded-xl text-center text-[10px] uppercase font-bold">WhatsApp</a></div>`; } }); if(document.getElementById('stats-rescue')) document.getElementById('stats-rescue').innerText = list.children.length; }
         
-        window.updateCount = async (field, val) => {
-             const ref = doc(db, "historico", selectedDate);
-             const data = attendanceHistory[selectedDate] || {};
-             const current = data[field] || 0;
-             const newValue = Math.max(0, current + val);
-             await setDoc(ref, { [field]: newValue }, { merge: true });
-        };
-
-        window.renderRescue = () => { 
-            const list = document.getElementById('missingList'); if(!list) return; list.innerHTML = '';
-            members.forEach(m => { if(getRealCategory(m)!=='Visitante') { const diff = Math.floor((new Date()-new Date(m.lastAttended))/(1000*60*60*24)); if(diff>=21) list.innerHTML += `<div class="glass-card p-6 border-t-8 border-orange-500"><div><p class="text-[9px] font-black text-orange-500 uppercase">${Math.floor(diff/7)} SEMANAS</p><h4 class="font-black text-slate-800 dark:text-white text-xs">${m.name}</h4></div><a href="https://wa.me/${m.telefone || ''}?text=Olá!" target="_blank" class="block mt-4 bg-teal-600 text-white p-3 rounded-xl text-center text-[10px] uppercase font-bold">WhatsApp</a></div>`; } }); 
-            if(document.getElementById('stats-rescue')) document.getElementById('stats-rescue').innerText = list.children.length;
-        }
-
         window.updateCharts = () => {
+            if(!members.length) return;
             const ctx1 = document.getElementById('heatmapChart'); if(!ctx1) return;
             const isDark = document.documentElement.classList.contains('dark');
             const color = isDark ? '#60a5fa' : '#002e5d';
@@ -751,20 +624,12 @@
             const orgs = ['Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária'];
             const st = orgs.map(o => { const tot = members.filter(m => m.org === o).length; const prs = members.filter(m => m.org === o && (attendanceHistory[selectedDate]?.presents || []).includes(m.id)).length; return tot>0 ? Math.round((prs/tot)*100) : 0; });
             if(hChart) hChart.destroy(); 
-            hChart = new Chart(ctx1.getContext('2d'), { 
-                type: 'bar', 
-                data: { labels: ['ÉLD','SOC','MOÇ','RAP','PRI'], datasets: [{ data: st, backgroundColor: color, borderRadius: 8 }] }, 
-                options: { indexAxis: 'y', plugins: { legend: false }, scales: { x: { max: 100, ticks: { color: isDark?'#94a3b8':'#666' } }, y: { ticks: { color: isDark?'#94a3b8':'#666' } } } } 
-            });
+            hChart = new Chart(ctx1.getContext('2d'), { type: 'bar', data: { labels: ['ÉLD','SOC','MOÇ','RAP','PRI'], datasets: [{ data: st, backgroundColor: color, borderRadius: 8 }] }, options: { indexAxis: 'y', plugins: { legend: false }, scales: { x: { max: 100, ticks: { color: isDark?'#94a3b8':'#666' } }, y: { ticks: { color: isDark?'#94a3b8':'#666' } } } } });
             
             const ctx2 = document.getElementById('attendanceChart'); if(!ctx2) return;
             const cts = domingosISO.slice(0, 5).reverse().map(d => (attendanceHistory[d]?.presents || []).length);
             if(aChart) aChart.destroy(); 
-            aChart = new Chart(ctx2.getContext('2d'), { 
-                type: 'line', 
-                data: { labels: domingosISO.slice(0, 5).reverse().map(d=>d.split('-')[2]+'/'+d.split('-')[1]), datasets: [{ data: cts, borderColor: color, fill: true, tension: 0.5 }] }, 
-                options: { plugins: { legend: false }, scales: { x: { ticks: { color: isDark?'#94a3b8':'#666' } }, y: { ticks: { color: isDark?'#94a3b8':'#666' } } } } 
-            });
+            aChart = new Chart(ctx2.getContext('2d'), { type: 'line', data: { labels: domingosISO.slice(0, 5).reverse().map(d=>d.split('-')[2]+'/'+d.split('-')[1]), datasets: [{ data: cts, borderColor: color, fill: true, tension: 0.5 }] }, options: { plugins: { legend: false }, scales: { x: { ticks: { color: isDark?'#94a3b8':'#666' } }, y: { ticks: { color: isDark?'#94a3b8':'#666' } } } } });
         }
 
         if(currentUser) {
@@ -772,9 +637,7 @@
             document.getElementById('user-mobile-name').innerText = currentUser.name;
             document.getElementById('user-mobile-role').innerText = currentUser.role;
             if(currentUser.role === 'admin') { document.getElementById('admin-btn').classList.remove('hidden'); document.getElementById('admin-mobile-btn').classList.remove('hidden'); }
-            const fArea = document.getElementById('orgFilters');
-            ['TODOS', 'Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária'].forEach(o => { const id = o.replace(/\s+/g, ''); fArea.innerHTML += `<button onclick="setFilter('${o}')" class="filter-pill ${o=='TODOS'?'active':''} glass-card px-6 py-2 whitespace-nowrap text-[9px] font-black uppercase tracking-widest border border-slate-100 dark:border-slate-600 dark:text-white" id="pill-${id}">${o}</button>`; });
-            window.setFilter = (f) => { currentFilter = f; document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active', 'bg-[#002e5d]', 'text-white')); const el = document.getElementById('pill-'+f.replace(/\s+/g, '')); if(el) el.classList.add('active', 'bg-[#002e5d]', 'text-white'); renderAttendance(); };
+            // Filtros removidos conforme pedido
             listenData(); switchTab('dashboard');
         } else { switchTab('login'); document.getElementById('loading-screen').classList.add('hidden'); }
 
@@ -783,13 +646,10 @@
             const currentIndex = dSelect.selectedIndex;
             const newIndex = currentIndex + direction;
             if (newIndex >= 0 && newIndex < dSelect.options.length) {
-                dSelect.selectedIndex = newIndex;
-                selectedDate = dSelect.value;
+                dSelect.selectedIndex = newIndex; selectedDate = dSelect.value;
                 if ("vibrate" in navigator) navigator.vibrate(10);
                 renderAll(); 
-            } else {
-                showToast("Fim das datas geradas", "info");
-            }
+            } else showToast("Fim das datas geradas", "info");
         };
         
     </script>
