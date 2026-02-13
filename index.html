@@ -14,13 +14,13 @@
                 extend: {
                     colors: { sacramental: '#002e5d' },
                     animation: {
-                        'slide-up': 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-                        'fade-in': 'fadeIn 0.2s ease-out'
+                        'pop-up': 'popUp 0.25s cubic-bezier(0.19, 1, 0.22, 1) forwards',
+                        'fade-in': 'fadeIn 0.2s ease-out forwards'
                     },
                     keyframes: {
-                        slideUp: {
-                            '0%': { transform: 'translateY(20px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        popUp: {
+                            '0%': { transform: 'translate(-50%, 40px) scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'translate(-50%, 0) scale(1)', opacity: '1' },
                         },
                         fadeIn: {
                             '0%': { opacity: '0' },
@@ -53,35 +53,51 @@
         @media (max-width: 1023px) {
             .sidebar { display: none; }
             .app-layout { display: block; }
-            .content-container { padding: 20px; padding-bottom: 120px; }
-            /* Removemos padding do sticky search pois agora ele fica dentro da section */
+            .content-container { padding: 20px; padding-bottom: 140px; /* Mais espaço para o menu flutuante */ }
+            .sticky-search { position: sticky; top: 0; z-index: 100; padding: 10px 0; }
         }
 
-        /* Glass Card */
+        /* Glass Card Standard */
         .glass-card { background: white; border-radius: 28px; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.04); border: 1px solid #f1f5f9; transition: all 0.3s; }
         html.dark .glass-card { background: #1e293b; border-color: #334155; box-shadow: none; }
         html.dark body { background-color: #0f172a; color: #f1f5f9; }
-        
+        html.dark .sticky-search { background: #0f172a; }
         html.dark .sidebar { background: #0f172a; border-right-color: #334155; }
 
-        /* Liquid Nav (Apple Style) */
-        .liquid-nav {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
-        }
-        html.dark .liquid-nav {
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4);
+        /* --- SUPER LIQUID GLASS (APPLE STYLE) --- */
+        .liquid-glass {
+            /* Fundo Claro: Branco com 75% opacidade */
+            background: rgba(255, 255, 255, 0.75);
+            /* O Segredo da Apple: Saturação alta + Blur forte */
+            backdrop-filter: saturate(180%) blur(25px);
+            -webkit-backdrop-filter: saturate(180%) blur(25px);
+            /* Borda sutil para contraste */
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            /* Sombra profunda para flutuar */
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
         }
 
-        .nav-btn-active { color: var(--sacramental-blue) !important; transform: scale(1.1); }
-        html.dark .nav-btn-active { color: #60a5fa !important; }
+        /* Dark Mode Liquid Glass */
+        html.dark .liquid-glass {
+            /* Fundo Escuro: Slate-900 com 75% opacidade */
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Nav Icons Styling */
+        .nav-icon { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .nav-btn-active .nav-icon { 
+            color: var(--sacramental-blue); 
+            transform: scale(1.2) translateY(-2px); 
+            filter: drop-shadow(0 4px 6px rgba(0,46,93,0.3));
+        }
+        html.dark .nav-btn-active .nav-icon { 
+            color: #60a5fa; 
+            filter: drop-shadow(0 4px 6px rgba(96,165,250,0.3));
+        }
         
-        .sidebar .nav-btn-active { background-color: #f0f7ff; border-right: 4px solid var(--sacramental-blue); transform: none; }
+        .sidebar .nav-btn-active { background-color: #f0f7ff; border-right: 4px solid var(--sacramental-blue); transform: none; filter: none; }
         html.dark .sidebar .nav-btn-active { background-color: #1e293b; border-right: 4px solid #60a5fa; }
 
         .family-divider { background-color: #f8fafc; padding: 8px 16px; border-radius: 12px; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-top: 15px; border: 1px solid #e2e8f0; width: 100%; display: block; }
@@ -171,7 +187,7 @@
 
         <main class="main-content bg-slate-50 dark:bg-slate-900">
             
-           <div id="global-top-bar" class="w-full sticky top-0 z-[140] bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-100 dark:border-slate-800 py-3 px-4 flex items-center justify-between gap-3">
+           <div id="global-top-bar" class="w-full sticky top-0 z-[140] bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-white/50 dark:border-slate-700/50 py-3 px-4 flex items-center justify-between gap-3 shadow-sm">
                 
                 <h2 id="dynamic-page-title" class="font-black text-[#002e5d] dark:text-white text-sm uppercase leading-tight truncate transition-all duration-300 w-full lg:w-auto">
                     Página Inicial
@@ -325,45 +341,45 @@
 
             <div id="more-menu-overlay" onclick="toggleMoreMenu()" class="hidden fixed inset-0 bg-black/40 z-[190] backdrop-blur-sm transition-opacity"></div>
             
-            <div id="more-menu-content" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 w-[85%] max-w-sm glass-card p-6 z-[195] shadow-2xl animate-pop-up bg-white/90 dark:bg-slate-900/95 border border-white/40 dark:border-slate-600 origin-bottom">
-                <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest mb-4 text-center">Mais Opções</h3>
+            <div id="more-menu-content" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 w-[85%] max-w-sm liquid-glass p-6 z-[195] rounded-3xl animate-pop-up origin-bottom">
+                <h3 class="text-xs font-black uppercase text-slate-500 dark:text-slate-300 tracking-widest mb-4 text-center">Mais Opções</h3>
                 <div class="grid grid-cols-3 gap-4">
-                    <button onclick="switchTab('analysis'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 transition-all">
-                        <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center shadow-sm"><i class="fas fa-heart-pulse text-lg"></i></div>
-                        <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">Resgate</span>
+                    <button onclick="switchTab('analysis'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-orange-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-heart-pulse text-lg"></i></div>
+                        <span class="text-[10px] font-bold text-slate-700 dark:text-white">Resgate</span>
                     </button>
-                    <button onclick="switchTab('reports'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 transition-all">
-                        <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center shadow-sm"><i class="fas fa-file-invoice text-lg"></i></div>
-                        <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">Relatórios</span>
+                    <button onclick="switchTab('reports'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-file-invoice text-lg"></i></div>
+                        <span class="text-[10px] font-bold text-slate-700 dark:text-white">Relatórios</span>
                     </button>
-                    <button onclick="switchTab('add'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 transition-all">
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-sm"><i class="fas fa-users text-lg"></i></div>
-                        <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">Membros</span>
+                    <button onclick="switchTab('add'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-users text-lg"></i></div>
+                        <span class="text-[10px] font-bold text-slate-700 dark:text-white">Membros</span>
                     </button>
-                    <button onclick="switchTab('admin-users'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 transition-all">
-                        <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center shadow-sm"><i class="fas fa-users-cog text-lg"></i></div>
-                        <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">Admin</span>
+                    <button onclick="switchTab('admin-users'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-slate-800 text-white flex items-center justify-center shadow-lg"><i class="fas fa-users-cog text-lg"></i></div>
+                        <span class="text-[10px] font-bold text-slate-700 dark:text-white">Admin</span>
                     </button>
-                    <button onclick="toggleTheme(); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 transition-all">
-                        <div class="w-12 h-12 rounded-2xl bg-yellow-100 text-yellow-600 flex items-center justify-center shadow-sm"><i class="fas fa-adjust text-lg"></i></div>
-                        <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">Tema</span>
+                    <button onclick="toggleTheme(); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-yellow-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-adjust text-lg"></i></div>
+                        <span class="text-[10px] font-bold text-slate-700 dark:text-white">Tema</span>
                     </button>
-                    <button onclick="logout()" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 transition-all">
-                        <div class="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center shadow-sm"><i class="fas fa-power-off text-lg"></i></div>
-                        <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">Sair</span>
+                    <button onclick="logout()" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-red-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-power-off text-lg"></i></div>
+                        <span class="text-[10px] font-bold text-slate-700 dark:text-white">Sair</span>
                     </button>
                 </div>
             </div>
         </main>
 
-        <nav class="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[70%] max-w-xs h-16 liquid-nav rounded-full flex justify-around items-center px-4 z-[200] transition-all duration-300">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 transition-all hover:scale-110 active:scale-95">
+        <nav class="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[70%] max-w-xs h-16 liquid-glass rounded-full flex justify-around items-center px-4 z-[200] transition-all duration-300">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 dark:text-slate-400 transition-all hover:scale-110 active:scale-95 nav-icon">
                 <i class="fas fa-home text-xl"></i>
             </button>
-            <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 transition-all hover:scale-110 active:scale-95">
+            <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 dark:text-slate-400 transition-all hover:scale-110 active:scale-95 nav-icon">
                 <i class="fas fa-clipboard-check text-xl"></i>
             </button>
-            <button onclick="toggleMoreMenu()" id="nav-more" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 transition-all hover:scale-110 active:scale-95">
+            <button onclick="toggleMoreMenu()" id="nav-more" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 dark:text-slate-400 transition-all hover:scale-110 active:scale-95 nav-icon">
                 <i class="fas fa-bars text-xl"></i>
             </button>
         </nav>
@@ -466,9 +482,6 @@
 
             document.querySelectorAll('#nav-dashboard, #nav-attendance, #nav-more').forEach(b => b.classList.remove('nav-btn-active', 'scale-110'));
             
-            // Logic for Header Title & Date Picker Visibility
-            const titleEl = document.getElementById('dynamic-page-title');
-            const dateEl = document.getElementById('date-controls-wrapper');
             const titles = {
                 'dashboard': 'Página Inicial',
                 'attendance': 'Registrar Frequência',
@@ -479,20 +492,20 @@
                 'admin-users': 'Admin'
             };
             
-            // Set Title
+            const titleEl = document.getElementById('dynamic-page-title');
+            const dateEl = document.getElementById('date-controls-wrapper');
+            
             titleEl.innerText = titles[tab] || 'Ala';
             
-            // Conditional Date Picker Visibility
             const allowDate = ['dashboard', 'attendance', 'reports'];
             if(allowDate.includes(tab)) {
                 dateEl.classList.remove('hidden');
                 titleEl.classList.remove('w-full');
             } else {
                 dateEl.classList.add('hidden');
-                titleEl.classList.add('w-full'); // Center title if no date
+                titleEl.classList.add('w-full');
             }
 
-            // Highlight Active Nav
             if(tab === 'dashboard') document.getElementById('nav-dashboard').classList.add('nav-btn-active', 'scale-110');
             if(tab === 'attendance') document.getElementById('nav-attendance').classList.add('nav-btn-active', 'scale-110');
 
@@ -505,7 +518,7 @@
             // Deprecated
         };
 
-        // NEW: Toggle More Menu (FAST)
+        // Toggle More Menu
         window.toggleMoreMenu = () => {
             const overlay = document.getElementById('more-menu-overlay');
             const menu = document.getElementById('more-menu-content');
