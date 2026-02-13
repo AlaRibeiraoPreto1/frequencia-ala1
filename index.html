@@ -57,33 +57,33 @@
             .sticky-search { position: sticky; top: 0; z-index: 100; padding: 10px 0; }
         }
 
-        /* Glass Card */
+        /* Glass Card Standard */
         .glass-card { background: white; border-radius: 28px; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.04); border: 1px solid #f1f5f9; transition: all 0.3s; }
         html.dark .glass-card { background: #1e293b; border-color: #334155; box-shadow: none; }
         html.dark body { background-color: #0f172a; color: #f1f5f9; }
         html.dark .sticky-search { background: #0f172a; }
         html.dark .sidebar { background: #0f172a; border-right-color: #334155; }
 
-        /* Liquid Nav (Apple Style) */
+        /* LIQUID NAV (Estilo Apple / iOS) */
         .liquid-nav {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
         }
         html.dark .liquid-nav {
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(30, 41, 59, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
         }
 
-        /* Navigation Active State */
-        .nav-btn-active { color: var(--sacramental-blue) !important; }
+        /* Nav Active State */
+        .nav-btn-active { color: var(--sacramental-blue) !important; transform: scale(1.1); }
         html.dark .nav-btn-active { color: #60a5fa !important; }
         
         /* Desktop Sidebar Active */
-        .sidebar .nav-btn-active { background-color: #f0f7ff; border-right: 4px solid var(--sacramental-blue); }
+        .sidebar .nav-btn-active { background-color: #f0f7ff; border-right: 4px solid var(--sacramental-blue); transform: none; }
         html.dark .sidebar .nav-btn-active { background-color: #1e293b; border-right: 4px solid #60a5fa; }
 
         .family-divider { background-color: #f8fafc; padding: 8px 16px; border-radius: 12px; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-top: 15px; border: 1px solid #e2e8f0; width: 100%; display: block; }
@@ -303,7 +303,7 @@
             </div>
 
             <div id="more-menu-overlay" onclick="toggleMoreMenu()" class="hidden fixed inset-0 bg-black/40 z-[190] backdrop-blur-sm transition-opacity"></div>
-            <div id="more-menu-content" class="hidden fixed bottom-24 left-4 right-4 glass-card p-6 z-[195] shadow-2xl animate-slide-up bg-white/90 dark:bg-slate-900/95 border border-white/40 dark:border-slate-600">
+            <div id="more-menu-content" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 w-[85%] max-w-sm glass-card p-6 z-[195] shadow-2xl animate-slide-up bg-white/90 dark:bg-slate-900/95 border border-white/40 dark:border-slate-600">
                 <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest mb-4 text-center">Mais Opções</h3>
                 <div class="grid grid-cols-3 gap-4">
                     <button onclick="switchTab('analysis'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
@@ -334,10 +334,15 @@
             </div>
         </main>
 
-        <nav class="lg:hidden fixed bottom-6 left-6 right-6 h-16 liquid-nav rounded-full flex justify-around items-center px-4 z-[200]">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 transition-all hover:scale-110 active:scale-95"><i class="fas fa-home text-lg"></i></button>
-            <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 transition-all hover:scale-110 active:scale-95"><i class="fas fa-clipboard-check text-lg"></i></button>
-            <button onclick="toggleMoreMenu()" id="nav-more" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 transition-all hover:scale-110 active:scale-95"><i class="fas fa-grid text-lg"></i></button>
+        <nav class="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[70%] max-w-xs h-16 liquid-nav rounded-full flex justify-around items-center px-4 z-[200] transition-all duration-300">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 transition-all hover:scale-110 active:scale-95">
+                <i class="fas fa-home text-xl"></i>
+            </button>
+            <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 transition-all hover:scale-110 active:scale-95">
+                <i class="fas fa-clipboard-check text-xl"></i>
+            </button>
+            <button onclick="toggleMoreMenu()" id="nav-more" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 transition-all hover:scale-110 active:scale-95">
+                <i class="fas fa-bars text-xl"></i> </button>
         </nav>
     </div>
 
@@ -390,13 +395,19 @@
             const html = document.documentElement;
             if(html.classList.contains('dark')) {
                 html.classList.remove('dark'); localStorage.setItem('theme', 'light');
+                document.getElementById('theme-icon-desktop').className = "fas fa-moon";
+                document.getElementById('theme-text-desktop').innerText = "Modo Escuro";
             } else {
                 html.classList.add('dark'); localStorage.setItem('theme', 'dark');
+                document.getElementById('theme-icon-desktop').className = "fas fa-sun";
+                document.getElementById('theme-text-desktop').innerText = "Modo Claro";
             }
             if(members.length > 0) window.updateCharts();
         };
         if(localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.add('dark');
+            const icon = document.getElementById('theme-icon-desktop');
+            if(icon) { icon.className = "fas fa-sun"; document.getElementById('theme-text-desktop').innerText = "Modo Claro"; }
         }
 
         // UTILS
@@ -667,11 +678,6 @@
         };
 
         window.clearSearch = () => { document.getElementById('searchMember').value = ''; renderAttendance(); };
-        window.debounceSearch = () => {
-            const btnClr = document.getElementById('btnClearSearch');
-            if(btnClr) document.getElementById('searchMember').value.length > 0 ? btnClr.classList.remove('hidden') : btnClr.classList.add('hidden');
-            clearTimeout(searchTimeout); searchTimeout = setTimeout(() => { renderAttendance(); }, 300);
-        };
         window.formatNameInput = (el) => { el.value = el.value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' '); };
         window.formatPhone = (el) => { let v = el.value.replace(/\D/g,''); v = v.replace(/^(\d{2})(\d)/g,"($1) $2"); v = v.replace(/(\d)(\d{4})$/,"$1-$2"); el.value = v; };
         window.handleFamilySearch = (q) => { 
