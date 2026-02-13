@@ -312,8 +312,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // GLOBALS
-        let members = []; let attendanceHistory = {}; let allUsersList = [];
+        // --- GLOBAIS ---
+        let members = []; 
+        let attendanceHistory = {}; 
+        let allUsersList = [];
+        let domingosISO = []; // CORREÇÃO: Variável criada para os gráficos
         let currentUser = JSON.parse(localStorage.getItem('user_data')) || null;
         let selectedDate = new Date().toISOString().split('T')[0];
         let currentFilter = 'TODOS';
@@ -321,7 +324,7 @@
         let memberIdEditing = null; let userIdEditing = null; let memberIdJustifying = null;
         let orderByFrequency = false;
 
-        // TOASTS REPLACEMENT FOR ALERT
+        // --- TOASTS (NOTIFICAÇÕES) ---
         window.showToast = (msg, type = 'success') => {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -336,7 +339,14 @@
             }, 3000);
         };
 
-        // --- CÁLCULO DE DOMINGOS (LOCAL E SEGURO) ---
+        // --- FUNÇÃO CENTRALIZADORA DE RENDERIZAÇÃO (CORREÇÃO: ESTAVA FALTANDO) ---
+        window.renderAll = () => {
+            renderAttendance();
+            renderRescue();
+            updateCharts();
+        };
+
+        // --- CÁLCULO DE DOMINGOS ---
         const dSelectGlobal = document.getElementById('dateSelectGlobal');
         let dataAux = new Date();
         while (dataAux.getDay() !== 0) dataAux.setDate(dataAux.getDate() - 1);
@@ -346,15 +356,23 @@
             let mes = String(dataAux.getMonth() + 1).padStart(2, '0');
             let dia = String(dataAux.getDate()).padStart(2, '0');
             let iso = `${ano}-${mes}-${dia}`;
+            
+            // CORREÇÃO: Salvando na lista global para usar nos gráficos e nas setas
+            domingosISO.push(iso); 
+
             if(dSelectGlobal) dSelectGlobal.innerHTML += `<option value="${iso}">${i==0 ? 'DOMINGO HOJE ('+dataAux.toLocaleDateString('pt-BR')+')' : 'DOMINGO, '+dataAux.toLocaleDateString('pt-BR')}</option>`;
             dataAux.setDate(dataAux.getDate() - 7);
         }
+        
         if(dSelectGlobal) {
             selectedDate = dSelectGlobal.value;
-            dSelectGlobal.addEventListener('change', (e) => { selectedDate = e.target.value; renderAll(); });
+            dSelectGlobal.addEventListener('change', (e) => { 
+                selectedDate = e.target.value; 
+                renderAll(); 
+            });
         }
 
-        // NAVIGATION LOGIC
+        // --- NAVEGAÇÃO ENTRE ABAS ---
         window.switchTab = (tab) => {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             if (tab === 'login' || tab === 'first-login') {
@@ -428,13 +446,15 @@
         };
         window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
 
-        // SYNC
+        // --- SINCRONIZAÇÃO (LISTENER) ---
         function listenData() {
             onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => {
-                members = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAll();
+                members = snap.docs.map(d => ({id: d.id, ...d.data()})); 
+                renderAll(); // Agora funciona pois renderAll existe
             });
             onSnapshot(collection(db, "historico"), (snap) => {
-                attendanceHistory = {}; snap.docs.forEach(d => { attendanceHistory[d.id] = d.data(); }); renderAll();
+                attendanceHistory = {}; snap.docs.forEach(d => { attendanceHistory[d.id] = d.data(); }); 
+                renderAll(); // Agora funciona
             });
             onSnapshot(collection(db, "usuarios"), (snap) => {
                 allUsersList = snap.docs.map(d => ({id: d.id, ...d.data()}));
@@ -443,44 +463,48 @@
             document.getElementById('loading-screen').classList.add('hidden');
         }
 
+        // --- LÓGICA DE PRESENÇA ---
         window.togglePresence = async (memberId, memberName) => {
-    if (currentUser.role !== 'admin' || !selectedDate) return;
+            if (currentUser.role !== 'admin' || !selectedDate) return;
 
-    const batch = writeBatch(db);
-    const hRef = doc(db, "historico", selectedDate);
-    const mRef = doc(db, "membros", memberId);
-    
-    const data = attendanceHistory[selectedDate] || {};
-    const presents = data.presents ? [...data.presents] : [];
-    const online = data.online_ids ? [...data.online_ids] : [];
+            const batch = writeBatch(db);
+            const hRef = doc(db, "historico", selectedDate);
+            const mRef = doc(db, "membros", memberId);
+            
+            const data = attendanceHistory[selectedDate] || {};
+            const presents = data.presents ? [...data.presents] : [];
+            const online = data.online_ids ? [...data.online_ids] : [];
 
-    try {
-        if (!presents.includes(memberId)) {
-            // Ausente para Físico
-            batch.set(hRef, { presents: arrayUnion(memberId) }, { merge: true });
-            batch.update(mRef, { attendanceLog: arrayUnion(selectedDate), lastAttended: selectedDate });
-        } else if (!online.includes(memberId)) {
-            // Físico para Online
-            batch.set(hRef, { online_ids: arrayUnion(memberId) }, { merge: true });
-        } else {
-            // Online para Ausente
-            if(!confirm(`Remover presença de ${memberName}?`)) return;
-            batch.set(hRef, { presents: arrayRemove(memberId), online_ids: arrayRemove(memberId) }, { merge: true });
-            batch.update(mRef, { attendanceLog: arrayRemove(selectedDate) });
-        }
+            try {
+                if (!presents.includes(memberId)) {
+                    batch.set(hRef, { presents: arrayUnion(memberId) }, { merge: true });
+                    batch.update(mRef, { attendanceLog: arrayUnion(selectedDate), lastAttended: selectedDate });
+                } else if (!online.includes(memberId)) {
+                    batch.set(hRef, { online_ids: arrayUnion(memberId) }, { merge: true });
+                } else {
+                    if(!confirm(`Remover presença de ${memberName}?`)) return;
+                    batch.set(hRef, { presents: arrayRemove(memberId), online_ids: arrayRemove(memberId) }, { merge: true });
+                    batch.update(mRef, { attendanceLog: arrayRemove(selectedDate) });
+                }
 
-        await batch.commit();
+                await batch.commit();
 
-        // FEEDBACK TÁTIL (Haptic Feedback) - Vibrar por 50ms ao salvar com sucesso
-        if ("vibrate" in navigator) {
-            navigator.vibrate(50);
-        }
+                // Feedback Tátil
+                if ("vibrate" in navigator) {
+                    navigator.vibrate(50);
+                }
 
-    } catch (error) {
-        console.error("Erro na transação:", error);
-        showToast("Erro ao sincronizar dados", "error");
-    }
-};
+            } catch (error) {
+                console.error("Erro na transação:", error);
+                showToast("Erro ao sincronizar dados", "error");
+            }
+        };
+
+        // --- RENDERIZADORES ---
+        window.getRealCategory = (m) => {
+             // Função auxiliar para evitar erro se 'm' não tiver categoria definida
+             return m.categoria || 'Membro';
+        };
 
         window.renderAttendance = () => {
             const list = document.getElementById('memberList'); if(!list) return;
@@ -529,7 +553,6 @@
             document.querySelectorAll('.admin-only').forEach(b => b.classList.toggle('hidden', currentUser.role !== 'admin'));
         };
 
-        // RENDER ADMIN
         window.renderAdminUsers = () => {
             const l = document.getElementById('users-list'); if(!l) return; l.innerHTML = '';
             allUsersList.forEach(u => { l.innerHTML += `<div class="bg-white p-5 rounded-3xl flex justify-between items-center text-xs border"><div><p class="font-black uppercase text-[#002e5d]">${u.name}</p><p class="opacity-40 uppercase text-[9px] font-bold">${u.username}</p></div><button onclick="openEditUser({id:'${u.id}', name:'${u.name}', role:'${u.role}'})" class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center"><i class="fas fa-cog text-slate-400"></i></button></div>`; });
@@ -541,7 +564,7 @@
             });
         };
 
-        // OTHER FUNCTIONS
+        // --- FUNÇÕES AUXILIARES ---
         window.clearSearch = () => { document.getElementById('searchMember').value = ''; renderAttendance(); };
         window.formatNameInput = (el) => { el.value = el.value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' '); };
         window.formatPhone = (el) => { let v = el.value.replace(/\D/g,''); v = v.replace(/^(\d{2})(\d)/g,"($1) $2"); v = v.replace(/(\d)(\d{4})$/,"$1-$2"); el.value = v; };
@@ -559,6 +582,10 @@
             showToast("Membro cadastrado!", "success"); document.getElementById('newName').value = ''; document.getElementById('familySearch').value = ''; document.getElementById('newPhone').value = ''; document.getElementById('isHeadOfFamily').checked = false;
         };
         window.toggleOptions = () => document.getElementById('attendance-options').classList.toggle('hidden');
+        window.toggleBaptismDate = (val, containerId) => {
+            const container = document.getElementById(containerId);
+            if(val === 'Recém-Converso') container.classList.remove('hidden'); else container.classList.add('hidden');
+        };
         window.openMemberEdit = (id) => { const m = members.find(x => x.id === id); memberIdEditing = id; document.getElementById('edit-member-name').value = m.name; document.getElementById('edit-member-family').value = m.familia; document.getElementById('edit-member-org').value = m.org; document.getElementById('edit-member-cat').value = m.categoria || 'Membro'; document.getElementById('edit-member-phone').value = m.telefone || ''; document.getElementById('edit-member-isHead').checked = m.isHead || false; document.getElementById('edit-member-baptismDate').value = m.dataBatismo || ''; window.toggleBaptismDate(m.categoria, 'editBaptismDateContainer'); document.getElementById('memberEditModal').classList.remove('hidden'); };
         window.closeMemberEdit = () => document.getElementById('memberEditModal').classList.add('hidden');
         window.saveMemberAction = async () => { await updateDoc(doc(db, "membros", memberIdEditing), { name: document.getElementById('edit-member-name').value, familia: document.getElementById('edit-member-family').value.toUpperCase(), org: document.getElementById('edit-member-org').value, categoria: document.getElementById('edit-member-cat').value, telefone: document.getElementById('edit-member-phone').value, isHead: document.getElementById('edit-member-isHead').checked, dataBatismo: document.getElementById('edit-member-baptismDate').value }); showToast("Alterado!", "success"); closeMemberEdit(); };
@@ -570,20 +597,31 @@
         window.openJustify = (id, name) => { memberIdJustifying = id; document.getElementById('justify-member-name').innerText = "Justificar: " + name; document.getElementById('justify-text').value = attendanceHistory[selectedDate]?.justifications?.[id] || ''; document.getElementById('justificationModal').classList.remove('hidden'); };
         window.closeJustify = () => document.getElementById('justificationModal').classList.add('hidden');
         window.saveJustification = async () => { const txt = document.getElementById('justify-text').value.trim(); let jst = attendanceHistory[selectedDate]?.justifications || {}; if(txt==="") delete jst[memberIdJustifying]; else jst[memberIdJustifying]=txt; await setDoc(doc(db, "historico", selectedDate), { justifications: jst }, { merge: true }); showToast("Salvo!", "success"); closeJustify(); };
+        
+        window.updateCount = async (field, val) => {
+             const ref = doc(db, "historico", selectedDate);
+             const data = attendanceHistory[selectedDate] || {};
+             const current = data[field] || 0;
+             const newValue = Math.max(0, current + val);
+             await setDoc(ref, { [field]: newValue }, { merge: true });
+        };
 
-        // CORE RUNNER
-        function renderRescue() { 
+        // --- RESGATE ---
+        window.renderRescue = () => { 
             const list = document.getElementById('missingList'); if(!list) return; list.innerHTML = '';
             members.forEach(m => { if(getRealCategory(m)!=='Visitante') { const diff = Math.floor((new Date()-new Date(m.lastAttended))/(1000*60*60*24)); if(diff>=21) list.innerHTML += `<div class="glass-card p-6 border-t-8 border-orange-500"><div><p class="text-[9px] font-black text-orange-500 uppercase">${Math.floor(diff/7)} SEMANAS</p><h4 class="font-black text-slate-800 text-xs">${m.name}</h4></div><a href="https://wa.me/${m.telefone || ''}?text=Olá!" target="_blank" class="block mt-4 bg-teal-600 text-white p-3 rounded-xl text-center text-[10px] uppercase font-bold">WhatsApp</a></div>`; } }); 
             if(document.getElementById('stats-rescue')) document.getElementById('stats-rescue').innerText = list.children.length;
         }
 
-        function updateCharts() {
+        // --- GRÁFICOS ---
+        window.updateCharts = () => {
             const ctx1 = document.getElementById('heatmapChart'); if(!ctx1) return;
             const orgs = ['Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária'];
             const st = orgs.map(o => { const tot = members.filter(m => m.org === o).length; const prs = members.filter(m => m.org === o && (attendanceHistory[selectedDate]?.presents || []).includes(m.id)).length; return tot>0 ? Math.round((prs/tot)*100) : 0; });
             if(hChart) hChart.destroy(); hChart = new Chart(ctx1.getContext('2d'), { type: 'bar', data: { labels: ['ÉLD','SOC','MOÇ','RAP','PRI'], datasets: [{ data: st, backgroundColor: '#002e5d', borderRadius: 8 }] }, options: { indexAxis: 'y', plugins: { legend: false }, scales: { x: { max: 100 } } } });
+            
             const ctx2 = document.getElementById('attendanceChart'); if(!ctx2) return;
+            // CORREÇÃO: Usando domingosISO definido globalmente
             const cts = domingosISO.slice(0, 5).reverse().map(d => (attendanceHistory[d]?.presents || []).length);
             if(aChart) aChart.destroy(); aChart = new Chart(ctx2.getContext('2d'), { type: 'line', data: { labels: domingosISO.slice(0, 5).reverse().map(d=>d.split('-')[2]+'/'+d.split('-')[1]), datasets: [{ data: cts, borderColor: '#002e5d', fill: true, tension: 0.5 }] }, options: { plugins: { legend: false } } });
         }
@@ -599,25 +637,23 @@
             listenData(); switchTab('dashboard');
         } else { switchTab('login'); document.getElementById('loading-screen').classList.add('hidden'); }
 
-        // LÓGICA DE NAVEGAÇÃO RÁPIDA ENTRE DATAS
-window.navigateDate = (direction) => {
-    const dSelect = document.getElementById('dateSelectGlobal');
-    const currentIndex = dSelect.selectedIndex;
-    const newIndex = currentIndex + direction;
+        // --- NAVEGAÇÃO DE SETAS (CORRIGIDA) ---
+        window.navigateDate = (direction) => {
+            const dSelect = document.getElementById('dateSelectGlobal');
+            const currentIndex = dSelect.selectedIndex;
+            // Se direction for 1 (seta esquerda), vai para index maior (passado)
+            // Se direction for -1 (seta direita), vai para index menor (futuro)
+            const newIndex = currentIndex + direction;
 
-    // Verifica se existe a próxima ou anterior data disponível no seletor
-    if (newIndex >= 0 && newIndex < dSelect.options.length) {
-        dSelect.selectedIndex = newIndex;
-        selectedDate = dSelect.value;
-        
-        // Pequeno feedback tátil suave na troca de data (10ms)
-        if ("vibrate" in navigator) navigator.vibrate(10);
-        
-        renderAll();
-    } else {
-        showToast("Fim das datas geradas", "info");
-    }
-};
+            if (newIndex >= 0 && newIndex < dSelect.options.length) {
+                dSelect.selectedIndex = newIndex;
+                selectedDate = dSelect.value;
+                if ("vibrate" in navigator) navigator.vibrate(10);
+                renderAll(); // Agora funciona
+            } else {
+                showToast("Fim das datas geradas", "info");
+            }
+        };
         
     </script>
 </body>
