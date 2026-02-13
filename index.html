@@ -14,13 +14,13 @@
                 extend: {
                     colors: { sacramental: '#002e5d' },
                     animation: {
-                        'pop-up': 'popUp 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
-                        'fade-in': 'fadeIn 0.2s ease-out forwards'
+                        'slide-up': 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'fade-in': 'fadeIn 0.2s ease-out'
                     },
                     keyframes: {
-                        popUp: {
-                            '0%': { transform: 'translate(-50%, 20px) scale(0.95)', opacity: '0' },
-                            '100%': { transform: 'translate(-50%, 0) scale(1)', opacity: '1' },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
                         },
                         fadeIn: {
                             '0%': { opacity: '0' },
@@ -54,14 +54,14 @@
             .sidebar { display: none; }
             .app-layout { display: block; }
             .content-container { padding: 20px; padding-bottom: 120px; }
-            .sticky-search { position: sticky; top: 0; z-index: 100; padding: 10px 0; }
+            /* Removemos padding do sticky search pois agora ele fica dentro da section */
         }
 
         /* Glass Card */
         .glass-card { background: white; border-radius: 28px; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.04); border: 1px solid #f1f5f9; transition: all 0.3s; }
         html.dark .glass-card { background: #1e293b; border-color: #334155; box-shadow: none; }
         html.dark body { background-color: #0f172a; color: #f1f5f9; }
-        html.dark .sticky-search { background: #0f172a; }
+        
         html.dark .sidebar { background: #0f172a; border-right-color: #334155; }
 
         /* Liquid Nav (Apple Style) */
@@ -152,7 +152,7 @@
                 <h1 class="font-black text-xs uppercase text-[#002e5d] dark:text-white leading-none tracking-tighter text-left">Ala<br>Ribeirão Preto 1</h1>
             </div>
             <nav class="flex-1 space-y-1">
-                <button onclick="switchTab('dashboard')" id="side-dashboard" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-left"><i class="fas fa-grid-2"></i> Dashboard</button>
+                <button onclick="switchTab('dashboard')" id="side-dashboard" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-left"><i class="fas fa-grid-2"></i> Página Inicial</button>
                 <button onclick="switchTab('attendance')" id="side-attendance" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-left"><i class="fas fa-list-check"></i> Registrar Frequência</button>
                 <button onclick="switchTab('analysis')" id="side-analysis" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-left"><i class="fas fa-heart-pulse"></i> Resgate</button>
                 <button onclick="switchTab('reports')" id="side-reports" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-left"><i class="fas fa-file-invoice"></i> Relatórios</button>
@@ -170,20 +170,23 @@
         </aside>
 
         <main class="main-content bg-slate-50 dark:bg-slate-900">
-            <header class="lg:hidden p-6 flex justify-center items-center bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 sticky top-0 z-[150]">
-                <h2 id="mobile-page-title" class="font-black text-[#002e5d] dark:text-white text-lg italic uppercase tracking-tighter">Dashboard</h2>
-            </header>
+            
+           <div id="global-top-bar" class="w-full sticky top-0 z-[140] bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-100 dark:border-slate-800 py-3 px-4 flex items-center justify-between gap-3">
+                
+                <h2 id="dynamic-page-title" class="font-black text-[#002e5d] dark:text-white text-sm uppercase leading-tight truncate transition-all duration-300 w-full lg:w-auto">
+                    Página Inicial
+                </h2>
 
-           <div id="global-date-bar" class="w-full bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 py-3 px-6 sticky top-[80px] lg:top-0 z-[140] flex items-center justify-center gap-2">
-                <button onclick="navigateDate(1)" class="w-12 h-12 flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-300 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-90 transition-all border border-slate-100 dark:border-slate-700 shadow-sm"><i class="fas fa-chevron-left"></i></button>
-                <div class="glass-card flex items-center px-4 py-2 gap-3 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm min-w-[180px] sm:min-w-[220px]">
-                    <i class="fas fa-calendar-alt text-[#002e5d] dark:text-blue-400"></i>
-                    <div class="flex flex-col flex-1 text-left">
-                        <span class="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none">Referência</span>
-                        <select id="dateSelectGlobal" class="bg-transparent font-black text-xs uppercase tracking-tighter outline-none border-none cursor-pointer text-slate-700 dark:text-white w-full dark:bg-slate-900"></select>
+                <div id="date-controls-wrapper" class="flex items-center justify-end gap-1 flex-1 max-w-[70%] hidden">
+                    <button onclick="navigateDate(1)" class="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-300 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-90 transition-all border border-slate-100 dark:border-slate-700 shadow-sm"><i class="fas fa-chevron-left text-xs"></i></button>
+                    
+                    <div class="glass-card flex items-center px-3 py-2 gap-2 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm flex-1 min-w-0">
+                        <i class="fas fa-calendar-alt text-[#002e5d] dark:text-blue-400 text-xs"></i>
+                        <select id="dateSelectGlobal" class="bg-transparent font-black text-xs uppercase tracking-tighter outline-none border-none cursor-pointer text-slate-700 dark:text-white w-full dark:bg-slate-900 p-0"></select>
                     </div>
+
+                    <button onclick="navigateDate(-1)" class="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-300 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-90 transition-all border border-slate-100 dark:border-slate-700 shadow-sm"><i class="fas fa-chevron-right text-xs"></i></button>
                 </div>
-                <button onclick="navigateDate(-1)" class="w-12 h-12 flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-300 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-90 transition-all border border-slate-100 dark:border-slate-700 shadow-sm"><i class="fas fa-chevron-right"></i></button>
             </div>
 
             <div class="content-container w-full">
@@ -210,7 +213,7 @@
                 </section>
 
                 <section id="view-attendance" class="hidden flex flex-col h-full">
-                    <div class="sticky top-0 z-30 bg-slate-50 dark:bg-slate-900 pb-2 pt-1 transition-colors duration-300">
+                    <div class="sticky top-[68px] z-30 bg-slate-50 dark:bg-slate-900 pb-2 pt-1 transition-colors duration-300">
                         <div class="flex gap-2 mb-3">
                             <div class="relative flex-1 group">
                                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
@@ -455,12 +458,39 @@
             
             // Fecha menu se estiver aberto
             const menu = document.getElementById('more-menu-content');
-            if(!menu.classList.contains('hidden')) toggleMoreMenu();
+            const overlay = document.getElementById('more-menu-overlay');
+            if(!menu.classList.contains('hidden')) {
+                menu.classList.add('hidden');
+                overlay.classList.add('hidden');
+            }
 
             document.querySelectorAll('#nav-dashboard, #nav-attendance, #nav-more').forEach(b => b.classList.remove('nav-btn-active', 'scale-110'));
             
-            const titles = {'dashboard':'Painel Geral','attendance':'Frequência Sacramental','analysis':'Acompanhamento Resgate','reports':'Análise Estratégica','add':'Hub de Membros', 'members-list':'Gestão','admin-users':'Controle de Logins'};
-            if(document.getElementById('mobile-page-title')) document.getElementById('mobile-page-title').innerText = titles[tab] || 'Ala';
+            // Logic for Header Title & Date Picker Visibility
+            const titleEl = document.getElementById('dynamic-page-title');
+            const dateEl = document.getElementById('date-controls-wrapper');
+            const titles = {
+                'dashboard': 'Página Inicial',
+                'attendance': 'Registrar Frequência',
+                'analysis': 'Resgate',
+                'reports': 'Relatórios',
+                'add': 'Membros',
+                'members-list': 'Gestão',
+                'admin-users': 'Admin'
+            };
+            
+            // Set Title
+            titleEl.innerText = titles[tab] || 'Ala';
+            
+            // Conditional Date Picker Visibility
+            const allowDate = ['dashboard', 'attendance', 'reports'];
+            if(allowDate.includes(tab)) {
+                dateEl.classList.remove('hidden');
+                titleEl.classList.remove('w-full');
+            } else {
+                dateEl.classList.add('hidden');
+                titleEl.classList.add('w-full'); // Center title if no date
+            }
 
             // Highlight Active Nav
             if(tab === 'dashboard') document.getElementById('nav-dashboard').classList.add('nav-btn-active', 'scale-110');
@@ -472,7 +502,7 @@
         };
 
         window.toggleMobileMenu = () => {
-            // Deprecated, maintained for compatibility but unused in new UI
+            // Deprecated
         };
 
         // NEW: Toggle More Menu (FAST)
