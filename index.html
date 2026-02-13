@@ -56,8 +56,8 @@
         @media (max-width: 1023px) {
             .sidebar { display: none; }
             .app-layout { display: block; }
-            /* Padding inferior grande para a navbar flutuante não tapar o fim da lista */
             .content-container { padding: 20px; padding-bottom: 160px; overflow-x: hidden; }
+            .sticky-search { position: sticky; top: 0; z-index: 100; padding: 10px 0; }
         }
 
         /* Glass Card */
@@ -80,9 +80,8 @@
             box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
         }
 
-        /* Nav Icons Styling */
+        /* Nav Icons */
         .nav-icon { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        
         .nav-btn-active .nav-icon { 
             color: var(--sacramental-blue); 
             transform: scale(1.2) translateY(-2px); 
@@ -163,26 +162,24 @@
 
         <main class="main-content bg-slate-50 dark:bg-slate-900 overflow-x-hidden">
             
-           <div id="unified-header" class="w-full sticky top-0 z-[140] bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors duration-300">
+           <div id="global-top-bar" class="w-full sticky top-0 z-[140] bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors duration-300">
                 
                 <div class="flex items-center justify-between gap-2 px-4 py-3 h-[60px]">
-                    <h2 id="dynamic-page-title" class="w-[30%] font-black text-[#002e5d] dark:text-white text-sm uppercase leading-tight break-words whitespace-normal">
+                    <h2 id="dynamic-page-title" class="w-[30%] font-black text-[#002e5d] dark:text-white text-xs uppercase leading-tight break-words whitespace-normal">
                         Página Inicial
                     </h2>
 
                     <div id="date-controls-wrapper" class="w-[70%] flex items-center justify-end gap-1 hidden">
                         <button onclick="navigateDate(1)" class="w-9 h-9 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-90 transition-all border border-slate-200 dark:border-slate-700 shadow-sm flex-shrink-0"><i class="fas fa-chevron-left text-xs"></i></button>
-                        
                         <div class="glass-card flex items-center px-2 py-1 gap-2 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-sm flex-1 min-w-0 justify-center h-9">
                             <i class="fas fa-calendar-alt text-[#002e5d] dark:text-blue-400 text-xs"></i>
-                            <select id="dateSelectGlobal" class="bg-transparent font-bold text-xs uppercase tracking-tighter outline-none border-none cursor-pointer text-slate-700 dark:text-white w-full dark:bg-slate-900 p-0 text-center"></select>
+                            <select id="dateSelectGlobal" class="bg-transparent font-bold text-sm uppercase tracking-tighter outline-none border-none cursor-pointer text-slate-700 dark:text-white w-full dark:bg-slate-900 p-0 text-center"></select>
                         </div>
-
                         <button onclick="navigateDate(-1)" class="w-9 h-9 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-90 transition-all border border-slate-200 dark:border-slate-700 shadow-sm flex-shrink-0"><i class="fas fa-chevron-right text-xs"></i></button>
                     </div>
                 </div>
 
-                <div id="sticky-search-container" class="hidden px-4 pb-3 pt-1">
+                <div id="sticky-search-container" class="hidden px-4 pb-3 pt-0">
                     <div class="flex gap-2">
                         <div class="relative flex-1 group">
                             <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
@@ -241,7 +238,7 @@
                 </section>
 
                 <section id="view-attendance" class="hidden flex flex-col h-full">
-                    <div id="memberList" class="flex-1 space-y-3 pb-32 min-h-[300px] px-1"></div>
+                    <div id="memberList" class="flex-1 space-y-3 pb-32 mt-2 min-h-[300px] px-1"></div>
                 </section>
 
                 <section id="view-reports" class="hidden space-y-8">
@@ -315,7 +312,7 @@
                     <div class="flex gap-2">
                         <button onclick="deleteJustification()" id="btn-delete-note" class="hidden py-3 px-4 rounded-xl bg-red-100 text-red-600 font-bold text-xs"><i class="fas fa-trash"></i></button>
                         <button onclick="closeJustify()" class="flex-1 py-3 rounded-xl bg-slate-100 dark:bg-slate-600 font-bold text-slate-500 dark:text-slate-300 text-xs uppercase">Cancelar</button>
-                        <button onclick="saveJustification()" class="flex-1 py-3 rounded-xl bg-[#002e5d] dark:bg-blue-600 font-black text-white text-xs uppercase shadow-lg active:scale-95 transition-transform">Salvar</button>
+                        <button onclick="saveJustification()" class="flex-1 py-3 rounded-xl bg-[#002e5d] dark:bg-blue-600 font-black text-white text-xs uppercase shadow-lg active:scale-95 transition-transform">Salvar Nota</button>
                     </div>
                 </div>
             </div>
@@ -325,23 +322,23 @@
             <div id="more-menu-content" class="hidden fixed bottom-28 left-1/2 -translate-x-1/2 w-[85%] max-w-sm liquid-glass p-6 z-[195] rounded-3xl animate-pop-up origin-bottom">
                 <h3 class="text-xs font-black uppercase text-slate-500 dark:text-slate-300 tracking-widest mb-4 text-center">Mais Opções</h3>
                 <div class="grid grid-cols-3 gap-4">
-                    <button onclick="switchTab('analysis'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
+                    <button onclick="switchTab('analysis')" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
                         <div class="w-12 h-12 rounded-2xl bg-orange-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-heart-pulse text-lg"></i></div>
                         <span class="text-[10px] font-bold text-slate-700 dark:text-white">Resgate</span>
                     </button>
-                    <button onclick="switchTab('reports'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
+                    <button onclick="switchTab('reports')" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
                         <div class="w-12 h-12 rounded-2xl bg-blue-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-file-invoice text-lg"></i></div>
                         <span class="text-[10px] font-bold text-slate-700 dark:text-white">Relatórios</span>
                     </button>
-                    <button onclick="switchTab('add'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
+                    <button onclick="switchTab('add')" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
                         <div class="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-users text-lg"></i></div>
                         <span class="text-[10px] font-bold text-slate-700 dark:text-white">Membros</span>
                     </button>
-                    <button onclick="switchTab('admin-users'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
+                    <button onclick="switchTab('admin-users')" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
                         <div class="w-12 h-12 rounded-2xl bg-slate-800 text-white flex items-center justify-center shadow-lg"><i class="fas fa-users-cog text-lg"></i></div>
                         <span class="text-[10px] font-bold text-slate-700 dark:text-white">Admin</span>
                     </button>
-                    <button onclick="toggleTheme(); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
+                    <button onclick="toggleTheme()" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
                         <div class="w-12 h-12 rounded-2xl bg-yellow-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-adjust text-lg"></i></div>
                         <span class="text-[10px] font-bold text-slate-700 dark:text-white">Tema</span>
                     </button>
@@ -460,9 +457,10 @@
             if(!menu.classList.contains('hidden')) {
                 menu.classList.add('hidden');
                 overlay.classList.add('hidden');
+                document.getElementById('nav-more').classList.remove('nav-btn-active'); // Force inactive state
             }
 
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-btn-active'));
+            document.querySelectorAll('#nav-dashboard, #nav-attendance, #nav-more').forEach(b => b.classList.remove('nav-btn-active', 'scale-110'));
             
             const titles = {
                 'dashboard': 'Página Inicial',
@@ -476,7 +474,6 @@
             
             const titleEl = document.getElementById('dynamic-page-title');
             const dateEl = document.getElementById('date-controls-wrapper');
-            const searchEl = document.getElementById('sticky-search-container');
             
             titleEl.innerText = titles[tab] || 'Ala';
             
@@ -489,15 +486,8 @@
                 titleEl.classList.add('w-full');
             }
 
-            // Exibir/Esconder Search Bar
-            if(tab === 'attendance') {
-                searchEl.classList.remove('hidden');
-            } else {
-                searchEl.classList.add('hidden');
-            }
-
-            if(tab === 'dashboard') document.getElementById('nav-dashboard').classList.add('nav-btn-active');
-            if(tab === 'attendance') document.getElementById('nav-attendance').classList.add('nav-btn-active');
+            if(tab === 'dashboard') document.getElementById('nav-dashboard').classList.add('nav-btn-active', 'scale-110');
+            if(tab === 'attendance') document.getElementById('nav-attendance').classList.add('nav-btn-active', 'scale-110');
 
             if(tab === 'members-list') renderMembersList();
             if(tab === 'reports' || tab === 'dashboard') renderAll();
@@ -514,23 +504,23 @@
             if(menu.classList.contains('hidden')) {
                 menu.classList.remove('hidden');
                 overlay.classList.remove('hidden');
-                btn.classList.add('nav-btn-active');
+                btn.classList.add('nav-btn-active', 'scale-110');
             } else {
                 menu.classList.add('hidden');
                 overlay.classList.add('hidden');
-                btn.classList.remove('nav-btn-active');
+                btn.classList.remove('nav-btn-active', 'scale-110');
             }
         };
 
-        // AUTH
-        window.checkLogin = async () => {
+        // AUTH & SYNC (Standard)
+        window.checkLogin = async () => { /* ... existing logic ... */ 
             const u = document.getElementById('login-user').value.toLowerCase().trim();
             const p = document.getElementById('login-pass').value.trim();
             const snap = await getDocs(query(collection(db, "usuarios"), where("username", "==", u), where("password", "==", p)));
             if (!snap.empty) { localStorage.setItem('user_data', JSON.stringify({id: snap.docs[0].id, ...snap.docs[0].data()})); location.reload(); } 
             else showToast("Usuário ou senha incorretos", "error");
         };
-        window.processFirstLogin = async () => {
+        window.processFirstLogin = async () => { /* ... existing logic ... */ 
             const u = document.getElementById('first-user').value.toLowerCase().trim();
             const p1 = document.getElementById('first-pass').value.trim();
             const p2 = document.getElementById('first-pass-confirm').value.trim();
@@ -542,7 +532,6 @@
         };
         window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
 
-        // SYNC
         function listenData() {
             onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => {
                 members = snap.docs.map(d => ({id: d.id, ...d.data()})); 
@@ -559,9 +548,8 @@
             document.getElementById('loading-screen').classList.add('hidden');
         }
 
-        // LOGIC
         window.togglePresence = async (memberId, memberName) => {
-            if (currentUser.role !== 'admin' || !selectedDate) return;
+             if (currentUser.role !== 'admin' || !selectedDate) return;
             const batch = writeBatch(db);
             const hRef = doc(db, "historico", selectedDate);
             const mRef = doc(db, "membros", memberId);
@@ -585,9 +573,8 @@
         };
 
         window.getRealCategory = (m) => m.categoria || 'Membro';
-
-        // NEW RENDER LOGIC
-        window.markFamilyPresent = async (familyName) => {
+        
+        window.markFamilyPresent = async (familyName) => { /* ... existing logic ... */
             if(!confirm(`Marcar PRESENÇA para toda a Família ${familyName}?`)) return;
             if (currentUser.role !== 'admin' || !selectedDate) return;
             const familyMembers = members.filter(m => m.familia === familyName);
@@ -604,7 +591,7 @@
             catch (error) { console.error(error); showToast("Erro ao marcar família", "error"); }
         };
 
-        window.toggleMissingOnly = () => {
+        window.toggleMissingOnly = () => { /* ... existing logic ... */ 
             showMissingOnly = !showMissingOnly;
             const btn = document.getElementById('btnToggleMissing');
             if(showMissingOnly) {
@@ -618,9 +605,8 @@
             }
             renderAttendance();
         };
-
         window.toggleFrequencyOrder = () => {
-            orderByFrequency = !orderByFrequency;
+             orderByFrequency = !orderByFrequency;
             if (orderByFrequency) showToast("Mais frequentes primeiro", "info"); else showToast("Ordem alfabética", "info");
             renderAttendance();
         };
@@ -632,7 +618,7 @@
 
             const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
             const curP = data.presents || []; const curO = data.online_ids || [];
-            const justifications = data.justifications || {}; 
+            const justifications = data.justifications || {}; // Justificativas
             
             if(document.getElementById('display-lideres')) {
                 document.getElementById('display-lideres').innerText = data.lideresCount || 0;
@@ -650,12 +636,12 @@
 
             const card = document.getElementById('stats-present').parentElement;
             let old = card.querySelector('.detalhes-area'); if(old) old.remove();
-            let dHtml = `<div class="detalhes-area mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 text-left text-[10px] font-bold text-slate-500 dark:text-slate-400 space-y-1">
-                <p class="flex justify-between text-green-600 dark:text-green-400"><span>Membros Ala:</span> <span>${mFis + mOnl}</span></p>
-                ${(mOnl) > 0 ? `<p class="flex justify-between pl-2 opacity-70"><span>Online:</span> <span>${mOnl}</span></p>` : ''}
-                ${(vFis+vOnl) > 0 ? `<p class="flex justify-between text-teal-600 dark:text-teal-400"><span>Visitantes:</span> <span>${vFis+vOnl}</span></p>` : ''}
-                ${data.lideresCount > 0 ? `<p class="flex justify-between text-amber-600 dark:text-amber-400"><span>Líderes:</span> <span>${data.lideresCount}</span></p>` : ''}
-                ${data.missionariosCount > 0 ? `<p class="flex justify-between text-indigo-600 dark:text-indigo-400"><span>Missionários:</span> <span>${data.missionariosCount}</span></p>` : ''}
+            let dHtml = `<div class="detalhes-area mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 text-left space-y-3">
+                <div class="flex justify-between items-center"><span class="text-sm font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2">🏰 Membros Ala</span><span class="text-lg font-black text-slate-800 dark:text-white">${mFis + mOnl}</span></div>
+                ${(mOnl) > 0 ? `<div class="flex justify-between items-center"><span class="text-sm font-bold text-blue-500 flex items-center gap-2">🔴 Online</span><span class="text-lg font-black text-blue-600 dark:text-blue-400">${mOnl}</span></div>` : ''}
+                ${(vFis+vOnl) > 0 ? `<div class="flex justify-between items-center"><span class="text-sm font-bold text-teal-600 dark:text-teal-400 flex items-center gap-2">🤝 Visitantes</span><span class="text-lg font-black text-teal-700 dark:text-teal-300">${vFis+vOnl}</span></div>` : ''}
+                ${data.lideresCount > 0 ? `<div class="flex justify-between items-center"><span class="text-sm font-bold text-amber-600 dark:text-amber-400 flex items-center gap-2">👔 Líderes</span><span class="text-lg font-black text-amber-700 dark:text-amber-300">${data.lideresCount}</span></div>` : ''}
+                ${data.missionariosCount > 0 ? `<div class="flex justify-between items-center"><span class="text-sm font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">🏷️ Missionários</span><span class="text-lg font-black text-indigo-700 dark:text-indigo-300">${data.missionariosCount}</span></div>` : ''}
             </div>`;
             card.insertAdjacentHTML('beforeend', dHtml);
 
@@ -783,19 +769,19 @@
             closeJustify(); 
         };
         
+        // --- FUNÇÃO CORRIGIDA PARA EXCLUIR ---
         window.deleteJustification = async () => {
             if(!confirm("Excluir esta nota?")) return;
             const currentData = attendanceHistory[selectedDate] || {};
             let jst = { ...(currentData.justifications || {}) }; 
             delete jst[memberIdJustifying]; 
             
+            // Atualiza Banco (updateDoc força a substituição)
             await updateDoc(doc(db, "historico", selectedDate), { justifications: jst }); 
-            
-            if(attendanceHistory[selectedDate]) attendanceHistory[selectedDate].justifications = jst;
             
             showToast("Nota excluída", "info"); 
             closeJustify();
-            renderAttendance(); 
+            // Aguarda um pequeno delay para garantir sincronia, embora onSnapshot deva pegar
         };
 
         window.updateCount = async (field, val) => { const ref = doc(db, "historico", selectedDate); const data = attendanceHistory[selectedDate] || {}; const current = data[field] || 0; const newValue = Math.max(0, current + val); await setDoc(ref, { [field]: newValue }, { merge: true }); };
