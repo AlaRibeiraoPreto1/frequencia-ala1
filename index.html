@@ -37,6 +37,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
+        /* CORREÇÃO SCROLL LATERAL */
+        html, body { overflow-x: hidden; width: 100%; max-width: 100%; }
+        
         body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s, color 0.3s; -webkit-tap-highlight-color: transparent; }
         .hidden { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -53,7 +56,7 @@
         @media (max-width: 1023px) {
             .sidebar { display: none; }
             .app-layout { display: block; }
-            .content-container { padding: 20px; padding-bottom: 140px; /* Mais espaço para o menu flutuante */ }
+            .content-container { padding: 20px; padding-bottom: 140px; overflow-x: hidden; }
             .sticky-search { position: sticky; top: 0; z-index: 100; padding: 10px 0; }
         }
 
@@ -64,22 +67,15 @@
         html.dark .sticky-search { background: #0f172a; }
         html.dark .sidebar { background: #0f172a; border-right-color: #334155; }
 
-        /* --- SUPER LIQUID GLASS (APPLE STYLE) --- */
+        /* Liquid Glass */
         .liquid-glass {
-            /* Fundo Claro: Branco com 75% opacidade */
             background: rgba(255, 255, 255, 0.75);
-            /* O Segredo da Apple: Saturação alta + Blur forte */
             backdrop-filter: saturate(180%) blur(25px);
             -webkit-backdrop-filter: saturate(180%) blur(25px);
-            /* Borda sutil para contraste */
             border: 1px solid rgba(255, 255, 255, 0.4);
-            /* Sombra profunda para flutuar */
             box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
         }
-
-        /* Dark Mode Liquid Glass */
         html.dark .liquid-glass {
-            /* Fundo Escuro: Slate-900 com 75% opacidade */
             background: rgba(15, 23, 42, 0.75);
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
@@ -107,7 +103,7 @@
         .toast-active { animation: toastIn 0.3s ease-out forwards; }
     </style>
 </head>
-<body class="antialiased status-login bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100">
+<body class="antialiased status-login bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 overflow-x-hidden">
 
     <div id="loading-screen" class="fixed inset-0 bg-white dark:bg-slate-900 z-[300] flex items-center justify-center">
         <div class="text-center space-y-4">
@@ -116,7 +112,7 @@
         </div>
     </div>
 
-    <div id="access-container" class="min-h-screen flex items-center justify-center p-6">
+    <div id="access-container" class="min-h-screen flex items-center justify-center p-6 overflow-x-hidden">
         <section id="view-login" class="hidden glass-card p-10 w-full max-w-sm text-center space-y-8 shadow-2xl">
             <img src="https://images-us-prod.cms.commerce.dynamics.com/cms/api/fswvqbgntk/imageFileData/MA2bhk?ver=9757" alt="Cristo" class="h-32 mx-auto object-contain mb-4 drop-shadow-xl">
             <h2 class="text-2xl font-black text-slate-800 dark:text-white uppercase italic leading-tight">Ala <br>Ribeirão Preto 1</h2>
@@ -140,27 +136,7 @@
         </section>
     </div>
 
-    <div id="mobile-menu-overlay" onclick="toggleMobileMenu()" class="hidden fixed inset-0 bg-black/50 z-[200] backdrop-blur-sm"></div>
-    <div id="mobile-menu-panel" class="fixed top-0 right-0 h-full w-64 bg-white dark:bg-slate-900 z-[210] shadow-2xl translate-x-full flex flex-col border-l dark:border-slate-800">
-        <div class="p-6 bg-[#002e5d] dark:bg-slate-950 text-white">
-            <p id="user-mobile-name" class="font-bold truncate text-sm">...</p>
-            <p id="user-mobile-role" class="text-[9px] opacity-70 uppercase tracking-widest font-black"></p>
-        </div>
-        <div class="flex-1 p-4 space-y-2">
-            <button onclick="toggleTheme()" class="w-full flex items-center gap-3 p-4 rounded-2xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-xs uppercase transition-colors">
-                <i class="fas fa-moon text-[#002e5d] dark:text-yellow-400"></i> Alternar Tema
-            </button>
-            <hr class="border-slate-50 dark:border-slate-800">
-            <button id="admin-mobile-btn" onclick="switchTab('admin-users'); toggleMobileMenu();" class="hidden w-full flex items-center gap-3 p-4 rounded-2xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-xs uppercase transition-colors">
-                <i class="fas fa-users-cog text-[#002e5d] dark:text-blue-400"></i> Gerenciar Logins
-            </button>
-            <button onclick="logout()" class="w-full flex items-center gap-3 p-4 rounded-2xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold text-xs uppercase">
-                <i class="fas fa-power-off"></i> Sair do Sistema
-            </button>
-        </div>
-    </div>
-
-    <div id="app-layout" class="hidden app-layout">
+    <div id="app-layout" class="hidden app-layout overflow-x-hidden">
         
         <aside class="sidebar p-8">
             <div class="flex items-center gap-3 mb-12 px-2">
@@ -185,27 +161,23 @@
             </div>
         </aside>
 
-        <main class="main-content bg-slate-50 dark:bg-slate-900">
+        <main class="main-content bg-slate-50 dark:bg-slate-900 overflow-x-hidden">
             
            <div id="global-top-bar" class="w-full sticky top-0 z-[140] bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-white/50 dark:border-slate-700/50 py-3 px-4 flex items-center justify-between gap-3 shadow-sm">
-                
                 <h2 id="dynamic-page-title" class="font-black text-[#002e5d] dark:text-white text-sm uppercase leading-tight truncate transition-all duration-300 w-full lg:w-auto">
                     Página Inicial
                 </h2>
-
                 <div id="date-controls-wrapper" class="flex items-center justify-end gap-1 flex-1 max-w-[70%] hidden">
                     <button onclick="navigateDate(1)" class="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-300 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-90 transition-all border border-slate-100 dark:border-slate-700 shadow-sm"><i class="fas fa-chevron-left text-xs"></i></button>
-                    
                     <div class="glass-card flex items-center px-3 py-2 gap-2 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm flex-1 min-w-0">
                         <i class="fas fa-calendar-alt text-[#002e5d] dark:text-blue-400 text-xs"></i>
                         <select id="dateSelectGlobal" class="bg-transparent font-black text-xs uppercase tracking-tighter outline-none border-none cursor-pointer text-slate-700 dark:text-white w-full dark:bg-slate-900 p-0"></select>
                     </div>
-
                     <button onclick="navigateDate(-1)" class="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-300 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-90 transition-all border border-slate-100 dark:border-slate-700 shadow-sm"><i class="fas fa-chevron-right text-xs"></i></button>
                 </div>
             </div>
 
-            <div class="content-container w-full">
+            <div class="content-container w-full overflow-x-hidden">
                 
                 <section id="view-dashboard" class="hidden space-y-8">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -333,15 +305,16 @@
                     <h3 id="justify-member-name" class="font-black text-[#002e5d] dark:text-white text-lg uppercase text-center tracking-tight">Justificar Ausência</h3>
                     <textarea id="justify-text" rows="3" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-700 dark:text-white border border-slate-100 dark:border-slate-600 font-bold text-sm outline-none resize-none shadow-inner" placeholder="Digite o motivo aqui..."></textarea>
                     <div class="flex gap-2">
+                        <button onclick="deleteJustification()" id="btn-delete-note" class="hidden py-3 px-4 rounded-xl bg-red-100 text-red-600 font-bold text-xs"><i class="fas fa-trash"></i></button>
                         <button onclick="closeJustify()" class="flex-1 py-3 rounded-xl bg-slate-100 dark:bg-slate-600 font-bold text-slate-500 dark:text-slate-300 text-xs uppercase">Cancelar</button>
-                        <button onclick="saveJustification()" class="flex-1 py-3 rounded-xl bg-[#002e5d] dark:bg-blue-600 font-black text-white text-xs uppercase shadow-lg active:scale-95 transition-transform">Salvar Nota</button>
+                        <button onclick="saveJustification()" class="flex-1 py-3 rounded-xl bg-[#002e5d] dark:bg-blue-600 font-black text-white text-xs uppercase shadow-lg active:scale-95 transition-transform">Salvar</button>
                     </div>
                 </div>
             </div>
 
-            <div id="more-menu-overlay" onclick="toggleMoreMenu()" class="hidden fixed inset-0 bg-black/40 z-[190] backdrop-blur-sm transition-opacity"></div>
+            <div id="more-menu-overlay" onclick="toggleMoreMenu()" class="hidden fixed inset-0 bg-black/30 z-[190] backdrop-blur-sm transition-opacity"></div>
             
-            <div id="more-menu-content" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 w-[85%] max-w-sm liquid-glass p-6 z-[195] rounded-3xl animate-pop-up origin-bottom">
+            <div id="more-menu-content" class="hidden fixed bottom-28 left-1/2 -translate-x-1/2 w-[85%] max-w-sm liquid-glass p-6 z-[195] rounded-3xl animate-pop-up origin-bottom">
                 <h3 class="text-xs font-black uppercase text-slate-500 dark:text-slate-300 tracking-widest mb-4 text-center">Mais Opções</h3>
                 <div class="grid grid-cols-3 gap-4">
                     <button onclick="switchTab('analysis'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
@@ -467,12 +440,12 @@
             } else {
                 document.getElementById('app-layout').classList.remove('hidden');
                 document.getElementById('access-container').classList.add('hidden');
-                document.body.className = "antialiased status-app bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100";
+                document.body.className = "antialiased status-app bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 overflow-x-hidden";
             }
             const targetView = document.getElementById(`view-${tab}`);
             if(targetView) targetView.classList.remove('hidden');
             
-            // Fecha menu se estiver aberto
+            // AUTO CLOSE MENU
             const menu = document.getElementById('more-menu-content');
             const overlay = document.getElementById('more-menu-overlay');
             if(!menu.classList.contains('hidden')) {
@@ -514,11 +487,8 @@
             window.scrollTo(0,0);
         };
 
-        window.toggleMobileMenu = () => {
-            // Deprecated
-        };
+        window.toggleMobileMenu = () => { }; // Deprecated
 
-        // Toggle More Menu
         window.toggleMoreMenu = () => {
             const overlay = document.getElementById('more-menu-overlay');
             const menu = document.getElementById('more-menu-content');
@@ -645,6 +615,7 @@
 
             const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
             const curP = data.presents || []; const curO = data.online_ids || [];
+            const justifications = data.justifications || {}; // Justificativas
             
             if(document.getElementById('display-lideres')) {
                 document.getElementById('display-lideres').innerText = data.lideresCount || 0;
@@ -660,7 +631,6 @@
             document.getElementById('stats-present').innerText = mFis + mOnl + vFis + vOnl + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
             document.getElementById('stats-total').innerText = totM;
 
-            // DETALHAMENTO DASHBOARD
             const card = document.getElementById('stats-present').parentElement;
             let old = card.querySelector('.detalhes-area'); if(old) old.remove();
             let dHtml = `<div class="detalhes-area mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 text-left text-[10px] font-bold text-slate-500 dark:text-slate-400 space-y-1">
@@ -720,8 +690,11 @@
                         textClass = "text-slate-700 dark:text-slate-300";
                     }
                     const rCat = getRealCategory(m);
+                    const hasNote = justifications[m.id]; // Checa nota
+                    const noteIconClass = hasNote ? "text-amber-500 dark:text-amber-400" : "text-slate-300 dark:text-slate-600";
+                    const noteIconType = hasNote ? "fas fa-sticky-note" : "far fa-sticky-note";
 
-                    buffer += `<div class="glass-card mb-2 p-3 flex items-center gap-3 border-l-[6px] transition-all duration-200 ${bgClass} ${borderClass} shadow-sm"><div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name.replace(/'/g, "\\'")}')"` : ''} class="flex-1 flex items-center gap-3 cursor-pointer select-none"><div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${avatarStyle}">${avatarContent}</div><div class="flex-1 min-w-0"><h4 class="font-bold text-sm ${textClass} truncate">${m.name} ${star > 0 ? `<span class="text-amber-500 text-[10px] ml-1"><i class="fas fa-star"></i>${star}</span>`:''}</h4><p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mt-0.5 tracking-wide">${m.org} • ${rCat}</p></div></div>${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="text-slate-300 dark:text-slate-600 hover:text-[#002e5d] dark:hover:text-blue-400 p-3 transition-colors"><i class="fas fa-sticky-note text-lg"></i></button>` : ''}</div>`;
+                    buffer += `<div class="glass-card mb-2 p-3 flex items-center gap-3 border-l-[6px] transition-all duration-200 ${bgClass} ${borderClass} shadow-sm"><div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name.replace(/'/g, "\\'")}')"` : ''} class="flex-1 flex items-center gap-3 cursor-pointer select-none"><div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${avatarStyle}">${avatarContent}</div><div class="flex-1 min-w-0"><h4 class="font-bold text-sm ${textClass} break-words whitespace-normal leading-tight">${m.name} ${star > 0 ? `<span class="text-amber-500 text-[10px] ml-1"><i class="fas fa-star"></i>${star}</span>`:''}</h4><p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mt-0.5 tracking-wide">${m.org} • ${rCat}</p></div></div>${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="${noteIconClass} hover:text-[#002e5d] dark:hover:text-blue-400 p-3 transition-colors"><i class="${noteIconType} text-lg"></i></button>` : ''}</div>`;
                 }
             });
             list.innerHTML = visibleCount === 0 ? `<div class="flex flex-col items-center justify-center py-10 opacity-60"><div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4"><i class="fas ${showMissingOnly ? 'fa-check-circle text-green-500' : 'fa-search text-slate-400'} text-3xl"></i></div><p class="font-bold text-slate-500 dark:text-slate-400 text-sm">${showMissingOnly ? 'Todos os listados estão presentes!' : 'Nenhum membro encontrado.'}</p></div>` : buffer;
@@ -769,9 +742,20 @@
         window.openEditUser = (u) => { userIdEditing = u.id; document.getElementById('edit-user-name').value = u.name; document.getElementById('edit-user-role').value = u.role; document.getElementById('edit-user-pass').value = ''; document.getElementById('userEditModal').classList.remove('hidden'); };
         window.saveUserUpdate = async () => { const n = document.getElementById('edit-user-name').value; const r = document.getElementById('edit-user-role').value; const p = document.getElementById('edit-user-pass').value; const u = { name: n, role: r }; if(p) u.password = p; await updateDoc(doc(db, "usuarios", userIdEditing), u); showToast("Atualizado!", "success"); document.getElementById('userEditModal').classList.add('hidden'); };
         window.deleteUserAction = async () => { if(confirm("Remover login?")) { await deleteDoc(doc(db, "usuarios", userIdEditing)); showToast("Removido!", "info"); document.getElementById('userEditModal').classList.add('hidden'); } };
-        window.openJustify = (id, name) => { memberIdJustifying = id; document.getElementById('justify-member-name').innerText = "Justificar: " + name; document.getElementById('justify-text').value = attendanceHistory[selectedDate]?.justifications?.[id] || ''; document.getElementById('justificationModal').classList.remove('hidden'); };
+        
+        window.openJustify = (id, name) => { 
+            memberIdJustifying = id; 
+            document.getElementById('justify-member-name').innerText = "Justificar: " + name; 
+            const note = attendanceHistory[selectedDate]?.justifications?.[id] || '';
+            document.getElementById('justify-text').value = note; 
+            document.getElementById('justificationModal').classList.remove('hidden'); 
+            const btnDelete = document.getElementById('btn-delete-note');
+            if(note) btnDelete.classList.remove('hidden'); else btnDelete.classList.add('hidden');
+        };
         window.closeJustify = () => document.getElementById('justificationModal').classList.add('hidden');
         window.saveJustification = async () => { const txt = document.getElementById('justify-text').value.trim(); let jst = attendanceHistory[selectedDate]?.justifications || {}; if(txt==="") delete jst[memberIdJustifying]; else jst[memberIdJustifying]=txt; await setDoc(doc(db, "historico", selectedDate), { justifications: jst }, { merge: true }); showToast("Salvo!", "success"); closeJustify(); };
+        window.deleteJustification = async () => { if(confirm("Apagar nota?")) { let jst = attendanceHistory[selectedDate]?.justifications || {}; delete jst[memberIdJustifying]; await setDoc(doc(db, "historico", selectedDate), { justifications: jst }, { merge: true }); showToast("Nota excluída", "info"); closeJustify(); }};
+
         window.updateCount = async (field, val) => { const ref = doc(db, "historico", selectedDate); const data = attendanceHistory[selectedDate] || {}; const current = data[field] || 0; const newValue = Math.max(0, current + val); await setDoc(ref, { [field]: newValue }, { merge: true }); };
         window.renderRescue = () => { const list = document.getElementById('missingList'); if(!list) return; list.innerHTML = ''; members.forEach(m => { if(getRealCategory(m)!=='Visitante') { const diff = Math.floor((new Date()-new Date(m.lastAttended))/(1000*60*60*24)); if(diff>=21) list.innerHTML += `<div class="glass-card p-6 border-t-8 border-orange-500"><div><p class="text-[9px] font-black text-orange-500 uppercase">${Math.floor(diff/7)} SEMANAS</p><h4 class="font-black text-slate-800 dark:text-white text-xs">${m.name}</h4></div><a href="https://wa.me/${m.telefone || ''}?text=Olá!" target="_blank" class="block mt-4 bg-teal-600 text-white p-3 rounded-xl text-center text-[10px] uppercase font-bold">WhatsApp</a></div>`; } }); if(document.getElementById('stats-rescue')) document.getElementById('stats-rescue').innerText = list.children.length; }
         
