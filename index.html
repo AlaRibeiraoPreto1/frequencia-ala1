@@ -69,21 +69,12 @@
 
         /* --- ULTRA LIQUID GLASS (APPLE STYLE) --- */
         .liquid-glass {
-            /* Fundo mais transparente para mostrar o conteudo passando */
             background: rgba(255, 255, 255, 0.65);
-            
-            /* Blur forte + Saturação alta (Segredo do iOS) */
             backdrop-filter: blur(25px) saturate(200%);
             -webkit-backdrop-filter: blur(25px) saturate(200%);
-            
-            /* Borda branca quase sólida para contraste máximo */
             border: 1px solid rgba(255, 255, 255, 0.8);
-            
-            /* Sombra suave mas escura para "levantar" o elemento */
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
         }
-
-        /* Dark Mode Liquid Glass */
         html.dark .liquid-glass {
             background: rgba(17, 25, 40, 0.70);
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -763,7 +754,36 @@
         };
         window.closeJustify = () => document.getElementById('justificationModal').classList.add('hidden');
         window.saveJustification = async () => { const txt = document.getElementById('justify-text').value.trim(); let jst = attendanceHistory[selectedDate]?.justifications || {}; if(txt==="") delete jst[memberIdJustifying]; else jst[memberIdJustifying]=txt; await setDoc(doc(db, "historico", selectedDate), { justifications: jst }, { merge: true }); showToast("Salvo!", "success"); closeJustify(); };
-        window.deleteJustification = async () => { if(confirm("Apagar nota?")) { let jst = attendanceHistory[selectedDate]?.justifications || {}; delete jst[memberIdJustifying]; await setDoc(doc(db, "historico", selectedDate), { justifications: jst }, { merge: true }); showToast("Nota excluída", "info"); closeJustify(); }};
+        
+        // --- FUNÇÃO CORRIGIDA DE EXCLUIR NOTA ---
+        window.deleteJustification = async () => {
+            if(!confirm("Excluir esta nota?")) return;
+
+            try {
+                // 1. Prepara dados (cópia segura)
+                const currentData = attendanceHistory[selectedDate] || {};
+                const newJustifications = { ...(currentData.justifications || {}) }; 
+                delete newJustifications[memberIdJustifying]; // Deleta a chave
+
+                // 2. Atualiza Banco
+                await setDoc(doc(db, "historico", selectedDate), { 
+                    justifications: newJustifications 
+                }, { merge: true });
+
+                // 3. Atualiza Interface Imediatamente (Sem esperar snapshot)
+                if(attendanceHistory[selectedDate]) {
+                    attendanceHistory[selectedDate].justifications = newJustifications;
+                }
+                
+                showToast("Nota excluída", "info");
+                closeJustify();
+                renderAttendance(); // Força a lista a repintar o ícone cinza
+
+            } catch (e) {
+                console.error(e);
+                showToast("Erro ao excluir", "error");
+            }
+        };
 
         window.updateCount = async (field, val) => { const ref = doc(db, "historico", selectedDate); const data = attendanceHistory[selectedDate] || {}; const current = data[field] || 0; const newValue = Math.max(0, current + val); await setDoc(ref, { [field]: newValue }, { merge: true }); };
         window.renderRescue = () => { const list = document.getElementById('missingList'); if(!list) return; list.innerHTML = ''; members.forEach(m => { if(getRealCategory(m)!=='Visitante') { const diff = Math.floor((new Date()-new Date(m.lastAttended))/(1000*60*60*24)); if(diff>=21) list.innerHTML += `<div class="glass-card p-6 border-t-8 border-orange-500"><div><p class="text-[9px] font-black text-orange-500 uppercase">${Math.floor(diff/7)} SEMANAS</p><h4 class="font-black text-slate-800 dark:text-white text-xs">${m.name}</h4></div><a href="https://wa.me/${m.telefone || ''}?text=Olá!" target="_blank" class="block mt-4 bg-teal-600 text-white p-3 rounded-xl text-center text-[10px] uppercase font-bold">WhatsApp</a></div>`; } }); if(document.getElementById('stats-rescue')) document.getElementById('stats-rescue').innerText = list.children.length; }
