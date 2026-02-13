@@ -54,6 +54,9 @@
         .nav-btn-active { background-color: #f0f7ff; color: var(--sacramental-blue) !important; font-weight: 800; border-right: 4px solid var(--sacramental-blue); }
         html.dark .nav-btn-active { background-color: #1e293b; color: #60a5fa !important; border-right: 4px solid #60a5fa; }
 
+        .family-divider { background-color: #f8fafc; padding: 8px 16px; border-radius: 12px; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-top: 15px; border: 1px solid #e2e8f0; width: 100%; display: block; }
+        html.dark .family-divider { background-color: #1e293b; color: #94a3b8; border-color: #334155; }
+
         /* Animation Toast */
         @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         .toast-active { animation: toastIn 0.3s ease-out forwards; }
@@ -70,7 +73,8 @@
 
     <div id="access-container" class="min-h-screen flex items-center justify-center p-6">
         <section id="view-login" class="hidden glass-card p-10 w-full max-w-sm text-center space-y-8 shadow-2xl">
-            <div class="w-20 h-20 bg-[#002e5d] rounded-2xl mx-auto flex items-center justify-center text-white text-3xl shadow-lg"><i class="fas fa-church"></i></div>
+            <img src="https://images-us-prod.cms.commerce.dynamics.com/cms/api/fswvqbgntk/imageFileData/MA2bhk?ver=9757" alt="Cristo" class="h-32 mx-auto object-contain mb-4 drop-shadow-xl">
+            
             <h2 class="text-2xl font-black text-slate-800 dark:text-white uppercase italic leading-tight">Ala <br>Ribeirão Preto 1</h2>
             <div class="space-y-3">
                 <input type="text" id="login-user" placeholder="Usuário" class="w-full p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 dark:text-white border-none outline-none text-sm font-bold shadow-inner">
@@ -574,14 +578,38 @@
                     }
                     let star = 0; if(orderByFrequency) lastDom.forEach(d => { if (attendanceHistory[d]?.presents?.includes(m.id)) star++; });
                     
-                    const bgClass = isP ? (isOn ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20') : 'bg-white dark:bg-slate-800';
-                    const borderClass = isP ? (isOn ? 'border-blue-400' : 'border-emerald-400') : 'border-transparent';
-                    const initial = m.name.charAt(0).toUpperCase();
-                    const avatarContent = isP ? `<i class="fas ${isOn ? 'fa-wifi' : 'fa-check'} text-lg"></i>` : `<span class="text-sm font-bold">${initial}</span>`;
-                    const avatarStyle = isP ? (isOn ? 'bg-blue-500 text-white shadow-blue-300' : 'bg-emerald-500 text-white shadow-emerald-300') : 'bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-500';
+                    // --- CORREÇÃO DE CORES PARA DARK MODE ---
+                    let bgClass, borderClass, avatarStyle, avatarContent, textClass;
+
+                    if (isP) {
+                        // PRESENTE
+                        if (isOn) {
+                            // Online
+                            bgClass = "bg-blue-50 dark:bg-blue-900/40"; 
+                            borderClass = "border-blue-400 dark:border-blue-500";
+                            avatarStyle = "bg-blue-500 text-white shadow-blue-300 dark:shadow-none";
+                            avatarContent = `<i class="fas fa-wifi text-lg"></i>`;
+                            textClass = "text-slate-900 dark:text-blue-100";
+                        } else {
+                            // Físico
+                            bgClass = "bg-emerald-50 dark:bg-emerald-900/40"; 
+                            borderClass = "border-emerald-400 dark:border-emerald-500";
+                            avatarStyle = "bg-emerald-500 text-white shadow-emerald-300 dark:shadow-none";
+                            avatarContent = `<i class="fas fa-check text-lg"></i>`;
+                            textClass = "text-slate-900 dark:text-emerald-100";
+                        }
+                    } else {
+                        // AUSENTE
+                        bgClass = "bg-white dark:bg-slate-800";
+                        borderClass = "border-transparent";
+                        avatarStyle = "bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-500";
+                        avatarContent = `<span class="text-sm font-bold">${m.name.charAt(0).toUpperCase()}</span>`;
+                        textClass = "text-slate-700 dark:text-slate-300";
+                    }
+
                     const rCat = getRealCategory(m);
 
-                    buffer += `<div class="glass-card mb-2 p-3 flex items-center gap-3 border-l-[6px] transition-all duration-200 ${bgClass} ${borderClass} shadow-sm"><div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name.replace(/'/g, "\\'")}')"` : ''} class="flex-1 flex items-center gap-3 cursor-pointer select-none"><div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${avatarStyle}">${avatarContent}</div><div class="flex-1 min-w-0"><h4 class="font-bold text-sm ${isP ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-300'} truncate">${m.name} ${star > 0 ? `<span class="text-amber-500 text-[10px] ml-1"><i class="fas fa-star"></i>${star}</span>`:''}</h4><p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mt-0.5 tracking-wide">${m.org} • ${rCat}</p></div></div>${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="text-slate-300 dark:text-slate-600 hover:text-[#002e5d] dark:hover:text-blue-400 p-3 transition-colors"><i class="fas fa-sticky-note text-lg"></i></button>` : ''}</div>`;
+                    buffer += `<div class="glass-card mb-2 p-3 flex items-center gap-3 border-l-[6px] transition-all duration-200 ${bgClass} ${borderClass} shadow-sm"><div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name.replace(/'/g, "\\'")}')"` : ''} class="flex-1 flex items-center gap-3 cursor-pointer select-none"><div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${avatarStyle}">${avatarContent}</div><div class="flex-1 min-w-0"><h4 class="font-bold text-sm ${textClass} truncate">${m.name} ${star > 0 ? `<span class="text-amber-500 text-[10px] ml-1"><i class="fas fa-star"></i>${star}</span>`:''}</h4><p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mt-0.5 tracking-wide">${m.org} • ${rCat}</p></div></div>${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="text-slate-300 dark:text-slate-600 hover:text-[#002e5d] dark:hover:text-blue-400 p-3 transition-colors"><i class="fas fa-sticky-note text-lg"></i></button>` : ''}</div>`;
                 }
             });
             list.innerHTML = visibleCount === 0 ? `<div class="flex flex-col items-center justify-center py-10 opacity-60"><div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4"><i class="fas ${showMissingOnly ? 'fa-check-circle text-green-500' : 'fa-search text-slate-400'} text-3xl"></i></div><p class="font-bold text-slate-500 dark:text-slate-400 text-sm">${showMissingOnly ? 'Todos os listados estão presentes!' : 'Nenhum membro encontrado.'}</p></div>` : buffer;
