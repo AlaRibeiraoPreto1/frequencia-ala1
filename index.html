@@ -59,8 +59,11 @@
         .nav-btn-active { background-color: #f0f7ff; color: var(--sacramental-blue) !important; font-weight: 800; border-right: 4px solid var(--sacramental-blue); }
         html.dark .nav-btn-active { background-color: #1e293b; color: #60a5fa !important; border-right: 4px solid #60a5fa; }
 
-        /* Animações */
-        @keyframes toastIn { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+        /* Correção da Centralização da Mensagem */
+        @keyframes toastIn { 
+            from { opacity: 0; transform: translate(-50%, -20px); } 
+            to { opacity: 1; transform: translate(-50%, 0); } 
+        }
         .toast-active { animation: toastIn 0.3s ease-out forwards; }
     </style>
 </head>
@@ -326,6 +329,19 @@
                 </section>
                 <section id="view-analysis" class="hidden"><div id="missingList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div></section>
             </div>
+
+            <div id="justificationModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="glass-card w-full max-w-sm p-6 space-y-4 shadow-2xl bg-white dark:bg-slate-800">
+            <h3 id="justify-member-name" class="font-black text-[#002e5d] dark:text-white text-lg uppercase text-center tracking-tight">Justificar Ausência</h3>
+            <textarea id="justify-text" rows="3" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-700 dark:text-white border border-slate-100 dark:border-slate-600 font-bold text-sm outline-none resize-none shadow-inner" placeholder="Digite o motivo aqui..."></textarea>
+            <div class="flex gap-2">
+                <button onclick="closeJustify()" class="flex-1 py-3 rounded-xl bg-slate-100 dark:bg-slate-600 font-bold text-slate-500 dark:text-slate-300 text-xs uppercase">Cancelar</button>
+                <button onclick="saveJustification()" class="flex-1 py-3 rounded-xl bg-[#002e5d] dark:bg-blue-600 font-black text-white text-xs uppercase shadow-lg active:scale-95 transition-transform">Salvar Nota</button>
+            </div>
+        </div>
+    </div>
+
+            
         </main>
 
         <nav id="mobile-nav" class="lg:hidden fixed bottom-6 left-6 right-6 h-20 glass-card flex justify-around items-center px-4 z-[200] border-2 border-white dark:border-slate-600 shadow-2xl bg-white/90 dark:bg-slate-900/90 backdrop-blur">
@@ -609,7 +625,8 @@
                                 </div>
                             </div>
                         </div>
-                        ${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="text-slate-300 dark:text-slate-600 hover:text-blue-500 p-2"><i class="fas fa-comment-dots text-sm"></i></button>` : ''}
+                       /* CORREÇÃO DO ÍCONE: De volta para fa-sticky-note */
+                ${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="text-slate-300 dark:text-slate-500 hover:text-[#002e5d] dark:hover:text-blue-400 p-3 transition-colors"><i class="fas fa-sticky-note text-lg"></i></button>` : ''}
                     </div>`;
                 }
             });
