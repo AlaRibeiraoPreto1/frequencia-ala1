@@ -202,8 +202,7 @@
                 <section id="view-attendance" class="hidden flex flex-col h-full">
                     
                     <div class="sticky top-0 z-30 bg-slate-50 dark:bg-slate-900 pb-2 pt-1 transition-colors duration-300">
-                        <div class="flex gap-2 mb-3">
-                            <div class="relative flex-1 group">
+                        <div class="flex gap-2 mb-1 px-1"> <div class="relative flex-1 group">
                                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
                                 <input type="text" id="searchMember" oninput="debounceSearch()" placeholder="Buscar membro..." 
                                     class="w-full pl-10 pr-10 py-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-[#002e5d] dark:focus:ring-blue-500 dark:text-white shadow-sm transition-all">
@@ -219,9 +218,7 @@
                             </button>
                         </div>
 
-                        <div id="orgFilters" class="flex overflow-x-auto gap-2 no-scrollbar pb-1 fade-right select-none"></div>
-
-                        <div id="attendance-options" class="hidden mt-2 bg-white dark:bg-slate-800 p-4 rounded-3xl border dark:border-slate-700 shadow-lg">
+                        <div id="attendance-options" class="hidden mt-2 bg-white dark:bg-slate-800 p-4 rounded-3xl border dark:border-slate-700 shadow-lg mx-1 relative z-50">
                             <div class="flex justify-between items-center mb-3">
                                 <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Contadores Manuais</span>
                                 <button onclick="toggleOptions()" class="text-slate-300 hover:text-red-500"><i class="fas fa-times"></i></button>
@@ -229,36 +226,21 @@
                             <div class="grid grid-cols-3 gap-2">
                                 <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
                                     <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300">Líderes</span>
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="updateCount('lideresCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button>
-                                        <span id="display-lideres" class="font-black text-sm text-[#002e5d] dark:text-white">0</span>
-                                        <button onclick="updateCount('lideresCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button>
-                                    </div>
+                                    <div class="flex items-center gap-2"><button onclick="updateCount('lideresCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button><span id="display-lideres" class="font-black text-sm text-[#002e5d] dark:text-white">0</span><button onclick="updateCount('lideresCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button></div>
                                 </div>
                                 <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
                                     <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300">Visitantes</span>
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="updateCount('visitantesCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button>
-                                        <span id="display-visitantes" class="font-black text-sm text-[#002e5d] dark:text-white">0</span>
-                                        <button onclick="updateCount('visitantesCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button>
-                                    </div>
+                                    <div class="flex items-center gap-2"><button onclick="updateCount('visitantesCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button><span id="display-visitantes" class="font-black text-sm text-[#002e5d] dark:text-white">0</span><button onclick="updateCount('visitantesCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button></div>
                                 </div>
                                 <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
                                     <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300">Missionários</span>
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="updateCount('missionariosCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button>
-                                        <span id="display-missionarios" class="font-black text-sm text-[#002e5d] dark:text-white">0</span>
-                                        <button onclick="updateCount('missionariosCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button>
-                                    </div>
+                                    <div class="flex items-center gap-2"><button onclick="updateCount('missionariosCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button><span id="display-missionarios" class="font-black text-sm text-[#002e5d] dark:text-white">0</span><button onclick="updateCount('missionariosCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button></div>
                                 </div>
                             </div>
-                            <button onclick="toggleFrequencyOrder()" id="btnOrderFreqInner" class="w-full mt-3 py-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase flex items-center justify-center gap-2">
-                                <i class="fas fa-sort-amount-down"></i> Ordenar por Frequência
-                            </button>
+                            <button onclick="toggleFrequencyOrder()" id="btnOrderFreqInner" class="w-full mt-3 py-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase flex items-center justify-center gap-2"><i class="fas fa-sort-amount-down"></i> Ordenar por Frequência</button>
                         </div>
                     </div>
-
-                    <div id="memberList" class="flex-1 space-y-3 pb-20 mt-2 min-h-[300px]"></div>
+                    <div id="memberList" class="flex-1 space-y-3 pb-24 mt-2 min-h-[300px] px-1"></div>
                 </section>
 
                 <section id="view-reports" class="hidden space-y-8">
@@ -553,27 +535,27 @@
             return styles[org] || 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-700 dark:text-slate-300';
         };
 
-        // --- NOVA FUNÇÃO: MARCAR FAMÍLIA EM LOTE ---
+       // --- 1. FUNÇÃO AUXILIAR: MARCAR FAMÍLIA INTEIRA ---
         window.markFamilyPresent = async (familyName) => {
-            // 1. Confirmação de segurança
-            if(!confirm(`Deseja marcar PRESENÇA para todos da Família ${familyName}?`)) return;
+            // Pergunta de segurança
+            if(!confirm(`Marcar PRESENÇA para toda a Família ${familyName}?`)) return;
 
             if (currentUser.role !== 'admin' || !selectedDate) return;
 
-            // 2. Encontrar todos os membros dessa família
+            // Filtra membros da família
             const familyMembers = members.filter(m => m.familia === familyName);
             const idsToMark = familyMembers.map(m => m.id);
 
             if(idsToMark.length === 0) return;
 
-            // 3. Preparar atualização no Banco de Dados
+            // Prepara gravação em lote no banco
             const batch = writeBatch(db);
             const hRef = doc(db, "historico", selectedDate);
             
-            // Adiciona todos os IDs ao array de presentes de uma vez
+            // Adiciona todos os IDs
             batch.set(hRef, { presents: arrayUnion(...idsToMark) }, { merge: true });
 
-            // Atualiza o histórico individual de cada um
+            // Atualiza histórico individual
             idsToMark.forEach(id => {
                 const mRef = doc(db, "membros", id);
                 batch.update(mRef, { attendanceLog: arrayUnion(selectedDate), lastAttended: selectedDate });
@@ -581,7 +563,8 @@
 
             try {
                 await batch.commit();
-                if ("vibrate" in navigator) navigator.vibrate([50, 50, 50]); // Vibração dupla para confirmar lote
+                // Vibração dupla para confirmar
+                if ("vibrate" in navigator) navigator.vibrate([50, 50, 50]); 
                 showToast(`${familyName}: Presença registrada!`, "success");
             } catch (error) {
                 console.error(error);
@@ -589,36 +572,52 @@
             }
         };
 
-       // --- RENDER ATTENDANCE (VISUAL CLEAN + FAMÍLIA EM LOTE) ---
+        // --- 2. FUNÇÃO PRINCIPAL: RENDERIZAR LISTA (VISUAL LIMPO) ---
         window.renderAttendance = () => {
             const list = document.getElementById('memberList'); if(!list) return;
             const search = document.getElementById('searchMember').value.toLowerCase();
-            const btnClr = document.getElementById('btnClearSearch'); if(btnClr) search.length > 0 ? btnClr.classList.remove('hidden') : btnClr.classList.add('hidden');
-
-            const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
-            const curP = data.presents || []; const curO = data.online_ids || [];
             
-            // Atualiza contadores do topo
+            // Controle do botão "X" da busca
+            const btnClr = document.getElementById('btnClearSearch'); 
+            if(btnClr) search.length > 0 ? btnClr.classList.remove('hidden') : btnClr.classList.add('hidden');
+
+            // Pega dados do histórico
+            const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
+            const curP = data.presents || []; 
+            const curO = data.online_ids || [];
+            
+            // Atualiza os contadores manuais (Líderes, Visitantes, etc)
             if(document.getElementById('display-lideres')) {
                 document.getElementById('display-lideres').innerText = data.lideresCount || 0;
                 document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
                 document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
             }
             
-            // Totais
-            let mFis = 0; let mOnl = 0; let vFis = 0; let vOnl = 0; let totM = 0;
+            // Cálculos de Totais (Físico vs Online)
+            let mFis = 0; let mOnl = 0; let totM = 0;
             members.forEach(m => {
-                const isP = curP.includes(m.id); const isOn = curO.includes(m.id);
-                const rCat = getRealCategory(m); if(rCat !== 'Visitante') { totM++; if(isP) isOn ? mOnl++ : mFis++; } else { if(isP) isOn ? vOnl++ : vFis++; }
+                const isP = curP.includes(m.id); 
+                const isOn = curO.includes(m.id);
+                const rCat = m.categoria || 'Membro';
+                
+                // Só conta para estatística se não for Visitante avulso
+                if(rCat !== 'Visitante') { 
+                    totM++; 
+                    if(isP) isOn ? mOnl++ : mFis++; 
+                } 
             });
-            document.getElementById('stats-present').innerText = mFis + mOnl + vFis + vOnl + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
-            document.getElementById('stats-total').innerText = totM;
 
-            // Renderização da Lista
+            // Atualiza Dashboard do Topo
+            const totalGeral = mFis + mOnl + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
+            if(document.getElementById('stats-present')) document.getElementById('stats-present').innerText = totalGeral;
+            if(document.getElementById('stats-total')) document.getElementById('stats-total').innerText = totM;
+
+            // --- INÍCIO DA MONTAGEM DA LISTA ---
             list.innerHTML = ''; 
             let lastFam = "";
             let visibleCount = 0;
 
+            // Ordenação (Frequência ou Alfabética)
             const lastDom = Object.keys(attendanceHistory).sort().reverse().slice(0, 4);
             const sorted = [...members].sort((a, b) => {
                 if (orderByFrequency) {
@@ -631,40 +630,70 @@
             });
 
             let buffer = '';
+            
             sorted.forEach(m => {
-                const isP = curP.includes(m.id); const isOn = curO.includes(m.id);
+                const isP = curP.includes(m.id); 
+                const isOn = curO.includes(m.id);
+                
+                // Filtro 1: Se o botão "Olho Cortado" estiver ativo, esconde quem está presente
                 if (showMissingOnly && isP) return;
 
-                if((m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) && (currentFilter === 'TODOS' || m.org === currentFilter)) {
-                    visibleCount++;
+                // Filtro 2: Busca por texto (Nome ou Família)
+                // (Removemos o filtro de organização para limpar a tela)
+                if(m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) {
                     
-                    // --- CABEÇALHO DE FAMÍLIA INTERATIVO ---
+                    visibleCount++;
+
+                    // --- CABEÇALHO DE FAMÍLIA (Clicável) ---
+                    // Só mostra se não estiver ordenado por frequência e se a família mudou
                     if (!orderByFrequency && m.familia !== lastFam && !search) { 
                         buffer += `
-                        <div onclick="markFamilyPresent('${m.familia}')" class="family-divider flex justify-between items-center mt-5 mb-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors group">
-                            <span class="flex items-center gap-2"><i class="fas fa-users opacity-50"></i> Família ${m.familia}</span>
-                            <span class="text-[9px] text-slate-400 group-hover:text-[#002e5d] dark:group-hover:text-blue-400 uppercase font-bold tracking-wider">Marcar Todos <i class="fas fa-check-double ml-1"></i></span>
+                        <div onclick="markFamilyPresent('${m.familia}')" class="family-divider flex justify-between items-center mt-5 mb-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors group select-none">
+                            <span class="flex items-center gap-2 font-bold text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-wider">
+                                <i class="fas fa-users text-xs opacity-50"></i> Família ${m.familia}
+                            </span>
+                            <span class="text-[9px] text-slate-300 group-hover:text-[#002e5d] dark:group-hover:text-blue-400 uppercase font-bold tracking-wider transition-colors">
+                                Marcar Todos <i class="fas fa-check-double ml-1"></i>
+                            </span>
                         </div>`; 
                         lastFam = m.familia; 
                     }
                     
+                    // Estrelinhas de frequência (para ordenação)
                     let star = 0; if(orderByFrequency) lastDom.forEach(d => { if (attendanceHistory[d]?.presents?.includes(m.id)) star++; });
                     
-                    // --- VISUAL CLEAN (SEM BADGES COLORIDAS) ---
+                    // --- DEFINIÇÃO DO VISUAL DO CARD ---
+                    
+                    // Cores do Fundo e Borda (Imersivo)
+                    let bgClass = "bg-white dark:bg-slate-800"; // Padrão
+                    let borderClass = "border-transparent";
+                    
+                    if(isP) {
+                        if(isOn) {
+                            bgClass = "bg-blue-50 dark:bg-blue-900/20"; // Online
+                            borderClass = "border-blue-400";
+                        } else {
+                            bgClass = "bg-emerald-50 dark:bg-emerald-900/20"; // Presente Físico
+                            borderClass = "border-emerald-400";
+                        }
+                    }
+
+                    // Avatar (Círculo com Inicial ou Check)
                     const initial = m.name.charAt(0).toUpperCase();
+                    const avatarContent = isP 
+                        ? `<i class="fas ${isOn ? 'fa-wifi' : 'fa-check'} text-lg"></i>` 
+                        : `<span class="text-sm font-bold">${initial}</span>`;
                     
-                    // Cores de Status (Só mudam se estiver presente)
-                    const bgClass = isP ? (isOn ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20') : 'bg-white dark:bg-slate-800';
-                    const borderClass = isP ? (isOn ? 'border-blue-400' : 'border-emerald-400') : 'border-transparent';
-                    
-                    // Avatar
-                    const avatarContent = isP ? `<i class="fas ${isOn ? 'fa-wifi' : 'fa-check'} text-lg"></i>` : `<span class="text-sm font-bold">${initial}</span>`;
-                    const avatarStyle = isP ? (isOn ? 'bg-blue-500 text-white' : 'bg-emerald-500 text-white') : 'bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-500';
+                    const avatarStyle = isP 
+                        ? (isOn ? 'bg-blue-500 text-white shadow-blue-300' : 'bg-emerald-500 text-white shadow-emerald-300') 
+                        : 'bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-500';
 
-                    const rCat = getRealCategory(m);
+                    const rCat = m.categoria || 'Membro';
 
+                    // --- HTML DO CARD ---
                     buffer += `
                     <div class="glass-card mb-3 p-3 flex items-center gap-3 border-l-[6px] transition-all duration-200 ${bgClass} ${borderClass} shadow-sm">
+                        
                         <div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name.replace(/'/g, "\\'")}')"` : ''} class="flex-1 flex items-center gap-3 cursor-pointer select-none">
                             
                             <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${avatarStyle}">
@@ -682,17 +711,30 @@
                             </div>
                         </div>
                         
-                        ${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="text-slate-300 dark:text-slate-600 hover:text-[#002e5d] dark:hover:text-blue-400 p-3 transition-colors"><i class="fas fa-sticky-note text-lg"></i></button>` : ''}
+                        ${!isP && currentUser.role === 'admin' ? 
+                            `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="text-slate-300 dark:text-slate-600 hover:text-[#002e5d] dark:hover:text-blue-400 p-3 transition-colors">
+                                <i class="fas fa-sticky-note text-lg"></i>
+                            </button>` 
+                        : ''}
                     </div>`;
                 }
             });
 
+            // Empty State (Se não achar ninguém)
             if (visibleCount === 0) {
-                list.innerHTML = `<div class="flex flex-col items-center justify-center py-10 opacity-60"><div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4"><i class="fas ${showMissingOnly ? 'fa-check-circle text-green-500' : 'fa-search text-slate-400'} text-3xl"></i></div><p class="font-bold text-slate-500 dark:text-slate-400 text-sm">${showMissingOnly ? 'Todos os listados estão presentes!' : 'Nenhum membro encontrado.'}</p></div>`;
+                list.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-10 opacity-60">
+                        <div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas ${showMissingOnly ? 'fa-check-circle text-green-500' : 'fa-search text-slate-400'} text-3xl"></i>
+                        </div>
+                        <p class="font-bold text-slate-500 dark:text-slate-400 text-sm">
+                            ${showMissingOnly ? 'Todos os listados estão presentes!' : 'Nenhum membro encontrado.'}
+                        </p>
+                    </div>`;
             } else {
                 list.innerHTML = buffer;
             }
-        }; 
+        };
        
         window.renderAdminUsers = () => {
             const l = document.getElementById('users-list'); if(!l) return; l.innerHTML = '';
