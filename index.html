@@ -14,7 +14,7 @@
                 extend: {
                     colors: { sacramental: '#002e5d' },
                     animation: {
-                        'pop-up': 'popUp 0.25s cubic-bezier(0.19, 1, 0.22, 1) forwards',
+                        'pop-up': 'popUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
                         'fade-in': 'fadeIn 0.2s ease-out forwards'
                     },
                     keyframes: {
@@ -56,7 +56,7 @@
         @media (max-width: 1023px) {
             .sidebar { display: none; }
             .app-layout { display: block; }
-            .content-container { padding: 20px; padding-bottom: 140px; overflow-x: hidden; }
+            .content-container { padding: 20px; padding-bottom: 160px; /* Espaço extra para o menu flutuante */ overflow-x: hidden; }
             .sticky-search { position: sticky; top: 0; z-index: 100; padding: 10px 0; }
         }
 
@@ -67,34 +67,79 @@
         html.dark .sticky-search { background: #0f172a; }
         html.dark .sidebar { background: #0f172a; border-right-color: #334155; }
 
-        /* --- ULTRA LIQUID GLASS (APPLE STYLE) --- */
+        /* --- ULTRA LIQUID GLASS (TRANSPARENTE E DISTORCIDO) --- */
         .liquid-glass {
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(25px) saturate(200%);
-            -webkit-backdrop-filter: blur(25px) saturate(200%);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-        }
-        html.dark .liquid-glass {
-            background: rgba(17, 25, 40, 0.70);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            /* Fundo Quase Invisível (30%) */
+            background: rgba(255, 255, 255, 0.30);
+            
+            /* O Segredo: Blur Forte + Saturação Alta */
+            backdrop-filter: blur(30px) saturate(200%);
+            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            
+            /* Borda fina e nítida para contraste */
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            
+            /* Sombra suave para flutuar */
+            box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.2);
         }
 
-        /* Nav Icons Styling */
-        .nav-icon { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .nav-btn-active .nav-icon { 
-            color: var(--sacramental-blue); 
-            transform: scale(1.2) translateY(-2px); 
-            filter: drop-shadow(0 4px 6px rgba(0,46,93,0.3));
+        /* Dark Mode Liquid Glass */
+        html.dark .liquid-glass {
+            background: rgba(0, 0, 0, 0.30); /* Bem transparente no escuro */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.6);
         }
-        html.dark .nav-btn-active .nav-icon { 
-            color: #60a5fa; 
-            filter: drop-shadow(0 4px 6px rgba(96,165,250,0.3));
+
+        /* ESTILO DOS ÍCONES DA NAVBAR */
+        .nav-btn {
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: #94a3b8; /* Slate-400 inactive */
         }
         
-        .sidebar .nav-btn-active { background-color: #f0f7ff; border-right: 4px solid var(--sacramental-blue); transform: none; filter: none; }
-        html.dark .sidebar .nav-btn-active { background-color: #1e293b; border-right: 4px solid #60a5fa; }
+        /* ESTADO ATIVO (SELECIONADO) */
+        .nav-btn-active {
+            color: #fff !important; /* Ícone Branco */
+            transform: translateY(-5px) scale(1.1); /* Sobe e cresce */
+        }
+        
+        /* Círculo de Fundo do Ícone Ativo */
+        .nav-btn-active::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            background: var(--sacramental-blue);
+            border-radius: 50%;
+            z-index: -1;
+            box-shadow: 0 4px 15px rgba(0, 46, 93, 0.4);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Ajuste Dark Mode Ativo */
+        html.dark .nav-btn-active { color: #fff !important; }
+        html.dark .nav-btn-active::after {
+            background: #3b82f6; /* Blue-500 */
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Sidebar Desktop (Lógica Separada) */
+        .sidebar .nav-btn-active { 
+            background-color: #f0f7ff; 
+            border-right: 4px solid var(--sacramental-blue); 
+            transform: none; 
+            color: var(--sacramental-blue) !important;
+        }
+        .sidebar .nav-btn-active::after { display: none; } /* Remove bolinha no desktop */
+        
+        html.dark .sidebar .nav-btn-active { 
+            background-color: #1e293b; 
+            border-right: 4px solid #60a5fa; 
+            color: #60a5fa !important;
+        }
 
         .family-divider { background-color: #f8fafc; padding: 8px 16px; border-radius: 12px; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-top: 15px; border: 1px solid #e2e8f0; width: 100%; display: block; }
         html.dark .family-divider { background-color: #1e293b; color: #94a3b8; border-color: #334155; }
@@ -307,14 +352,14 @@
                     <div class="flex gap-2">
                         <button onclick="deleteJustification()" id="btn-delete-note" class="hidden py-3 px-4 rounded-xl bg-red-100 text-red-600 font-bold text-xs"><i class="fas fa-trash"></i></button>
                         <button onclick="closeJustify()" class="flex-1 py-3 rounded-xl bg-slate-100 dark:bg-slate-600 font-bold text-slate-500 dark:text-slate-300 text-xs uppercase">Cancelar</button>
-                        <button onclick="saveJustification()" class="flex-1 py-3 rounded-xl bg-[#002e5d] dark:bg-blue-600 font-black text-white text-xs uppercase shadow-lg active:scale-95 transition-transform">Salvar</button>
+                        <button onclick="saveJustification()" class="flex-1 py-3 rounded-xl bg-[#002e5d] dark:bg-blue-600 font-black text-white text-xs uppercase shadow-lg active:scale-95 transition-transform">Salvar Nota</button>
                     </div>
                 </div>
             </div>
 
-            <div id="more-menu-overlay" onclick="toggleMoreMenu()" class="hidden fixed inset-0 bg-black/30 z-[190] backdrop-blur-sm transition-opacity"></div>
+            <div id="more-menu-overlay" onclick="toggleMoreMenu()" class="hidden fixed inset-0 bg-black/40 z-[190] backdrop-blur-sm transition-opacity"></div>
             
-            <div id="more-menu-content" class="hidden fixed bottom-28 left-1/2 -translate-x-1/2 w-[85%] max-w-sm liquid-glass p-6 z-[195] rounded-3xl animate-pop-up origin-bottom">
+            <div id="more-menu-content" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 w-[85%] max-w-sm liquid-glass p-6 z-[195] rounded-3xl animate-pop-up origin-bottom">
                 <h3 class="text-xs font-black uppercase text-slate-500 dark:text-slate-300 tracking-widest mb-4 text-center">Mais Opções</h3>
                 <div class="grid grid-cols-3 gap-4">
                     <button onclick="switchTab('analysis'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
@@ -346,13 +391,13 @@
         </main>
 
         <nav class="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[70%] max-w-xs h-16 liquid-glass rounded-full flex justify-around items-center px-4 z-[200] transition-all duration-300">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 dark:text-slate-400 transition-all hover:scale-110 active:scale-95 nav-icon">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center w-12 h-12 nav-btn">
                 <i class="fas fa-home text-xl"></i>
             </button>
-            <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 dark:text-slate-400 transition-all hover:scale-110 active:scale-95 nav-icon">
+            <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center justify-center w-12 h-12 nav-btn">
                 <i class="fas fa-clipboard-check text-xl"></i>
             </button>
-            <button onclick="toggleMoreMenu()" id="nav-more" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 dark:text-slate-400 transition-all hover:scale-110 active:scale-95 nav-icon">
+            <button onclick="toggleMoreMenu()" id="nav-more" class="flex flex-col items-center justify-center w-12 h-12 nav-btn">
                 <i class="fas fa-bars text-xl"></i>
             </button>
         </nav>
@@ -453,7 +498,7 @@
                 overlay.classList.add('hidden');
             }
 
-            document.querySelectorAll('#nav-dashboard, #nav-attendance, #nav-more').forEach(b => b.classList.remove('nav-btn-active', 'scale-110'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-btn-active'));
             
             const titles = {
                 'dashboard': 'Página Inicial',
@@ -479,8 +524,8 @@
                 titleEl.classList.add('w-full');
             }
 
-            if(tab === 'dashboard') document.getElementById('nav-dashboard').classList.add('nav-btn-active', 'scale-110');
-            if(tab === 'attendance') document.getElementById('nav-attendance').classList.add('nav-btn-active', 'scale-110');
+            if(tab === 'dashboard') document.getElementById('nav-dashboard').classList.add('nav-btn-active');
+            if(tab === 'attendance') document.getElementById('nav-attendance').classList.add('nav-btn-active');
 
             if(tab === 'members-list') renderMembersList();
             if(tab === 'reports' || tab === 'dashboard') renderAll();
@@ -497,11 +542,11 @@
             if(menu.classList.contains('hidden')) {
                 menu.classList.remove('hidden');
                 overlay.classList.remove('hidden');
-                btn.classList.add('nav-btn-active', 'scale-110');
+                btn.classList.add('nav-btn-active');
             } else {
                 menu.classList.add('hidden');
                 overlay.classList.add('hidden');
-                btn.classList.remove('nav-btn-active', 'scale-110');
+                btn.classList.remove('nav-btn-active');
             }
         };
 
@@ -753,36 +798,35 @@
             if(note) btnDelete.classList.remove('hidden'); else btnDelete.classList.add('hidden');
         };
         window.closeJustify = () => document.getElementById('justificationModal').classList.add('hidden');
-        window.saveJustification = async () => { const txt = document.getElementById('justify-text').value.trim(); let jst = attendanceHistory[selectedDate]?.justifications || {}; if(txt==="") delete jst[memberIdJustifying]; else jst[memberIdJustifying]=txt; await setDoc(doc(db, "historico", selectedDate), { justifications: jst }, { merge: true }); showToast("Salvo!", "success"); closeJustify(); };
+        window.saveJustification = async () => { 
+            const txt = document.getElementById('justify-text').value.trim(); 
+            const currentData = attendanceHistory[selectedDate] || {};
+            let jst = { ...(currentData.justifications || {}) }; 
+            
+            if(txt === "") delete jst[memberIdJustifying]; 
+            else jst[memberIdJustifying] = txt; 
+            
+            await setDoc(doc(db, "historico", selectedDate), { justifications: jst }, { merge: true }); 
+            showToast("Salvo!", "success"); 
+            closeJustify(); 
+        };
         
-        // --- FUNÇÃO CORRIGIDA DE EXCLUIR NOTA ---
+        // --- FUNÇÃO CORRIGIDA PARA EXCLUIR ---
         window.deleteJustification = async () => {
             if(!confirm("Excluir esta nota?")) return;
-
-            try {
-                // 1. Prepara dados (cópia segura)
-                const currentData = attendanceHistory[selectedDate] || {};
-                const newJustifications = { ...(currentData.justifications || {}) }; 
-                delete newJustifications[memberIdJustifying]; // Deleta a chave
-
-                // 2. Atualiza Banco
-                await setDoc(doc(db, "historico", selectedDate), { 
-                    justifications: newJustifications 
-                }, { merge: true });
-
-                // 3. Atualiza Interface Imediatamente (Sem esperar snapshot)
-                if(attendanceHistory[selectedDate]) {
-                    attendanceHistory[selectedDate].justifications = newJustifications;
-                }
-                
-                showToast("Nota excluída", "info");
-                closeJustify();
-                renderAttendance(); // Força a lista a repintar o ícone cinza
-
-            } catch (e) {
-                console.error(e);
-                showToast("Erro ao excluir", "error");
-            }
+            const currentData = attendanceHistory[selectedDate] || {};
+            let jst = { ...(currentData.justifications || {}) }; 
+            delete jst[memberIdJustifying]; 
+            
+            // Atualiza Banco
+            await setDoc(doc(db, "historico", selectedDate), { justifications: jst }, { merge: true }); 
+            
+            // Atualiza Local (Importante para o ícone mudar na hora)
+            if(attendanceHistory[selectedDate]) attendanceHistory[selectedDate].justifications = jst;
+            
+            showToast("Nota excluída", "info"); 
+            closeJustify();
+            renderAttendance(); // Força a atualização visual do ícone
         };
 
         window.updateCount = async (field, val) => { const ref = doc(db, "historico", selectedDate); const data = attendanceHistory[selectedDate] || {}; const current = data[field] || 0; const newValue = Math.max(0, current + val); await setDoc(ref, { [field]: newValue }, { merge: true }); };
