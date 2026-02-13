@@ -23,36 +23,41 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s, color 0.3s; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s, color 0.3s; -webkit-tap-highlight-color: transparent; }
         .hidden { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        body.status-login { height: 100vh !important; overflow: hidden !important; position: fixed; width: 100%; }
-        body.status-app { height: auto !important; overflow-y: auto !important; position: relative; }
+        body.status-login { height: 100vh; overflow: hidden; position: fixed; width: 100%; }
+        body.status-app { height: auto; overflow-y: auto; position: relative; }
         
         @media (min-width: 1024px) {
-            .app-layout { display: flex !important; height: 100vh; overflow: hidden; }
-            .sidebar { width: 300px !important; flex-shrink: 0; display: flex !important; background: white; border-right: 1px solid #e2e8f0; flex-direction: column; }
+            .app-layout { display: flex; height: 100vh; overflow: hidden; }
+            .sidebar { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; }
             .main-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
             .content-container { width: 100%; max-width: 1100px; padding: 40px; }
         }
         @media (max-width: 1023px) {
-            .sidebar { display: none !important; }
-            .app-layout { display: block !important; }
+            .sidebar { display: none; }
+            .app-layout { display: block; }
             .content-container { padding: 20px; padding-bottom: 120px; }
             .sticky-search { position: sticky; top: 0; z-index: 100; padding: 10px 0; }
         }
 
+        /* Glass Card */
         .glass-card { background: white; border-radius: 28px; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.04); border: 1px solid #f1f5f9; transition: all 0.3s; }
         html.dark .glass-card { background: #1e293b; border-color: #334155; box-shadow: none; }
-        html.dark .sidebar { background: #0f172a; border-right-color: #334155; }
         html.dark body { background-color: #0f172a; color: #f1f5f9; }
         html.dark .sticky-search { background: #0f172a; }
+        html.dark .sidebar { background: #0f172a; border-right-color: #334155; }
 
+        /* Navigation */
         .nav-btn-active { background-color: #f0f7ff; color: var(--sacramental-blue) !important; font-weight: 800; border-right: 4px solid var(--sacramental-blue); }
         html.dark .nav-btn-active { background-color: #1e293b; color: #60a5fa !important; border-right: 4px solid #60a5fa; }
 
-        /* Animation Corrected */
+        .family-divider { background-color: #f8fafc; padding: 8px 16px; border-radius: 12px; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-top: 15px; border: 1px solid #e2e8f0; width: 100%; display: block; }
+        html.dark .family-divider { background-color: #1e293b; color: #94a3b8; border-color: #334155; }
+
+        /* Animation Toast */
         @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         .toast-active { animation: toastIn 0.3s ease-out forwards; }
     </style>
@@ -62,14 +67,14 @@
     <div id="loading-screen" class="fixed inset-0 bg-white dark:bg-slate-900 z-[300] flex items-center justify-center">
         <div class="text-center space-y-4">
             <div class="w-12 h-12 border-4 border-slate-100 dark:border-slate-700 border-t-[#002e5d] dark:border-t-blue-500 rounded-full animate-spin mx-auto"></div>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center italic">Carregando...</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Carregando...</p>
         </div>
     </div>
 
     <div id="access-container" class="min-h-screen flex items-center justify-center p-6">
         <section id="view-login" class="hidden glass-card p-10 w-full max-w-sm text-center space-y-8 shadow-2xl">
             <div class="w-20 h-20 bg-[#002e5d] rounded-2xl mx-auto flex items-center justify-center text-white text-3xl shadow-lg"><i class="fas fa-church"></i></div>
-            <h2 class="text-2xl font-black text-slate-800 dark:text-white tracking-tighter uppercase italic leading-tight">Ala <br>Ribeirão Preto 1</h2>
+            <h2 class="text-2xl font-black text-slate-800 dark:text-white uppercase italic leading-tight">Ala <br>Ribeirão Preto 1</h2>
             <div class="space-y-3">
                 <input type="text" id="login-user" placeholder="Usuário" class="w-full p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 dark:text-white border-none outline-none text-sm font-bold shadow-inner">
                 <input type="password" id="login-pass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 dark:text-white border-none outline-none text-sm">
@@ -533,6 +538,19 @@
             });
             document.getElementById('stats-present').innerText = mFis + mOnl + vFis + vOnl + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
             document.getElementById('stats-total').innerText = totM;
+
+            // --- RESTAURAÇÃO DO DETALHAMENTO NO DASHBOARD ---
+            const card = document.getElementById('stats-present').parentElement;
+            let old = card.querySelector('.detalhes-area'); if(old) old.remove();
+            let dHtml = `<div class="detalhes-area mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 text-left text-[10px] font-bold text-slate-500 dark:text-slate-400 space-y-1">
+                <p class="flex justify-between text-green-600 dark:text-green-400"><span>Membros Ala:</span> <span>${mFis + mOnl}</span></p>
+                ${(mOnl) > 0 ? `<p class="flex justify-between pl-2 opacity-70"><span>Online:</span> <span>${mOnl}</span></p>` : ''}
+                ${(vFis+vOnl) > 0 ? `<p class="flex justify-between text-teal-600 dark:text-teal-400"><span>Visitantes:</span> <span>${vFis+vOnl}</span></p>` : ''}
+                ${data.lideresCount > 0 ? `<p class="flex justify-between text-amber-600 dark:text-amber-400"><span>Líderes:</span> <span>${data.lideresCount}</span></p>` : ''}
+                ${data.missionariosCount > 0 ? `<p class="flex justify-between text-indigo-600 dark:text-indigo-400"><span>Missionários:</span> <span>${data.missionariosCount}</span></p>` : ''}
+            </div>`;
+            card.insertAdjacentHTML('beforeend', dHtml);
+            // ------------------------------------------------
 
             list.innerHTML = ''; let lastFam = ""; let visibleCount = 0;
             const lastDom = Object.keys(attendanceHistory).sort().reverse().slice(0, 4);
