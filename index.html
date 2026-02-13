@@ -14,13 +14,13 @@
                 extend: {
                     colors: { sacramental: '#002e5d' },
                     animation: {
-                        'slide-up': 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-                        'fade-in': 'fadeIn 0.2s ease-out'
+                        'pop-up': 'popUp 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                        'fade-in': 'fadeIn 0.2s ease-out forwards'
                     },
                     keyframes: {
-                        slideUp: {
-                            '0%': { transform: 'translateY(20px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        popUp: {
+                            '0%': { transform: 'translate(-50%, 20px) scale(0.95)', opacity: '0' },
+                            '100%': { transform: 'translate(-50%, 0) scale(1)', opacity: '1' },
                         },
                         fadeIn: {
                             '0%': { opacity: '0' },
@@ -57,32 +57,30 @@
             .sticky-search { position: sticky; top: 0; z-index: 100; padding: 10px 0; }
         }
 
-        /* Glass Card Standard */
+        /* Glass Card */
         .glass-card { background: white; border-radius: 28px; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.04); border: 1px solid #f1f5f9; transition: all 0.3s; }
         html.dark .glass-card { background: #1e293b; border-color: #334155; box-shadow: none; }
         html.dark body { background-color: #0f172a; color: #f1f5f9; }
         html.dark .sticky-search { background: #0f172a; }
         html.dark .sidebar { background: #0f172a; border-right-color: #334155; }
 
-        /* LIQUID NAV (Estilo Apple / iOS) */
+        /* Liquid Nav (Apple Style) */
         .liquid-nav {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
         }
         html.dark .liquid-nav {
-            background: rgba(30, 41, 59, 0.8);
+            background: rgba(15, 23, 42, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4);
         }
 
-        /* Nav Active State */
         .nav-btn-active { color: var(--sacramental-blue) !important; transform: scale(1.1); }
         html.dark .nav-btn-active { color: #60a5fa !important; }
         
-        /* Desktop Sidebar Active */
         .sidebar .nav-btn-active { background-color: #f0f7ff; border-right: 4px solid var(--sacramental-blue); transform: none; }
         html.dark .sidebar .nav-btn-active { background-color: #1e293b; border-right: 4px solid #60a5fa; }
 
@@ -124,6 +122,26 @@
             <button onclick="processFirstLogin()" class="w-full bg-green-600 text-white p-5 rounded-2xl font-black uppercase text-xs active:scale-95 transition-all">Ativar Conta</button>
             <button onclick="switchTab('login')" class="text-xs text-slate-400 underline font-bold">Voltar</button>
         </section>
+    </div>
+
+    <div id="mobile-menu-overlay" onclick="toggleMobileMenu()" class="hidden fixed inset-0 bg-black/50 z-[200] backdrop-blur-sm"></div>
+    <div id="mobile-menu-panel" class="fixed top-0 right-0 h-full w-64 bg-white dark:bg-slate-900 z-[210] shadow-2xl translate-x-full flex flex-col border-l dark:border-slate-800">
+        <div class="p-6 bg-[#002e5d] dark:bg-slate-950 text-white">
+            <p id="user-mobile-name" class="font-bold truncate text-sm">...</p>
+            <p id="user-mobile-role" class="text-[9px] opacity-70 uppercase tracking-widest font-black"></p>
+        </div>
+        <div class="flex-1 p-4 space-y-2">
+            <button onclick="toggleTheme()" class="w-full flex items-center gap-3 p-4 rounded-2xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-xs uppercase transition-colors">
+                <i class="fas fa-moon text-[#002e5d] dark:text-yellow-400"></i> Alternar Tema
+            </button>
+            <hr class="border-slate-50 dark:border-slate-800">
+            <button id="admin-mobile-btn" onclick="switchTab('admin-users'); toggleMobileMenu();" class="hidden w-full flex items-center gap-3 p-4 rounded-2xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-xs uppercase transition-colors">
+                <i class="fas fa-users-cog text-[#002e5d] dark:text-blue-400"></i> Gerenciar Logins
+            </button>
+            <button onclick="logout()" class="w-full flex items-center gap-3 p-4 rounded-2xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold text-xs uppercase">
+                <i class="fas fa-power-off"></i> Sair do Sistema
+            </button>
+        </div>
     </div>
 
     <div id="app-layout" class="hidden app-layout">
@@ -303,31 +321,32 @@
             </div>
 
             <div id="more-menu-overlay" onclick="toggleMoreMenu()" class="hidden fixed inset-0 bg-black/40 z-[190] backdrop-blur-sm transition-opacity"></div>
-            <div id="more-menu-content" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 w-[85%] max-w-sm glass-card p-6 z-[195] shadow-2xl animate-slide-up bg-white/90 dark:bg-slate-900/95 border border-white/40 dark:border-slate-600">
+            
+            <div id="more-menu-content" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 w-[85%] max-w-sm glass-card p-6 z-[195] shadow-2xl animate-pop-up bg-white/90 dark:bg-slate-900/95 border border-white/40 dark:border-slate-600 origin-bottom">
                 <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest mb-4 text-center">Mais Opções</h3>
                 <div class="grid grid-cols-3 gap-4">
-                    <button onclick="switchTab('analysis'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                        <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center"><i class="fas fa-heart-pulse"></i></div>
+                    <button onclick="switchTab('analysis'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center shadow-sm"><i class="fas fa-heart-pulse text-lg"></i></div>
                         <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">Resgate</span>
                     </button>
-                    <button onclick="switchTab('reports'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center"><i class="fas fa-file-invoice"></i></div>
+                    <button onclick="switchTab('reports'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center shadow-sm"><i class="fas fa-file-invoice text-lg"></i></div>
                         <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">Relatórios</span>
                     </button>
-                    <button onclick="switchTab('add'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                        <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center"><i class="fas fa-users"></i></div>
+                    <button onclick="switchTab('add'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-sm"><i class="fas fa-users text-lg"></i></div>
                         <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">Membros</span>
                     </button>
-                    <button onclick="switchTab('admin-users'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                        <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center"><i class="fas fa-users-cog"></i></div>
+                    <button onclick="switchTab('admin-users'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center shadow-sm"><i class="fas fa-users-cog text-lg"></i></div>
                         <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">Admin</span>
                     </button>
-                    <button onclick="toggleTheme(); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                        <div class="w-10 h-10 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center"><i class="fas fa-adjust"></i></div>
+                    <button onclick="toggleTheme(); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-yellow-100 text-yellow-600 flex items-center justify-center shadow-sm"><i class="fas fa-adjust text-lg"></i></div>
                         <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">Tema</span>
                     </button>
-                    <button onclick="logout()" class="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                        <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center"><i class="fas fa-power-off"></i></div>
+                    <button onclick="logout()" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center shadow-sm"><i class="fas fa-power-off text-lg"></i></div>
                         <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">Sair</span>
                     </button>
                 </div>
@@ -342,7 +361,8 @@
                 <i class="fas fa-clipboard-check text-xl"></i>
             </button>
             <button onclick="toggleMoreMenu()" id="nav-more" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 transition-all hover:scale-110 active:scale-95">
-                <i class="fas fa-bars text-xl"></i> </button>
+                <i class="fas fa-bars text-xl"></i>
+            </button>
         </nav>
     </div>
 
@@ -395,19 +415,13 @@
             const html = document.documentElement;
             if(html.classList.contains('dark')) {
                 html.classList.remove('dark'); localStorage.setItem('theme', 'light');
-                document.getElementById('theme-icon-desktop').className = "fas fa-moon";
-                document.getElementById('theme-text-desktop').innerText = "Modo Escuro";
             } else {
                 html.classList.add('dark'); localStorage.setItem('theme', 'dark');
-                document.getElementById('theme-icon-desktop').className = "fas fa-sun";
-                document.getElementById('theme-text-desktop').innerText = "Modo Claro";
             }
             if(members.length > 0) window.updateCharts();
         };
         if(localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.add('dark');
-            const icon = document.getElementById('theme-icon-desktop');
-            if(icon) { icon.className = "fas fa-sun"; document.getElementById('theme-text-desktop').innerText = "Modo Claro"; }
         }
 
         // UTILS
@@ -439,7 +453,11 @@
             const targetView = document.getElementById(`view-${tab}`);
             if(targetView) targetView.classList.remove('hidden');
             
-            document.querySelectorAll('#nav-dashboard, #nav-attendance, #nav-more').forEach(b => b.classList.remove('nav-btn-active', 'text-[#002e5d]', 'dark:text-blue-400', 'scale-110'));
+            // Fecha menu se estiver aberto
+            const menu = document.getElementById('more-menu-content');
+            if(!menu.classList.contains('hidden')) toggleMoreMenu();
+
+            document.querySelectorAll('#nav-dashboard, #nav-attendance, #nav-more').forEach(b => b.classList.remove('nav-btn-active', 'scale-110'));
             
             const titles = {'dashboard':'Painel Geral','attendance':'Frequência Sacramental','analysis':'Acompanhamento Resgate','reports':'Análise Estratégica','add':'Hub de Membros', 'members-list':'Gestão','admin-users':'Controle de Logins'};
             if(document.getElementById('mobile-page-title')) document.getElementById('mobile-page-title').innerText = titles[tab] || 'Ala';
@@ -457,7 +475,7 @@
             // Deprecated, maintained for compatibility but unused in new UI
         };
 
-        // NEW: Toggle More Menu
+        // NEW: Toggle More Menu (FAST)
         window.toggleMoreMenu = () => {
             const overlay = document.getElementById('more-menu-overlay');
             const menu = document.getElementById('more-menu-content');
@@ -678,6 +696,11 @@
         };
 
         window.clearSearch = () => { document.getElementById('searchMember').value = ''; renderAttendance(); };
+        window.debounceSearch = () => {
+            const btnClr = document.getElementById('btnClearSearch');
+            if(btnClr) document.getElementById('searchMember').value.length > 0 ? btnClr.classList.remove('hidden') : btnClr.classList.add('hidden');
+            clearTimeout(searchTimeout); searchTimeout = setTimeout(() => { renderAttendance(); }, 300);
+        };
         window.formatNameInput = (el) => { el.value = el.value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' '); };
         window.formatPhone = (el) => { let v = el.value.replace(/\D/g,''); v = v.replace(/^(\d{2})(\d)/g,"($1) $2"); v = v.replace(/(\d)(\d{4})$/,"$1-$2"); el.value = v; };
         window.handleFamilySearch = (q) => { 
