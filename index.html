@@ -429,6 +429,7 @@
         for(let i=0; i<12; i++) {
             let iso = getLocalISOString(dataAux); 
             domingosISO.push(iso); 
+            // CORREÇÃO: Apenas data
             if(dSelectGlobal) dSelectGlobal.innerHTML += `<option value="${iso}" class="text-black">${dataAux.toLocaleDateString('pt-BR')}</option>`;
             dataAux.setDate(dataAux.getDate() - 7);
         }
@@ -544,11 +545,11 @@
             if(menu.classList.contains('hidden')) {
                 menu.classList.remove('hidden');
                 overlay.classList.remove('hidden');
-                btn.classList.add('nav-btn-active');
+                btn.classList.remove('nav-btn-active'); // Remove active
             } else {
                 menu.classList.add('hidden');
                 overlay.classList.add('hidden');
-                btn.classList.remove('nav-btn-active');
+                btn.classList.add('nav-btn-active'); // Add active
             }
         };
 
@@ -591,7 +592,7 @@
 
         // LOGIC
         window.togglePresence = async (memberId, memberName) => {
-             if (currentUser.role !== 'admin' || !selectedDate) return;
+            if (currentUser.role !== 'admin' || !selectedDate) return;
             const batch = writeBatch(db);
             const hRef = doc(db, "historico", selectedDate);
             const mRef = doc(db, "membros", memberId);
@@ -616,6 +617,7 @@
 
         window.getRealCategory = (m) => m.categoria || 'Membro';
 
+        // NEW RENDER LOGIC
         window.markFamilyPresent = async (familyName) => {
             if(!confirm(`Marcar PRESENÇA para toda a Família ${familyName}?`)) return;
             if (currentUser.role !== 'admin' || !selectedDate) return;
@@ -649,7 +651,7 @@
         };
 
         window.toggleFrequencyOrder = () => {
-             orderByFrequency = !orderByFrequency;
+            orderByFrequency = !orderByFrequency;
             if (orderByFrequency) showToast("Mais frequentes primeiro", "info"); else showToast("Ordem alfabética", "info");
             renderAttendance();
         };
@@ -661,7 +663,7 @@
 
             const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
             const curP = data.presents || []; const curO = data.online_ids || [];
-            const justifications = data.justifications || {}; 
+            const justifications = data.justifications || {}; // Justificativas
             
             if(document.getElementById('display-lideres')) {
                 document.getElementById('display-lideres').innerText = data.lideresCount || 0;
@@ -679,13 +681,19 @@
 
             const card = document.getElementById('stats-present').parentElement;
             let old = card.querySelector('.detalhes-area'); if(old) old.remove();
-            let dHtml = `<div class="detalhes-area mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 text-left text-sm font-bold text-slate-500 dark:text-slate-400 space-y-3">
-                <p class="flex justify-between items-center text-green-600 dark:text-green-400"><span>🏰 Membros Ala</span> <span class="text-lg">${mFis + mOnl}</span></p>
-                ${(mOnl) > 0 ? `<p class="flex justify-between items-center pl-2 opacity-70"><span>🔴 Online</span> <span class="text-lg">${mOnl}</span></p>` : ''}
-                ${(vFis+vOnl) > 0 ? `<p class="flex justify-between items-center text-teal-600 dark:text-teal-400"><span>🤝 Visitantes</span> <span class="text-lg">${vFis+vOnl}</span></p>` : ''}
-                ${data.lideresCount > 0 ? `<p class="flex justify-between items-center text-amber-600 dark:text-amber-400"><span>👔 Líderes</span> <span class="text-lg">${data.lideresCount}</span></p>` : ''}
-                ${data.missionariosCount > 0 ? `<p class="flex justify-between items-center text-indigo-600 dark:text-indigo-400"><span>🏷️ Missionários</span> <span class="text-lg">${data.missionariosCount}</span></p>` : ''}
+            
+            // NOVO LAYOUT DO DASHBOARD (CLEAN UI - SEM EMOJIS)
+            let dHtml = `<div class="detalhes-area mt-6 pt-4 border-t border-dashed border-slate-200 dark:border-slate-700">
+                <div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0">
+                    <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Membros Ala</span>
+                    <span class="text-sm font-black text-slate-700 dark:text-white">${mFis + mOnl}</span>
+                </div>
+                ${(mOnl) > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0"><span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Online</span><span class="text-sm font-black text-blue-600 dark:text-blue-400">${mOnl}</span></div>` : ''}
+                ${(vFis+vOnl) > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0"><span class="text-[10px] font-bold text-teal-500 uppercase tracking-widest">Visitantes</span><span class="text-sm font-black text-teal-600 dark:text-teal-400">${vFis+vOnl}</span></div>` : ''}
+                ${data.lideresCount > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0"><span class="text-[10px] font-bold text-amber-500 uppercase tracking-widest">Líderes</span><span class="text-sm font-black text-amber-600 dark:text-amber-400">${data.lideresCount}</span></div>` : ''}
+                ${data.missionariosCount > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0"><span class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Missionários</span><span class="text-sm font-black text-indigo-600 dark:text-indigo-400">${data.missionariosCount}</span></div>` : ''}
             </div>`;
+            
             card.insertAdjacentHTML('beforeend', dHtml);
 
             list.innerHTML = ''; let lastFam = ""; let visibleCount = 0;
@@ -807,12 +815,11 @@
             if(txt === "") delete jst[memberIdJustifying]; 
             else jst[memberIdJustifying] = txt; 
             
-            await updateDoc(doc(db, "historico", selectedDate), { justifications: jst }); // FORÇA A ATUALIZAÇÃO
+            await updateDoc(doc(db, "historico", selectedDate), { justifications: jst }); 
             showToast("Salvo!", "success"); 
             closeJustify(); 
         };
         
-        // --- FUNÇÃO CORRIGIDA PARA EXCLUIR E ATUALIZAR ---
         window.deleteJustification = async () => {
             if(!confirm("Excluir esta nota?")) return;
             const currentData = attendanceHistory[selectedDate] || {};
@@ -823,7 +830,6 @@
             
             showToast("Nota excluída", "info"); 
             closeJustify();
-            // A atualização visual acontece automaticamente pelo onSnapshot do Firebase
         };
 
         window.updateCount = async (field, val) => { const ref = doc(db, "historico", selectedDate); const data = attendanceHistory[selectedDate] || {}; const current = data[field] || 0; const newValue = Math.max(0, current + val); await setDoc(ref, { [field]: newValue }, { merge: true }); };
