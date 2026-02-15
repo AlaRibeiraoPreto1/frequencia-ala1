@@ -398,6 +398,14 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // HELPER PARA DATA LOCAL (SEM UTC)
+        const getLocalISOString = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
         // GLOBALS
         let members = []; 
         let attendanceHistory = {}; 
@@ -412,18 +420,25 @@
         let searchTimeout;
         let showMissingOnly = false;
 
-        // DATE INIT
+        // DATE INIT CORRIGIDO
         const dSelectGlobal = document.getElementById('dateSelectGlobal');
         let dataAux = new Date();
         while (dataAux.getDay() !== 0) dataAux.setDate(dataAux.getDate() - 1);
+        domingosISO = [];
+        if(dSelectGlobal) dSelectGlobal.innerHTML = '';
         for(let i=0; i<12; i++) {
-            let iso = dataAux.toISOString().split('T')[0];
+            let iso = getLocalISOString(dataAux); 
             domingosISO.push(iso); 
-            // CORREÇÃO: Apenas data
             if(dSelectGlobal) dSelectGlobal.innerHTML += `<option value="${iso}" class="text-black">${dataAux.toLocaleDateString('pt-BR')}</option>`;
             dataAux.setDate(dataAux.getDate() - 7);
         }
-        if(dSelectGlobal) { selectedDate = dSelectGlobal.value; dSelectGlobal.addEventListener('change', (e) => { selectedDate = e.target.value; renderAll(); }); }
+        if(domingosISO.length > 0) {
+            selectedDate = domingosISO[0];
+            if(dSelectGlobal) {
+                dSelectGlobal.value = selectedDate;
+                dSelectGlobal.addEventListener('change', (e) => { selectedDate = e.target.value; renderAll(); });
+            }
+        }
 
         // THEME
         window.toggleTheme = () => {
@@ -474,6 +489,7 @@
             if(!menu.classList.contains('hidden')) {
                 menu.classList.add('hidden');
                 overlay.classList.add('hidden');
+                document.getElementById('nav-more').classList.remove('nav-btn-active'); 
             }
 
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-btn-active'));
@@ -503,7 +519,7 @@
                 titleEl.classList.add('w-full');
             }
 
-            // Exibir/Esconder Search Bar
+            // Exibir/Esconder Search Bar (Apenas em attendance)
             if(tab === 'attendance') {
                 searchEl.classList.remove('hidden');
             } else {
@@ -575,7 +591,7 @@
 
         // LOGIC
         window.togglePresence = async (memberId, memberName) => {
-            if (currentUser.role !== 'admin' || !selectedDate) return;
+             if (currentUser.role !== 'admin' || !selectedDate) return;
             const batch = writeBatch(db);
             const hRef = doc(db, "historico", selectedDate);
             const mRef = doc(db, "membros", memberId);
@@ -600,7 +616,6 @@
 
         window.getRealCategory = (m) => m.categoria || 'Membro';
 
-        // NEW RENDER LOGIC
         window.markFamilyPresent = async (familyName) => {
             if(!confirm(`Marcar PRESENÇA para toda a Família ${familyName}?`)) return;
             if (currentUser.role !== 'admin' || !selectedDate) return;
@@ -634,7 +649,7 @@
         };
 
         window.toggleFrequencyOrder = () => {
-            orderByFrequency = !orderByFrequency;
+             orderByFrequency = !orderByFrequency;
             if (orderByFrequency) showToast("Mais frequentes primeiro", "info"); else showToast("Ordem alfabética", "info");
             renderAttendance();
         };
@@ -646,7 +661,7 @@
 
             const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
             const curP = data.presents || []; const curO = data.online_ids || [];
-            const justifications = data.justifications || {}; // Justificativas
+            const justifications = data.justifications || {}; 
             
             if(document.getElementById('display-lideres')) {
                 document.getElementById('display-lideres').innerText = data.lideresCount || 0;
@@ -792,11 +807,12 @@
             if(txt === "") delete jst[memberIdJustifying]; 
             else jst[memberIdJustifying] = txt; 
             
-            await setDoc(doc(db, "historico", selectedDate), { justifications: jst }, { merge: true }); 
+            await updateDoc(doc(db, "historico", selectedDate), { justifications: jst }); // FORÇA A ATUALIZAÇÃO
             showToast("Salvo!", "success"); 
             closeJustify(); 
         };
         
+        // --- FUNÇÃO CORRIGIDA PARA EXCLUIR E ATUALIZAR ---
         window.deleteJustification = async () => {
             if(!confirm("Excluir esta nota?")) return;
             const currentData = attendanceHistory[selectedDate] || {};
@@ -807,7 +823,7 @@
             
             showToast("Nota excluída", "info"); 
             closeJustify();
-            // Aguarda um pequeno delay para garantir sincronia, embora onSnapshot deva pegar
+            // A atualização visual acontece automaticamente pelo onSnapshot do Firebase
         };
 
         window.updateCount = async (field, val) => { const ref = doc(db, "historico", selectedDate); const data = attendanceHistory[selectedDate] || {}; const current = data[field] || 0; const newValue = Math.max(0, current + val); await setDoc(ref, { [field]: newValue }, { merge: true }); };
