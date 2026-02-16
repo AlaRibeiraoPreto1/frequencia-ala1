@@ -214,11 +214,11 @@
                         </div>
                         <div class="grid grid-cols-3 gap-2">
                             <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
-                                <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300">Líderes</span>
+                                <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300 text-center leading-tight">Líderes Estaca</span>
                                 <div class="flex items-center gap-2"><button onclick="updateCount('lideresCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button><span id="display-lideres" class="font-black text-sm text-[#002e5d] dark:text-white">0</span><button onclick="updateCount('lideresCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button></div>
                             </div>
                             <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
-                                <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300">Visitantes</span>
+                                <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300 text-center leading-tight">Visitantes de Fora</span>
                                 <div class="flex items-center gap-2"><button onclick="updateCount('visitantesCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button><span id="display-visitantes" class="font-black text-sm text-[#002e5d] dark:text-white">0</span><button onclick="updateCount('visitantesCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button></div>
                             </div>
                             <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
@@ -236,7 +236,7 @@
                 <section id="view-dashboard" class="hidden space-y-8 mt-6">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="glass-card p-8 border-l-[12px] border-green-500">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Presentes Hoje</p>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Presentes</p>
                             <p id="stats-present" class="text-5xl font-black text-slate-800 dark:text-white leading-tight">0</p>
                         </div>
                         <div class="glass-card p-8 border-l-[12px] border-[#002e5d] dark:border-blue-500">
@@ -429,7 +429,6 @@
         for(let i=0; i<12; i++) {
             let iso = getLocalISOString(dataAux); 
             domingosISO.push(iso); 
-            // CORREÇÃO: Apenas data
             if(dSelectGlobal) dSelectGlobal.innerHTML += `<option value="${iso}" class="text-black">${dataAux.toLocaleDateString('pt-BR')}</option>`;
             dataAux.setDate(dataAux.getDate() - 7);
         }
@@ -682,15 +681,17 @@
             const card = document.getElementById('stats-present').parentElement;
             let old = card.querySelector('.detalhes-area'); if(old) old.remove();
             
-            // NOVO LAYOUT DO DASHBOARD (CLEAN UI - SEM EMOJIS)
+            // DASHBOARD CLEAN UI (SEM EMOJIS, TEXTO GRANDE E ALINHADO)
             let dHtml = `<div class="detalhes-area mt-6 pt-4 border-t border-dashed border-slate-200 dark:border-slate-700">
                 <div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0">
                     <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Membros Ala</span>
                     <span class="text-sm font-black text-slate-700 dark:text-white">${mFis + mOnl}</span>
                 </div>
-                ${(mOnl) > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0"><span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Online</span><span class="text-sm font-black text-blue-600 dark:text-blue-400">${mOnl}</span></div>` : ''}
-                ${(vFis+vOnl) > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0"><span class="text-[10px] font-bold text-teal-500 uppercase tracking-widest">Visitantes</span><span class="text-sm font-black text-teal-600 dark:text-teal-400">${vFis+vOnl}</span></div>` : ''}
-                ${data.lideresCount > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0"><span class="text-[10px] font-bold text-amber-500 uppercase tracking-widest">Líderes</span><span class="text-sm font-black text-amber-600 dark:text-amber-400">${data.lideresCount}</span></div>` : ''}
+                ${(mOnl) > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0 pl-4 border-l-2 border-blue-100 dark:border-blue-900"><span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Online</span><span class="text-sm font-black text-blue-600 dark:text-blue-400">${mOnl}</span></div>` : ''}
+                ${(mFis) > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0 pl-4 border-l-2 border-emerald-100 dark:border-emerald-900"><span class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Presencial</span><span class="text-sm font-black text-emerald-600 dark:text-emerald-400">${mFis}</span></div>` : ''}
+                ${(vFis+vOnl) > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0"><span class="text-[10px] font-bold text-teal-500 uppercase tracking-widest">Visitantes Locais</span><span class="text-sm font-black text-teal-600 dark:text-teal-400">${vFis+vOnl}</span></div>` : ''}
+                ${data.lideresCount > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0"><span class="text-[10px] font-bold text-amber-500 uppercase tracking-widest">Líderes Estaca</span><span class="text-sm font-black text-amber-600 dark:text-amber-400">${data.lideresCount}</span></div>` : ''}
+                ${data.visitantesCount > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0"><span class="text-[10px] font-bold text-cyan-500 uppercase tracking-widest">Visitantes de Fora</span><span class="text-sm font-black text-cyan-600 dark:text-cyan-400">${data.visitantesCount}</span></div>` : ''}
                 ${data.missionariosCount > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0"><span class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Missionários</span><span class="text-sm font-black text-indigo-600 dark:text-indigo-400">${data.missionariosCount}</span></div>` : ''}
             </div>`;
             
