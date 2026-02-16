@@ -233,24 +233,34 @@
 
             <div class="content-container w-full overflow-x-hidden pt-0">
                 
-                <section id="view-dashboard" class="hidden space-y-8 mt-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="glass-card p-8 border-l-[12px] border-green-500">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Presentes</p>
-                            <p id="stats-present" class="text-5xl font-black text-slate-800 dark:text-white leading-tight">0</p>
+                <section id="view-dashboard" class="hidden space-y-6 mt-6">
+                    <div id="dashboard-main-card" class="glass-card p-6 border-l-[6px] border-[#002e5d] dark:border-blue-500 shadow-lg relative overflow-hidden">
                         </div>
-                        <div class="glass-card p-8 border-l-[12px] border-[#002e5d] dark:border-blue-500">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Membros Ala</p>
-                            <p id="stats-total" class="text-5xl font-black text-slate-800 dark:text-white leading-tight">0</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="glass-card p-6 border-l-[6px] border-[#002e5d] dark:border-blue-500 flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Total Membros</p>
+                                <p id="stats-total" class="text-4xl font-black text-slate-800 dark:text-white leading-tight mt-1">0</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-[#002e5d] dark:text-blue-400">
+                                <i class="fas fa-users text-xl"></i>
+                            </div>
                         </div>
-                        <div class="glass-card p-8 border-l-[12px] border-orange-500">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resgate</p>
-                            <p id="stats-rescue" class="text-5xl font-black text-slate-800 dark:text-white leading-tight">0</p>
+                        <div class="glass-card p-6 border-l-[6px] border-orange-500 flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Resgate</p>
+                                <p id="stats-rescue" class="text-4xl font-black text-slate-800 dark:text-white leading-tight mt-1">0</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center text-orange-500">
+                                <i class="fas fa-life-ring text-xl"></i>
+                            </div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="glass-card p-8 text-center shadow-inner"><h3 class="font-black text-[10px] uppercase text-slate-400 tracking-widest mb-6">Frequência por Organização (%)</h3><canvas id="heatmapChart" height="220"></canvas></div>
-                        <div class="glass-card p-8 text-center shadow-inner"><h3 class="font-black text-[10px] uppercase text-slate-400 tracking-widest mb-6">Histórico Semanal</h3><canvas id="attendanceChart" height="220"></canvas></div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="glass-card p-6 text-center shadow-inner"><h3 class="font-black text-[10px] uppercase text-slate-400 tracking-widest mb-6">Frequência por Organização (%)</h3><canvas id="heatmapChart" height="220"></canvas></div>
+                        <div class="glass-card p-6 text-center shadow-inner"><h3 class="font-black text-[10px] uppercase text-slate-400 tracking-widest mb-6">Histórico Semanal</h3><canvas id="attendanceChart" height="220"></canvas></div>
                     </div>
                 </section>
 
@@ -661,43 +671,99 @@
             const search = document.getElementById('searchMember').value.toLowerCase();
             const btnClr = document.getElementById('btnClearSearch'); if(btnClr) search.length > 0 ? btnClr.classList.remove('hidden') : btnClr.classList.add('hidden');
 
+            // DADOS ATUAIS
             const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
             const curP = data.presents || []; const curO = data.online_ids || [];
-            const justifications = data.justifications || {}; // Justificativas
-            
+            const justifications = data.justifications || {};
+
+            // --- LÓGICA DE CRESCIMENTO (COMPARAR COM DOMINGO ANTERIOR) ---
+            let growthHtml = '';
+            // Encontra o índice da data atual na lista de domingos gerados
+            const currentIndex = domingosISO.indexOf(selectedDate);
+            // O domingo anterior é o próximo índice (pois a lista é gerada do mais novo pro mais velho no meu loop, 
+            // mas no seu código original era do hoje para trás. Se index + 1 existir, é a semana passada).
+            if (currentIndex !== -1 && currentIndex + 1 < domingosISO.length) {
+                const prevDate = domingosISO[currentIndex + 1];
+                const prevData = attendanceHistory[prevDate] || { presents: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
+                
+                // Calcula totais
+                let curTotalCalc = 0; members.forEach(m => { if(curP.includes(m.id)) curTotalCalc++; });
+                curTotalCalc += (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
+
+                let prevTotalCalc = 0; members.forEach(m => { if((prevData.presents||[]).includes(m.id)) prevTotalCalc++; });
+                prevTotalCalc += (prevData.lideresCount||0) + (prevData.visitantesCount||0) + (prevData.missionariosCount||0);
+
+                if (prevTotalCalc > 0) {
+                    const diff = curTotalCalc - prevTotalCalc;
+                    const percent = Math.round((diff / prevTotalCalc) * 100);
+                    const isPositive = diff >= 0;
+                    const colorClass = isPositive ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600';
+                    const iconClass = isPositive ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down';
+                    const signal = isPositive ? '+' : '';
+                    growthHtml = `<span class="${colorClass} text-xs font-black px-2.5 py-1 rounded-full flex items-center gap-1"><i class="fas ${iconClass}"></i> ${signal}${percent}%</span>`;
+                } else {
+                    growthHtml = `<span class="bg-slate-100 text-slate-400 text-xs font-black px-2.5 py-1 rounded-full">--</span>`;
+                }
+            }
+
+            // ATUALIZA CONTADORES MANUAIS NA TELA DE REGISTRO
             if(document.getElementById('display-lideres')) {
                 document.getElementById('display-lideres').innerText = data.lideresCount || 0;
                 document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
                 document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
             }
             
+            // CÁLCULO DE TOTAIS PARA EXIBIÇÃO
             let mFis = 0; let mOnl = 0; let vFis = 0; let vOnl = 0; let totM = 0;
             members.forEach(m => {
                 const isP = curP.includes(m.id); const isOn = curO.includes(m.id);
                 const rCat = getRealCategory(m); if(rCat !== 'Visitante') { totM++; if(isP) isOn ? mOnl++ : mFis++; } else { if(isP) isOn ? vOnl++ : vFis++; }
             });
-            document.getElementById('stats-present').innerText = mFis + mOnl + vFis + vOnl + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
+            
+            const totalPresentes = mFis + mOnl + vFis + vOnl + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
+            
+            // ATUALIZA O CARD PRINCIPAL DO DASHBOARD (COM BARRA DE META)
+            const dashboardCard = document.getElementById('dashboard-main-card');
+            if(dashboardCard) {
+                const meta = 100;
+                const progresso = Math.min(100, Math.round((totalPresentes / meta) * 100));
+                
+                dashboardCard.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <p class="text-sm font-bold text-slate-500 dark:text-slate-400">Frequência Sacramental</p>
+                            <div class="flex items-center gap-3 mt-1">
+                                <h1 class="text-5xl font-black text-slate-800 dark:text-white tracking-tight">${totalPresentes}</h1>
+                                ${growthHtml}
+                            </div>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-[#002e5d]/10 dark:bg-blue-500/20 flex items-center justify-center text-[#002e5d] dark:text-blue-400">
+                            <i class="fas fa-church text-xl"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="relative w-full h-3 bg-slate-100 dark:bg-slate-700 rounded-full mt-2 mb-1 overflow-hidden">
+                        <div class="absolute top-0 left-0 h-full bg-[#002e5d] dark:bg-blue-500 rounded-full transition-all duration-1000 ease-out" style="width: ${progresso}%"></div>
+                    </div>
+                    <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 text-right uppercase tracking-widest mb-6">Meta mensal: ${meta}</p>
+
+                    <div class="pt-4 border-t border-dashed border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-500 dark:text-slate-400 space-y-3">
+                        <div class="flex justify-between items-center"><span class="text-green-600 dark:text-green-400 flex items-center gap-2"><i class="fas fa-users text-xs"></i> Membros Ala</span> <span class="text-base font-black text-slate-800 dark:text-white">${mFis + mOnl}</span></div>
+                        ${(mOnl) > 0 ? `<div class="flex justify-between items-center pl-6 text-xs"><span class="text-blue-400 uppercase tracking-widest">Online</span><span class="font-black text-blue-600 dark:text-blue-400">${mOnl}</span></div>` : ''}
+                        ${(mFis) > 0 ? `<div class="flex justify-between items-center pl-6 text-xs border-b border-slate-50 dark:border-slate-800 pb-2"><span class="text-emerald-500 uppercase tracking-widest">Presencial</span><span class="font-black text-emerald-600 dark:text-emerald-400">${mFis}</span></div>` : ''}
+                        
+                        ${(vFis+vOnl) > 0 ? `<div class="flex justify-between items-center"><span class="text-teal-600 dark:text-teal-400 flex items-center gap-2"><i class="fas fa-user-tag text-xs"></i> Visitantes Locais</span> <span class="text-base font-black text-teal-700 dark:text-teal-300">${vFis+vOnl}</span></div>` : ''}
+                        ${data.lideresCount > 0 ? `<div class="flex justify-between items-center"><span class="text-amber-600 dark:text-amber-400 flex items-center gap-2"><i class="fas fa-user-tie text-xs"></i> Líderes Estaca</span> <span class="text-base font-black text-amber-700 dark:text-amber-300">${data.lideresCount}</span></div>` : ''}
+                        ${data.visitantesCount > 0 ? `<div class="flex justify-between items-center"><span class="text-cyan-600 dark:text-cyan-400 flex items-center gap-2"><i class="fas fa-bus text-xs"></i> Visitantes de Fora</span> <span class="text-base font-black text-cyan-700 dark:text-cyan-300">${data.visitantesCount}</span></div>` : ''}
+                        ${data.missionariosCount > 0 ? `<div class="flex justify-between items-center"><span class="text-indigo-600 dark:text-indigo-400 flex items-center gap-2"><i class="fas fa-id-badge text-xs"></i> Missionários</span> <span class="text-base font-black text-indigo-700 dark:text-indigo-300">${data.missionariosCount}</span></div>` : ''}
+                    </div>
+                `;
+            }
+            
+            // ATUALIZA O NÚMERO TOTAL NOS OUTROS LUGARES
             document.getElementById('stats-total').innerText = totM;
 
-            const card = document.getElementById('stats-present').parentElement;
-            let old = card.querySelector('.detalhes-area'); if(old) old.remove();
-            
-            // DASHBOARD CLEAN UI (SEM EMOJIS, TEXTO GRANDE E ALINHADO)
-            let dHtml = `<div class="detalhes-area mt-6 pt-4 border-t border-dashed border-slate-200 dark:border-slate-700">
-                <div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0">
-                    <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Membros Ala</span>
-                    <span class="text-sm font-black text-slate-700 dark:text-white">${mFis + mOnl}</span>
-                </div>
-                ${(mFis) > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0 pl-4 border-l-2 border-emerald-100 dark:border-emerald-900"><span class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Presencial</span><span class="text-sm font-black text-emerald-600 dark:text-emerald-400">${mFis}</span></div>` : ''}
-                ${(mOnl) > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0 pl-4 border-l-2 border-blue-100 dark:border-blue-900"><span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Online</span><span class="text-sm font-black text-blue-600 dark:text-blue-400">${mOnl}</span></div>` : ''}
-                ${(vFis+vOnl) > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0"><span class="text-[10px] font-bold text-teal-500 uppercase tracking-widest">Visitantes Locais</span><span class="text-sm font-black text-teal-600 dark:text-teal-400">${vFis+vOnl}</span></div>` : ''}
-                ${data.lideresCount > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0"><span class="text-[10px] font-bold text-amber-500 uppercase tracking-widest">Líderes Estaca</span><span class="text-sm font-black text-amber-600 dark:text-amber-400">${data.lideresCount}</span></div>` : ''}
-                ${data.visitantesCount > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0"><span class="text-[10px] font-bold text-cyan-500 uppercase tracking-widest">Visitantes de Fora</span><span class="text-sm font-black text-cyan-600 dark:text-cyan-400">${data.visitantesCount}</span></div>` : ''}
-                ${data.missionariosCount > 0 ? `<div class="flex justify-between items-center py-2 border-b border-slate-50 dark:border-slate-800 last:border-0"><span class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Missionários</span><span class="text-sm font-black text-indigo-600 dark:text-indigo-400">${data.missionariosCount}</span></div>` : ''}
-            </div>`;
-            
-            card.insertAdjacentHTML('beforeend', dHtml);
-
+            // RENDERIZAÇÃO DA LISTA DE CHAMADA (MANTIDA)
             list.innerHTML = ''; let lastFam = ""; let visibleCount = 0;
             const lastDom = Object.keys(attendanceHistory).sort().reverse().slice(0, 4);
             const sorted = [...members].sort((a, b) => {
@@ -755,7 +821,6 @@
             });
             list.innerHTML = visibleCount === 0 ? `<div class="flex flex-col items-center justify-center py-10 opacity-60"><div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4"><i class="fas ${showMissingOnly ? 'fa-check-circle text-green-500' : 'fa-search text-slate-400'} text-3xl"></i></div><p class="font-bold text-slate-500 dark:text-slate-400 text-sm">${showMissingOnly ? 'Todos os listados estão presentes!' : 'Nenhum membro encontrado.'}</p></div>` : buffer;
         };
-
         window.renderAdminUsers = () => {
             const l = document.getElementById('users-list'); if(!l) return; l.innerHTML = '';
             allUsersList.forEach(u => { l.innerHTML += `<div class="bg-white dark:bg-slate-700 p-5 rounded-3xl flex justify-between items-center text-xs border dark:border-slate-600"><div><p class="font-black uppercase text-[#002e5d] dark:text-white">${u.name}</p><p class="opacity-40 uppercase text-[9px] font-bold dark:text-slate-300">${u.username}</p></div><button onclick="openEditUser({id:'${u.id}', name:'${u.name}', role:'${u.role}'})" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-600 flex items-center justify-center"><i class="fas fa-cog text-slate-400 dark:text-slate-200"></i></button></div>`; });
