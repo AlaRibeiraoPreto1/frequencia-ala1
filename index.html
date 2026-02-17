@@ -16,6 +16,7 @@
                     animation: {
                         'pop-up': 'popUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
                         'fade-in': 'fadeIn 0.2s ease-out forwards'
+                        'grow-width': 'growWidth 1s ease-out forwards'
                     },
                     keyframes: {
                         popUp: {
@@ -26,6 +27,9 @@
                             '0%': { opacity: '0' },
                             '100%': { opacity: '1' },
                         }
+                        growWidth: { // <--- ADICIONE ISTO
+                            '0%': { width: '0%' },
+                         }
                     }
                 }
             }
@@ -259,7 +263,10 @@
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="glass-card p-6 text-center shadow-inner"><h3 class="font-black text-[10px] uppercase text-slate-400 tracking-widest mb-6">Frequência por Organização (%)</h3><canvas id="heatmapChart" height="220"></canvas></div>
+                        <div class="glass-card p-6 shadow-inner">
+                                <h3 class="font-black text-[10px] uppercase text-slate-400 dark:text-slate-500 tracking-widest mb-4">Frequência por Organização</h3>
+                            <div id="org-stats-container" class="space-y-4"></div>
+                        </div>
                         <div class="glass-card p-6 text-center shadow-inner"><h3 class="font-black text-[10px] uppercase text-slate-400 tracking-widest mb-6">Histórico Semanal</h3><canvas id="attendanceChart" height="220"></canvas></div>
                     </div>
                 </section>
@@ -901,32 +908,86 @@
         
         window.updateCharts = () => {
             if(!members.length) return;
-            const ctx1 = document.getElementById('heatmapChart'); if(!ctx1) return;
+
+            // --- 1. LÓGICA DAS BARRAS DE PROGRESSO (NOVO) ---
+            const orgs = ['Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária'];
+            const container = document.getElementById('org-stats-container');
+            
+            if(container) {
+                let htmlBuffer = '';
+                
+                orgs.forEach(org => {
+                    // Filtra membros da organização
+                    const orgMembers = members.filter(m => m.org === org);
+                    const total = orgMembers.length;
+                    
+                    if(total === 0) return; // Se não tiver ninguém na org, pula
+                    
+                    // Conta quantos estão presentes na data selecionada
+                    const presentsList = attendanceHistory[selectedDate]?.presents || [];
+                    const presentCount = orgMembers.filter(m => presentsList.includes(m.id)).length;
+                    
+                    // Calcula porcentagem
+                    const percent = Math.round((presentCount / total) * 100);
+                    
+                    // Lógica de Cor: Se > 90% fica Verde, senão fica Azul padrão
+                    const isHigh = percent > 90;
+                    const barColor = isHigh ? 'bg-emerald-500' : 'bg-[#002e5d] dark:bg-blue-600';
+                    
+                    // Monta o HTML da Barra
+                    htmlBuffer += `
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-end">
+                                <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                                    ${org}
+                                </span>
+                                <span class="text-xs font-black text-slate-700 dark:text-white">
+                                    ${presentCount}/${total}
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="flex-1 h-2.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                                    <div class="h-full ${barColor} rounded-full animate-grow-width" style="width: ${percent}%"></div>
+                                </div>
+                                <span class="text-xs font-black text-slate-600 dark:text-slate-300 w-8 text-right">
+                                    ${percent}%
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = htmlBuffer;
+            }
+
+            // --- 2. GRÁFICO DE LINHA (MANTIDO IGUAL) ---
+            const ctx2 = document.getElementById('attendanceChart'); if(!ctx2) return;
             const isDark = document.documentElement.classList.contains('dark');
             const color = isDark ? '#60a5fa' : '#002e5d';
             
-            const orgs = ['Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária'];
-            const st = orgs.map(o => { const tot = members.filter(m => m.org === o).length; const prs = members.filter(m => m.org === o && (attendanceHistory[selectedDate]?.presents || []).includes(m.id)).length; return tot>0 ? Math.round((prs/tot)*100) : 0; });
-            if(hChart) hChart.destroy(); 
-            hChart = new Chart(ctx1.getContext('2d'), { type: 'bar', data: { labels: ['ÉLD','SOC','MOÇ','RAP','PRI'], datasets: [{ data: st, backgroundColor: color, borderRadius: 8 }] }, options: { indexAxis: 'y', plugins: { legend: false }, scales: { x: { max: 100, ticks: { color: isDark?'#94a3b8':'#666' } }, y: { ticks: { color: isDark?'#94a3b8':'#666' } } } } });
+            const cts = domingosISO.slice(0, 5).reverse().map(d => {
+               const data = attendanceHistory[d] || {};
+               let total = (data.presents || []).length + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
+               return total;
+            });
             
-            const ctx2 = document.getElementById('attendanceChart'); if(!ctx2) return;
-            const cts = domingosISO.slice(0, 5).reverse().map(d => (attendanceHistory[d]?.presents || []).length);
             if(aChart) aChart.destroy(); 
-            aChart = new Chart(ctx2.getContext('2d'), { type: 'line', data: { labels: domingosISO.slice(0, 5).reverse().map(d=>d.split('-')[2]+'/'+d.split('-')[1]), datasets: [{ data: cts, borderColor: color, fill: true, tension: 0.5 }] }, options: { plugins: { legend: false }, scales: { x: { ticks: { color: isDark?'#94a3b8':'#666' } }, y: { ticks: { color: isDark?'#94a3b8':'#666' } } } } });
+            aChart = new Chart(ctx2.getContext('2d'), { 
+                type: 'line', 
+                data: { 
+                    labels: domingosISO.slice(0, 5).reverse().map(d=>d.split('-')[2]+'/'+d.split('-')[1]), 
+                    datasets: [{ data: cts, borderColor: color, fill: true, tension: 0.4, borderWidth: 3 }] 
+                }, 
+                options: { 
+                    plugins: { legend: false }, 
+                    scales: { 
+                        x: { ticks: { color: isDark?'#94a3b8':'#666' }, grid: {display: false} }, 
+                        y: { ticks: { color: isDark?'#94a3b8':'#666' }, grid: {color: isDark?'#334155':'#e2e8f0'} } 
+                    } 
+                } 
+            });
         }
-
-        if(currentUser) {
-            document.getElementById('user-name-side').innerText = currentUser.name;
-            if(document.getElementById('user-mobile-name')) document.getElementById('user-mobile-name').innerText = currentUser.name;
-            if(document.getElementById('user-mobile-role')) document.getElementById('user-mobile-role').innerText = currentUser.role;
-            if(currentUser.role === 'admin') { 
-                document.getElementById('admin-btn').classList.remove('hidden'); 
-                if(document.getElementById('admin-mobile-btn')) document.getElementById('admin-mobile-btn').classList.remove('hidden'); 
-            }
-            listenData(); switchTab('dashboard');
-        } else { switchTab('login'); document.getElementById('loading-screen').classList.add('hidden'); }
-
+        
         window.navigateDate = (direction) => {
             const dSelect = document.getElementById('dateSelectGlobal');
             const currentIndex = dSelect.selectedIndex;
