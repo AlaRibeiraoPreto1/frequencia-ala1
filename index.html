@@ -28,8 +28,7 @@
                             '100%': { opacity: '1' }
                         },
                         growWidth: {
-                            '0%': { width: '0%' },
-                            '100%': { width: '100%' }
+                            '0%': { width: '0%' }
                         }
                     }
                 }
@@ -42,9 +41,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* TRAVAMENTO HORIZONTAL */
         html, body { overflow-x: hidden; width: 100%; max-width: 100%; }
-        
         body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s, color 0.3s; -webkit-tap-highlight-color: transparent; }
         .hidden { display: none !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -64,60 +61,32 @@
             .content-container { padding: 20px; padding-bottom: 160px; overflow-x: hidden; }
         }
 
-        /* Glass Card */
+        /* UI Components */
         .glass-card { background: white; border-radius: 28px; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.04); border: 1px solid #f1f5f9; transition: all 0.3s; }
         html.dark .glass-card { background: #1e293b; border-color: #334155; box-shadow: none; }
         html.dark body { background-color: #0f172a; color: #f1f5f9; }
         html.dark .sidebar { background: #0f172a; border-right-color: #334155; }
 
-        /* LIQUID GLASS NAV */
-        .liquid-glass {
-            background: rgba(255, 255, 255, 0.70);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
-        }
-        html.dark .liquid-glass {
-            background: rgba(17, 25, 40, 0.75);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
-        }
+        .liquid-glass { background: rgba(255, 255, 255, 0.70); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15); }
+        html.dark .liquid-glass { background: rgba(17, 25, 40, 0.75); border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6); }
 
-        /* STICKY HEADER */
-        .sticky-header {
-            position: sticky;
-            top: 0;
-            z-index: 140;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-        }
-        html.dark .sticky-header {
-            background: rgba(15, 23, 42, 0.95);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
+        .sticky-header { position: sticky; top: 0; z-index: 140; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0,0,0,0.05); transition: all 0.3s ease; }
+        html.dark .sticky-header { background: rgba(15, 23, 42, 0.95); border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        /* Nav Icons */
-        .nav-icon { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .nav-icon { transition: all 0.3s; }
         .nav-btn-active .nav-icon { color: var(--sacramental-blue); transform: scale(1.2) translateY(-2px); filter: drop-shadow(0 4px 6px rgba(0,46,93,0.2)); }
         html.dark .nav-btn-active .nav-icon { color: #60a5fa; filter: drop-shadow(0 4px 6px rgba(96,165,250,0.3)); }
-        
         .sidebar .nav-btn-active { background-color: #f0f7ff; border-right: 4px solid var(--sacramental-blue); transform: none; filter: none; }
         html.dark .sidebar .nav-btn-active { background-color: #1e293b; border-right: 4px solid #60a5fa; }
-
         .family-divider { background-color: #f8fafc; padding: 8px 16px; border-radius: 12px; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-top: 15px; border: 1px solid #e2e8f0; width: 100%; display: block; }
         html.dark .family-divider { background-color: #1e293b; color: #94a3b8; border-color: #334155; }
-
         @keyframes toastIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         .toast-active { animation: toastIn 0.3s ease-out forwards; }
     </style>
 </head>
 <body class="antialiased status-login bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 overflow-x-hidden">
 
-    <div id="loading-screen" class="fixed inset-0 bg-white dark:bg-slate-900 z-[300] flex items-center justify-center transition-opacity duration-500">
+    <div id="loading-screen" class="fixed inset-0 bg-white dark:bg-slate-900 z-[300] flex items-center justify-center">
         <div class="text-center space-y-4">
             <div class="w-12 h-12 border-4 border-slate-100 dark:border-slate-700 border-t-[#002e5d] dark:border-t-blue-500 rounded-full animate-spin mx-auto"></div>
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Carregando...</p>
@@ -133,23 +102,10 @@
                 <input type="password" id="login-pass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 dark:text-white border-none outline-none text-sm">
             </div>
             <button onclick="checkLogin()" class="w-full bg-[#002e5d] dark:bg-blue-600 text-white py-4 rounded-2xl font-black shadow-xl active:scale-95 transition-all text-xs tracking-widest uppercase">Entrar</button>
-            <button onclick="switchTab('first-login')" class="text-xs font-bold text-slate-400 underline">Ativar Primeiro Acesso</button>
-        </section>
-
-        <section id="view-first-login" class="hidden glass-card p-10 w-full max-w-sm text-center space-y-6">
-            <h2 class="font-black text-xl italic uppercase text-[#002e5d] dark:text-blue-400">Ativar Conta</h2>
-            <div class="space-y-3">
-                <input type="text" id="first-user" placeholder="Login Autorizado" class="w-full p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 dark:text-white border-none text-sm font-bold">
-                <input type="password" id="first-pass" placeholder="Senha" class="w-full p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 dark:text-white border-none text-sm">
-                <input type="password" id="first-pass-confirm" placeholder="Confirme Senha" class="w-full p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 dark:text-white border-none text-sm">
-            </div>
-            <button onclick="processFirstLogin()" class="w-full bg-green-600 text-white p-5 rounded-2xl font-black uppercase text-xs active:scale-95 transition-all">Ativar Conta</button>
-            <button onclick="switchTab('login')" class="text-xs text-slate-400 underline font-bold">Voltar</button>
         </section>
     </div>
 
     <div id="app-layout" class="hidden app-layout overflow-x-hidden">
-        
         <aside class="sidebar p-8">
             <div class="flex items-center gap-3 mb-12 px-2">
                 <div class="w-10 h-10 bg-[#002e5d] dark:bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg"><i class="fas fa-church text-lg"></i></div>
@@ -163,9 +119,7 @@
                 <button onclick="switchTab('add')" id="side-add" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-left"><i class="fas fa-users"></i> Membros</button>
                 <hr class="border-slate-50 dark:border-slate-800 my-6">
                 <button id="admin-btn" onclick="switchTab('admin-users')" class="hidden w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-left"><i class="fas fa-users-cog"></i> Gerenciar Logins</button>
-                <button onclick="toggleTheme()" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-left mt-2">
-                    <i id="theme-icon-desktop" class="fas fa-moon"></i> <span id="theme-text-desktop">Modo Escuro</span>
-                </button>
+                <button onclick="toggleTheme()" class="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-left mt-2"><i id="theme-icon-desktop" class="fas fa-moon"></i> <span id="theme-text-desktop">Modo Escuro</span></button>
             </nav>
             <div class="bg-slate-50 dark:bg-slate-800 p-6 rounded-[32px] mt-auto">
                 <p id="user-name-side" class="font-black text-[10px] uppercase text-slate-700 dark:text-slate-300 truncate italic">...</p>
@@ -174,8 +128,7 @@
         </aside>
 
         <main class="main-content bg-slate-50 dark:bg-slate-900 overflow-x-hidden">
-            
-           <header id="master-header" class="sticky-header w-full">
+            <header id="master-header" class="sticky-header w-full">
                 <div class="flex items-center justify-between gap-2 px-4 py-3 min-h-[60px]">
                     <h2 id="dynamic-page-title" class="w-[30%] font-black text-[#002e5d] dark:text-white text-sm uppercase leading-tight break-words whitespace-normal">Página Inicial</h2>
                     <div id="date-controls-wrapper" class="w-[70%] flex items-center justify-end gap-1 hidden">
@@ -199,23 +152,11 @@
                         <button onclick="toggleOptions()" class="w-12 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[#002e5d] dark:text-blue-400 shadow-sm flex items-center justify-center active:scale-95 transition-all"><i class="fas fa-sliders"></i></button>
                     </div>
                     <div id="attendance-options" class="hidden mt-3 bg-white dark:bg-slate-800 p-4 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl">
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Contadores Manuais</span>
-                            <button onclick="toggleOptions()" class="text-slate-300 hover:text-red-500"><i class="fas fa-times"></i></button>
-                        </div>
+                        <div class="flex justify-between items-center mb-3"><span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Contadores Manuais</span><button onclick="toggleOptions()" class="text-slate-300 hover:text-red-500"><i class="fas fa-times"></i></button></div>
                         <div class="grid grid-cols-3 gap-2">
-                            <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
-                                <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300 text-center leading-tight">Líderes Estaca</span>
-                                <div class="flex items-center gap-2"><button onclick="updateCount('lideresCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button><span id="display-lideres" class="font-black text-sm text-[#002e5d] dark:text-white">0</span><button onclick="updateCount('lideresCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button></div>
-                            </div>
-                            <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
-                                <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300 text-center leading-tight">Visitantes de Fora</span>
-                                <div class="flex items-center gap-2"><button onclick="updateCount('visitantesCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button><span id="display-visitantes" class="font-black text-sm text-[#002e5d] dark:text-white">0</span><button onclick="updateCount('visitantesCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button></div>
-                            </div>
-                            <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1">
-                                <span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300">Missionários</span>
-                                <div class="flex items-center gap-2"><button onclick="updateCount('missionariosCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button><span id="display-missionarios" class="font-black text-sm text-[#002e5d] dark:text-white">0</span><button onclick="updateCount('missionariosCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button></div>
-                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1"><span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300 text-center leading-tight">Líderes Estaca</span><div class="flex items-center gap-2"><button onclick="updateCount('lideresCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button><span id="display-lideres" class="font-black text-sm text-[#002e5d] dark:text-white">0</span><button onclick="updateCount('lideresCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button></div></div>
+                            <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1"><span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300 text-center leading-tight">Visitantes de Fora</span><div class="flex items-center gap-2"><button onclick="updateCount('visitantesCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button><span id="display-visitantes" class="font-black text-sm text-[#002e5d] dark:text-white">0</span><button onclick="updateCount('visitantesCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button></div></div>
+                            <div class="bg-slate-50 dark:bg-slate-700 p-2 rounded-xl border dark:border-slate-600 flex flex-col items-center justify-center gap-1"><span class="text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300">Missionários</span><div class="flex items-center gap-2"><button onclick="updateCount('missionariosCount', -1)" class="w-6 h-6 rounded bg-white dark:bg-slate-600 shadow text-slate-400 hover:text-red-500">-</button><span id="display-missionarios" class="font-black text-sm text-[#002e5d] dark:text-white">0</span><button onclick="updateCount('missionariosCount', 1)" class="w-6 h-6 rounded bg-[#002e5d] dark:bg-blue-600 text-white shadow hover:bg-opacity-90">+</button></div></div>
                         </div>
                         <button onclick="toggleFrequencyOrder()" id="btnOrderFreqInner" class="w-full mt-3 py-3 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase flex items-center justify-center gap-2"><i class="fas fa-sort-amount-down"></i> Ordenar por Frequência</button>
                     </div>
@@ -225,7 +166,8 @@
             <div class="content-container w-full overflow-x-hidden pt-0">
                 
                 <section id="view-dashboard" class="hidden space-y-8 mt-6">
-                    <div id="dashboard-main-card" class="glass-card p-6 border-l-[6px] border-[#002e5d] dark:border-blue-500 shadow-lg relative overflow-hidden"></div>
+                    <div id="dashboard-main-card" class="glass-card p-6 border-l-[6px] border-[#002e5d] dark:border-blue-500 shadow-lg relative overflow-hidden">
+                        </div>
                     <div class="glass-card p-6 shadow-inner">
                         <h3 class="font-black text-[10px] uppercase text-slate-400 dark:text-slate-500 tracking-widest mb-4">Frequência por Organização</h3>
                         <div id="org-stats-container" class="space-y-4"></div>
@@ -241,7 +183,7 @@
                 </section>
 
                 <section id="view-reports" class="hidden space-y-8 mt-6">
-                     <div class="glass-card p-8 border-l-[12px] border-slate-800 dark:border-slate-600 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95" onclick="switchTab('members-list')">
+                    <div class="glass-card p-8 border-l-[12px] border-slate-800 dark:border-slate-600 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95" onclick="switchTab('members-list')">
                         <div class="flex items-center justify-between text-left"><div><h3 class="font-black text-slate-800 dark:text-white uppercase text-[10px] mb-1">Painel Administrativo</h3><p class="text-xl font-black text-[#002e5d] dark:text-blue-400 italic">Gestão da Unidade e Membros</p><p class="text-[10px] text-slate-400 font-bold uppercase mt-1 italic">Editar cadastros, nomes e chamados</p></div><i class="fas fa-users-viewfinder text-4xl text-slate-200 dark:text-slate-600"></i></div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
@@ -289,11 +231,8 @@
     <script>
         setTimeout(() => {
             const ls = document.getElementById('loading-screen');
-            if(ls && !ls.classList.contains('hidden')) {
-                console.warn('Carregamento forçado pelo sistema de segurança.');
-                ls.classList.add('hidden');
-            }
-        }, 4000);
+            if(ls && !ls.classList.contains('hidden')) ls.classList.add('hidden');
+        }, 3000);
     </script>
 
     <script type="module">
@@ -303,7 +242,6 @@
         const firebaseConfig = { apiKey: "AIzaSyAaEKx9n4N847WW97FhfZxLZYtsa5cTsE0", authDomain: "frequencia-da-ala.firebaseapp.com", projectId: "frequencia-da-ala", storageBucket: "frequencia-da-ala.firebasestorage.app", messagingSenderId: "823110082594", appId: "1:823110082594:web:525d38b65a5ab74ec9ea7b" };
         const app = initializeApp(firebaseConfig); const db = getFirestore(app);
 
-        // HELPER DATE
         const getLocalISOString = (date) => { const y=date.getFullYear(); const m=String(date.getMonth()+1).padStart(2,'0'); const d=String(date.getDate()).padStart(2,'0'); return `${y}-${m}-${d}`; };
 
         // GLOBALS
@@ -318,13 +256,13 @@
         for(let i=0; i<12; i++) { let iso = getLocalISOString(dataAux); domingosISO.push(iso); if(dSelectGlobal) dSelectGlobal.innerHTML += `<option value="${iso}" class="text-black">${dataAux.toLocaleDateString('pt-BR')}</option>`; dataAux.setDate(dataAux.getDate()-7); }
         if(domingosISO.length > 0) { selectedDate = domingosISO[0]; if(dSelectGlobal) { dSelectGlobal.value = selectedDate; dSelectGlobal.addEventListener('change', (e) => { selectedDate = e.target.value; renderAll(); }); } }
 
-        // LOGIC
+        // --- WINDOW FUNCTIONS (GLOBAL SCOPE) ---
         window.toggleTheme = () => { const html = document.documentElement; if(html.classList.contains('dark')) { html.classList.remove('dark'); localStorage.setItem('theme', 'light'); } else { html.classList.add('dark'); localStorage.setItem('theme', 'dark'); } if(members.length > 0) window.updateCharts(); };
         if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
 
         window.showToast = (msg, type='success') => { const c = document.getElementById('toast-container'); const t = document.createElement('div'); const cl = {success:'bg-emerald-500', error:'bg-rose-500', info:'bg-[#002e5d]'}; t.className = `${cl[type] || cl.success} text-white px-6 py-4 rounded-2xl shadow-xl flex items-center gap-3 animate-pop-up`; t.innerHTML = `<span class="font-bold text-xs uppercase">${msg}</span>`; c.appendChild(t); setTimeout(() => t.remove(), 3000); };
         
-        window.renderAll = () => { try { renderAttendance(); renderRescue(); updateCharts(); } catch(e) { console.error(e); } };
+        window.renderAll = () => { renderAttendance(); renderRescue(); updateCharts(); };
 
         window.switchTab = (tab) => {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
@@ -406,7 +344,7 @@
 
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-2"><div><p class="text-sm font-bold text-slate-500 dark:text-slate-400">Frequência Sacramental</p><div class="flex items-center gap-3 mt-1"><h1 class="text-5xl font-black text-slate-800 dark:text-white tracking-tight">${totGeral}</h1>${growthHtml}</div></div><div class="w-10 h-10 rounded-full bg-[#002e5d]/10 dark:bg-blue-500/20 flex items-center justify-center text-[#002e5d] dark:text-blue-400"><i class="fas fa-church text-xl"></i></div></div>
-                    <div class="relative w-full h-3 bg-slate-100 dark:bg-slate-700 rounded-full mt-2 mb-1 overflow-hidden"><div class="absolute top-0 left-0 h-full bg-[#002e5d] dark:bg-blue-500 rounded-full transition-all duration-1000 ease-out" style="width: ${prog}%"></div></div><p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 text-right uppercase tracking-widest mb-6">Meta: ${meta}</p>
+                    <div class="relative w-full h-3 bg-slate-100 dark:bg-slate-700 rounded-full mt-2 mb-1 overflow-hidden"><div class="absolute top-0 left-0 h-full bg-[#002e5d] dark:bg-blue-500 rounded-full transition-all duration-1000 ease-out" style="width: ${prog}%"></div></div><p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 text-right uppercase tracking-widest mb-6">Meta mensal: ${meta}</p>
                     <div class="pt-4 border-t border-dashed border-slate-200 dark:border-slate-700 text-left text-sm font-bold text-slate-500 dark:text-slate-400 space-y-3">
                         <div class="flex justify-between items-center py-1 border-b border-slate-50 dark:border-slate-800"><span class="text-[11px] font-bold uppercase tracking-widest text-slate-400">Membros da Ala</span> <span class="text-base font-black text-slate-800 dark:text-white">${mFis+mOnl}</span></div>
                         ${(mFis)>0 ? `<div class="flex justify-between items-center pl-4 text-xs"><span class="text-emerald-500 uppercase tracking-widest">Presencial</span><span class="font-black text-emerald-600">${mFis}</span></div>` : ''}
