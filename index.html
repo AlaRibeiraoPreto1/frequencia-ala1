@@ -37,7 +37,6 @@
         }
     </script>
 
-
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -71,7 +70,7 @@
         html.dark body { background-color: #0f172a; color: #f1f5f9; }
         html.dark .sidebar { background: #0f172a; border-right-color: #334155; }
 
-        /* --- LIQUID GLASS NAV --- */
+        /* LIQUID GLASS NAV */
         .liquid-glass {
             background: rgba(255, 255, 255, 0.70);
             backdrop-filter: blur(20px) saturate(180%);
@@ -85,7 +84,7 @@
             box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
         }
 
-        /* CABEÇALHO UNIFICADO STICKY */
+        /* STICKY HEADER */
         .sticky-header {
             position: sticky;
             top: 0;
@@ -101,17 +100,10 @@
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* Nav Icons Styling */
+        /* Nav Icons */
         .nav-icon { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .nav-btn-active .nav-icon { 
-            color: var(--sacramental-blue); 
-            transform: scale(1.2) translateY(-2px); 
-            filter: drop-shadow(0 4px 6px rgba(0,46,93,0.2));
-        }
-        html.dark .nav-btn-active .nav-icon { 
-            color: #60a5fa; 
-            filter: drop-shadow(0 4px 6px rgba(96,165,250,0.3));
-        }
+        .nav-btn-active .nav-icon { color: var(--sacramental-blue); transform: scale(1.2) translateY(-2px); filter: drop-shadow(0 4px 6px rgba(0,46,93,0.2)); }
+        html.dark .nav-btn-active .nav-icon { color: #60a5fa; filter: drop-shadow(0 4px 6px rgba(96,165,250,0.3)); }
         
         .sidebar .nav-btn-active { background-color: #f0f7ff; border-right: 4px solid var(--sacramental-blue); transform: none; filter: none; }
         html.dark .sidebar .nav-btn-active { background-color: #1e293b; border-right: 4px solid #60a5fa; }
@@ -125,7 +117,7 @@
 </head>
 <body class="antialiased status-login bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 overflow-x-hidden">
 
-    <div id="loading-screen" class="fixed inset-0 bg-white dark:bg-slate-900 z-[300] flex items-center justify-center">
+    <div id="loading-screen" class="fixed inset-0 bg-white dark:bg-slate-900 z-[300] flex items-center justify-center transition-opacity duration-500">
         <div class="text-center space-y-4">
             <div class="w-12 h-12 border-4 border-slate-100 dark:border-slate-700 border-t-[#002e5d] dark:border-t-blue-500 rounded-full animate-spin mx-auto"></div>
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Carregando...</p>
@@ -184,20 +176,14 @@
         <main class="main-content bg-slate-50 dark:bg-slate-900 overflow-x-hidden">
             
            <header id="master-header" class="sticky-header w-full">
-                
-                <div class="flex items-center justify-between gap-2 px-4 py-3 h-[60px]">
-                    <h2 id="dynamic-page-title" class="w-[30%] font-black text-[#002e5d] dark:text-white text-sm uppercase leading-tight break-words whitespace-normal">
-                        Página Inicial
-                    </h2>
-
+                <div class="flex items-center justify-between gap-2 px-4 py-3 min-h-[60px]">
+                    <h2 id="dynamic-page-title" class="w-[30%] font-black text-[#002e5d] dark:text-white text-sm uppercase leading-tight break-words whitespace-normal">Página Inicial</h2>
                     <div id="date-controls-wrapper" class="w-[70%] flex items-center justify-end gap-1 hidden">
                         <button onclick="navigateDate(1)" class="w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-90 transition-all border border-slate-200 dark:border-slate-700 shadow-sm flex-shrink-0"><i class="fas fa-chevron-left text-xs"></i></button>
-                        
                         <div class="bg-slate-100 dark:bg-slate-800 flex items-center px-2 py-1 gap-2 border border-slate-200 dark:border-slate-700 rounded-lg shadow-inner flex-1 min-w-0 justify-center h-9">
                             <i class="fas fa-calendar-alt text-[#002e5d] dark:text-blue-400 text-xs"></i>
                             <select id="dateSelectGlobal" class="bg-transparent font-bold text-sm uppercase tracking-tighter outline-none border-none cursor-pointer text-slate-700 dark:text-white w-full p-0 text-center"></select>
                         </div>
-
                         <button onclick="navigateDate(-1)" class="w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-90 transition-all border border-slate-200 dark:border-slate-700 shadow-sm flex-shrink-0"><i class="fas fa-chevron-right text-xs"></i></button>
                     </div>
                 </div>
@@ -212,7 +198,6 @@
                         <button id="btnToggleMissing" onclick="toggleMissingOnly()" class="w-12 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-300 shadow-sm flex items-center justify-center active:scale-95 transition-all"><i class="fas fa-eye-slash"></i></button>
                         <button onclick="toggleOptions()" class="w-12 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[#002e5d] dark:text-blue-400 shadow-sm flex items-center justify-center active:scale-95 transition-all"><i class="fas fa-sliders"></i></button>
                     </div>
-                    
                     <div id="attendance-options" class="hidden mt-3 bg-white dark:bg-slate-800 p-4 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl">
                         <div class="flex justify-between items-center mb-3">
                             <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Contadores Manuais</span>
@@ -239,37 +224,15 @@
 
             <div class="content-container w-full overflow-x-hidden pt-0">
                 
-                <section id="view-dashboard" class="hidden space-y-6 mt-6">
-                    <div id="dashboard-main-card" class="glass-card p-6 border-l-[6px] border-[#002e5d] dark:border-blue-500 shadow-lg relative overflow-hidden">
-                        </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="glass-card p-6 border-l-[6px] border-[#002e5d] dark:border-blue-500 flex items-center justify-between">
-                            <div>
-                                <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Total Membros</p>
-                                <p id="stats-total" class="text-4xl font-black text-slate-800 dark:text-white leading-tight mt-1">0</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-[#002e5d] dark:text-blue-400">
-                                <i class="fas fa-users text-xl"></i>
-                            </div>
-                        </div>
-                        <div class="glass-card p-6 border-l-[6px] border-orange-500 flex items-center justify-between">
-                            <div>
-                                <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Resgate</p>
-                                <p id="stats-rescue" class="text-4xl font-black text-slate-800 dark:text-white leading-tight mt-1">0</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center text-orange-500">
-                                <i class="fas fa-life-ring text-xl"></i>
-                            </div>
-                        </div>
+                <section id="view-dashboard" class="hidden space-y-8 mt-6">
+                    <div id="dashboard-main-card" class="glass-card p-6 border-l-[6px] border-[#002e5d] dark:border-blue-500 shadow-lg relative overflow-hidden"></div>
+                    <div class="glass-card p-6 shadow-inner">
+                        <h3 class="font-black text-[10px] uppercase text-slate-400 dark:text-slate-500 tracking-widest mb-4">Frequência por Organização</h3>
+                        <div id="org-stats-container" class="space-y-4"></div>
                     </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="glass-card p-6 shadow-inner">
-                                <h3 class="font-black text-[10px] uppercase text-slate-400 dark:text-slate-500 tracking-widest mb-4">Frequência por Organização</h3>
-                            <div id="org-stats-container" class="space-y-4"></div>
-                        </div>
-                        <div class="glass-card p-6 text-center shadow-inner"><h3 class="font-black text-[10px] uppercase text-slate-400 tracking-widest mb-6">Histórico Semanal</h3><canvas id="attendanceChart" height="220"></canvas></div>
+                    <div class="glass-card p-6 text-center shadow-inner">
+                        <h3 class="font-black text-[10px] uppercase text-slate-400 tracking-widest mb-6">Histórico Semanal</h3>
+                        <canvas id="attendanceChart" height="220"></canvas>
                     </div>
                 </section>
 
@@ -278,10 +241,8 @@
                 </section>
 
                 <section id="view-reports" class="hidden space-y-8 mt-6">
-                    <div class="glass-card p-8 border-l-[12px] border-slate-800 dark:border-slate-600 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95" onclick="switchTab('members-list')">
-                        <div class="flex items-center justify-between text-left">
-                            <div><h3 class="font-black text-slate-800 dark:text-white uppercase text-[10px] mb-1">Painel Administrativo</h3><p class="text-xl font-black text-[#002e5d] dark:text-blue-400 italic">Gestão da Unidade e Membros</p><p class="text-[10px] text-slate-400 font-bold uppercase mt-1 italic">Editar cadastros, nomes e chamados</p></div><i class="fas fa-users-viewfinder text-4xl text-slate-200 dark:text-slate-600"></i>
-                        </div>
+                     <div class="glass-card p-8 border-l-[12px] border-slate-800 dark:border-slate-600 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95" onclick="switchTab('members-list')">
+                        <div class="flex items-center justify-between text-left"><div><h3 class="font-black text-slate-800 dark:text-white uppercase text-[10px] mb-1">Painel Administrativo</h3><p class="text-xl font-black text-[#002e5d] dark:text-blue-400 italic">Gestão da Unidade e Membros</p><p class="text-[10px] text-slate-400 font-bold uppercase mt-1 italic">Editar cadastros, nomes e chamados</p></div><i class="fas fa-users-viewfinder text-4xl text-slate-200 dark:text-slate-600"></i></div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
                         <div class="glass-card p-8"><h3 class="font-black text-yellow-600 uppercase text-[10px] mb-4 border-b dark:border-slate-700 pb-2 tracking-widest">⚠️ Sinal Amarelo</h3><div id="report-yellow" class="space-y-3"></div></div>
@@ -291,716 +252,213 @@
                 </section>
 
                 <section id="view-add" class="hidden space-y-6 mt-6">
-                    <div class="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-[24px] mb-6 shadow-inner max-w-xl mx-auto">
-                        <button onclick="toggleMemberView('form')" id="btn-show-form" class="flex-1 py-4 rounded-[20px] text-[11px] font-black uppercase transition-all bg-white dark:bg-slate-700 shadow-sm text-[#002e5d] dark:text-white">Novo Cadastro</button>
-                        <button onclick="toggleMemberView('list')" id="btn-show-list" class="flex-1 py-4 rounded-[20px] text-[11px] font-bold uppercase transition-all text-slate-400">Ver e Editar</button>
-                    </div>
-                    <div id="sub-view-form" class="space-y-6 text-left max-w-2xl mx-auto">
-                        <div class="glass-card p-8 shadow-xl space-y-6">
-                            <h3 class="text-xl font-black text-[#002e5d] dark:text-blue-400 text-center italic uppercase tracking-tighter">Cadastro de Membro</h3>
-                            <div class="space-y-4">
-                                <input type="text" id="newName" oninput="formatNameInput(this)" placeholder="Nome Completo" class="w-full p-5 bg-slate-50 dark:bg-slate-900 dark:text-white border-none rounded-3xl font-bold text-sm shadow-inner outline-none">
-                                <div class="relative">
-                                    <input type="text" id="familySearch" oninput="handleFamilySearch(this.value)" placeholder="Sobrenome da Família" class="w-full p-5 bg-slate-50 dark:bg-slate-900 dark:text-white border-none rounded-3xl font-bold text-sm shadow-inner outline-none">
-                                    <div id="familySuggestions" class="hidden absolute left-0 right-0 top-[105%] bg-white dark:bg-slate-800 rounded-3xl shadow-2xl z-[150] max-h-48 overflow-y-auto border border-slate-100 dark:border-slate-700 text-left"></div>
-                                    <div id="headOfFamilyContainer" class="flex items-center gap-3 px-4 mt-2"><input type="checkbox" id="isHeadOfFamily" class="w-5 h-5 accent-[#002e5d] rounded"><label class="text-xs font-black text-slate-400 italic uppercase">Marcar como chefe da família</label></div>
-                                </div>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <select id="newOrg" class="p-4 bg-slate-50 dark:bg-slate-900 dark:text-white rounded-2xl text-[10px] font-black uppercase shadow-inner"><option value="Quórum de Élderes">ÉLDERES</option><option value="Sociedade de Socorro">SOCORRO</option><option value="Moças">MOÇAS</option><option value="Rapazes">RAPAZES</option><option value="Primária">PRIMÁRIA</option></select>
-                                    <select id="newCat" onchange="toggleBaptismDate(this.value, 'baptismDateContainer')" class="p-4 bg-slate-50 dark:bg-slate-900 dark:text-white rounded-2xl text-[10px] font-black uppercase shadow-inner"><option value="Membro">MEMBRO</option><option value="Recém-Converso">RECÉM-CONVERSO</option><option value="Novo Morador">NOVO MORADOR</option><option value="Visitante">VISITANTE</option></select>
-                                </div>
-                                <div id="baptismDateContainer" class="hidden space-y-1"><label class="text-[9px] font-black text-slate-400 uppercase px-5">Data do Batismo</label><input type="date" id="newBaptismDate" class="w-full p-4 bg-white dark:bg-slate-900 dark:text-white border border-slate-100 dark:border-slate-700 rounded-3xl text-sm font-bold shadow-inner"></div>
-                                <input type="tel" id="newPhone" oninput="formatPhone(this)" placeholder="WhatsApp (Somente números)" class="w-full p-5 bg-slate-50 dark:bg-slate-900 dark:text-white border-none rounded-3xl font-bold text-sm shadow-inner outline-none">
-                                <button onclick="saveNewMember()" class="w-full bg-[#002e5d] dark:bg-blue-600 text-white p-6 rounded-[32px] font-black uppercase text-sm shadow-xl active:scale-95 transition-all mt-6">Concluir Cadastro</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="sub-view-list" class="hidden space-y-6 text-left">
-                        <div class="glass-card p-6 flex flex-col md:flex-row gap-4 border border-slate-50 dark:border-slate-700 shadow-inner">
-                            <input type="text" id="searchManageMembers" oninput="renderMembersList()" placeholder="Buscar nome ou família..." class="flex-1 p-4 rounded-2xl bg-white dark:bg-slate-900 dark:text-white border border-slate-100 dark:border-slate-700 font-bold outline-none text-sm focus:ring-2 focus:ring-[#002e5d]">
-                            <select id="filterOrgList" onchange="renderMembersList()" class="p-3 bg-slate-50 dark:bg-slate-900 dark:text-white rounded-2xl text-[11px] font-black uppercase border-none text-slate-600 outline-none"><option value="TODOS">Todas Organizações</option><option value="Quórum de Élderes">Élderes</option><option value="Sociedade de Socorro">Socorro</option><option value="Moças">Moças</option><option value="Rapazes">Rapazes</option><option value="Primária">Primária</option></select>
-                        </div>
-                        <div id="manageMembersContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
-                    </div>
+                    <div class="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-[24px] mb-6 shadow-inner max-w-xl mx-auto"><button onclick="toggleMemberView('form')" id="btn-show-form" class="flex-1 py-4 rounded-[20px] text-[11px] font-black uppercase transition-all bg-white dark:bg-slate-700 shadow-sm text-[#002e5d] dark:text-white">Novo Cadastro</button><button onclick="toggleMemberView('list')" id="btn-show-list" class="flex-1 py-4 rounded-[20px] text-[11px] font-bold uppercase transition-all text-slate-400">Ver e Editar</button></div>
+                    <div id="sub-view-form" class="space-y-6 text-left max-w-2xl mx-auto"><div class="glass-card p-8 shadow-xl space-y-6"><h3 class="text-xl font-black text-[#002e5d] dark:text-blue-400 text-center italic uppercase tracking-tighter">Cadastro de Membro</h3><div class="space-y-4"><input type="text" id="newName" oninput="formatNameInput(this)" placeholder="Nome Completo" class="w-full p-5 bg-slate-50 dark:bg-slate-900 dark:text-white border-none rounded-3xl font-bold text-sm shadow-inner outline-none"><div class="relative"><input type="text" id="familySearch" oninput="handleFamilySearch(this.value)" placeholder="Sobrenome da Família" class="w-full p-5 bg-slate-50 dark:bg-slate-900 dark:text-white border-none rounded-3xl font-bold text-sm shadow-inner outline-none"><div id="familySuggestions" class="hidden absolute left-0 right-0 top-[105%] bg-white dark:bg-slate-800 rounded-3xl shadow-2xl z-[150] max-h-48 overflow-y-auto border border-slate-100 dark:border-slate-700 text-left"></div><div id="headOfFamilyContainer" class="flex items-center gap-3 px-4 mt-2"><input type="checkbox" id="isHeadOfFamily" class="w-5 h-5 accent-[#002e5d] rounded"><label class="text-xs font-black text-slate-400 italic uppercase">Marcar como chefe da família</label></div></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><select id="newOrg" class="p-4 bg-slate-50 dark:bg-slate-900 dark:text-white rounded-2xl text-[10px] font-black uppercase shadow-inner"><option value="Quórum de Élderes">ÉLDERES</option><option value="Sociedade de Socorro">SOCORRO</option><option value="Moças">MOÇAS</option><option value="Rapazes">RAPAZES</option><option value="Primária">PRIMÁRIA</option></select><select id="newCat" onchange="toggleBaptismDate(this.value, 'baptismDateContainer')" class="p-4 bg-slate-50 dark:bg-slate-900 dark:text-white rounded-2xl text-[10px] font-black uppercase shadow-inner"><option value="Membro">MEMBRO</option><option value="Recém-Converso">RECÉM-CONVERSO</option><option value="Novo Morador">NOVO MORADOR</option><option value="Visitante">VISITANTE</option></select></div><div id="baptismDateContainer" class="hidden space-y-1"><label class="text-[9px] font-black text-slate-400 uppercase px-5">Data do Batismo</label><input type="date" id="newBaptismDate" class="w-full p-4 bg-white dark:bg-slate-900 dark:text-white border border-slate-100 dark:border-slate-700 rounded-3xl text-sm font-bold shadow-inner"></div><input type="tel" id="newPhone" oninput="formatPhone(this)" placeholder="WhatsApp (Somente números)" class="w-full p-5 bg-slate-50 dark:bg-slate-900 dark:text-white border-none rounded-3xl font-bold text-sm shadow-inner outline-none"><button onclick="saveNewMember()" class="w-full bg-[#002e5d] dark:bg-blue-600 text-white p-6 rounded-[32px] font-black uppercase text-sm shadow-xl active:scale-95 transition-all mt-6">Concluir Cadastro</button></div></div></div><div id="sub-view-list" class="hidden space-y-6 text-left"><div class="glass-card p-6 flex flex-col md:flex-row gap-4 border border-slate-50 dark:border-slate-700 shadow-inner"><input type="text" id="searchManageMembers" oninput="renderMembersList()" placeholder="Buscar nome ou família..." class="flex-1 p-4 rounded-2xl bg-white dark:bg-slate-900 dark:text-white border border-slate-100 dark:border-slate-700 font-bold outline-none text-sm focus:ring-2 focus:ring-[#002e5d]"><select id="filterOrgList" onchange="renderMembersList()" class="p-3 bg-slate-50 dark:bg-slate-900 dark:text-white rounded-2xl text-[11px] font-black uppercase border-none text-slate-600 outline-none"><option value="TODOS">Todas Organizações</option><option value="Quórum de Élderes">Élderes</option><option value="Sociedade de Socorro">Socorro</option><option value="Moças">Moças</option><option value="Rapazes">Rapazes</option><option value="Primária">Primária</option></select></div><div id="manageMembersContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div></div>
                 </section>
 
                 <section id="view-members-list" class="hidden"><h1 class="font-bold text-xl mb-4">Esta seção agora faz parte de Membros</h1></section>
-                
-                <section id="view-admin-users" class="hidden space-y-10 text-left mt-6">
-                    <div class="glass-card p-10 max-w-lg mx-auto shadow-2xl space-y-8">
-                        <h4 class="font-black text-center uppercase tracking-widest text-[#002e5d] dark:text-blue-400">Novo Login de Acesso</h4>
-                        <div class="space-y-4">
-                            <input type="text" id="admin-new-name" placeholder="Nome Completo" class="w-full p-4 bg-slate-100 dark:bg-slate-700 dark:text-white rounded-3xl text-sm border-none font-bold">
-                            <input type="text" id="admin-new-user" placeholder="Nome de Usuário" class="w-full p-4 bg-slate-100 dark:bg-slate-700 dark:text-white rounded-3xl text-sm border-none font-bold shadow-inner">
-                            <select id="admin-new-role" class="w-full p-4 bg-slate-100 dark:bg-slate-700 dark:text-white rounded-3xl text-xs font-bold border-none uppercase"><option value="user">Secretário</option><option value="admin">Administrador</option></select>
-                            <button onclick="adminCreateUser()" class="w-full bg-[#002e5d] dark:bg-blue-600 text-white p-5 rounded-full font-black text-xs shadow-xl tracking-[4px]">AUTORIZAR</button>
-                        </div>
-                    </div>
-                    <div id="users-list" class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto"></div>
-                </section>
+                <section id="view-admin-users" class="hidden space-y-10 text-left mt-6"><div class="glass-card p-10 max-w-lg mx-auto shadow-2xl space-y-8"><h4 class="font-black text-center uppercase tracking-widest text-[#002e5d] dark:text-blue-400">Novo Login de Acesso</h4><div class="space-y-4"><input type="text" id="admin-new-name" placeholder="Nome Completo" class="w-full p-4 bg-slate-100 dark:bg-slate-700 dark:text-white rounded-3xl text-sm border-none font-bold"><input type="text" id="admin-new-user" placeholder="Nome de Usuário" class="w-full p-4 bg-slate-100 dark:bg-slate-700 dark:text-white rounded-3xl text-sm border-none font-bold shadow-inner"><select id="admin-new-role" class="w-full p-4 bg-slate-100 dark:bg-slate-700 dark:text-white rounded-3xl text-xs font-bold border-none uppercase"><option value="user">Secretário</option><option value="admin">Administrador</option></select><button onclick="adminCreateUser()" class="w-full bg-[#002e5d] dark:bg-blue-600 text-white p-5 rounded-full font-black text-xs shadow-xl tracking-[4px]">AUTORIZAR</button></div></div><div id="users-list" class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto"></div></section>
                 <section id="view-analysis" class="hidden mt-6"><div id="missingList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div></section>
             </div>
 
-            <div id="justificationModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-                <div class="glass-card w-full max-w-sm p-6 space-y-4 shadow-2xl bg-white dark:bg-slate-800">
-                    <h3 id="justify-member-name" class="font-black text-[#002e5d] dark:text-white text-lg uppercase text-center tracking-tight">Justificar Ausência</h3>
-                    <textarea id="justify-text" rows="3" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-700 dark:text-white border border-slate-100 dark:border-slate-600 font-bold text-sm outline-none resize-none shadow-inner" placeholder="Digite o motivo aqui..."></textarea>
-                    <div class="flex gap-2">
-                        <button onclick="deleteJustification()" id="btn-delete-note" class="hidden py-3 px-4 rounded-xl bg-red-100 text-red-600 font-bold text-xs"><i class="fas fa-trash"></i></button>
-                        <button onclick="closeJustify()" class="flex-1 py-3 rounded-xl bg-slate-100 dark:bg-slate-600 font-bold text-slate-500 dark:text-slate-300 text-xs uppercase">Cancelar</button>
-                        <button onclick="saveJustification()" class="flex-1 py-3 rounded-xl bg-[#002e5d] dark:bg-blue-600 font-black text-white text-xs uppercase shadow-lg active:scale-95 transition-transform">Salvar Nota</button>
-                    </div>
-                </div>
-            </div>
+            <div id="justificationModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"><div class="glass-card w-full max-w-sm p-6 space-y-4 shadow-2xl bg-white dark:bg-slate-800"><h3 id="justify-member-name" class="font-black text-[#002e5d] dark:text-white text-lg uppercase text-center tracking-tight">Justificar Ausência</h3><textarea id="justify-text" rows="3" class="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-700 dark:text-white border border-slate-100 dark:border-slate-600 font-bold text-sm outline-none resize-none shadow-inner" placeholder="Digite o motivo aqui..."></textarea><div class="flex gap-2"><button onclick="deleteJustification()" id="btn-delete-note" class="hidden py-3 px-4 rounded-xl bg-red-100 text-red-600 font-bold text-xs"><i class="fas fa-trash"></i></button><button onclick="closeJustify()" class="flex-1 py-3 rounded-xl bg-slate-100 dark:bg-slate-600 font-bold text-slate-500 dark:text-slate-300 text-xs uppercase">Cancelar</button><button onclick="saveJustification()" class="flex-1 py-3 rounded-xl bg-[#002e5d] dark:bg-blue-600 font-black text-white text-xs uppercase shadow-lg active:scale-95 transition-transform">Salvar Nota</button></div></div></div>
 
             <div id="more-menu-overlay" onclick="toggleMoreMenu()" class="hidden fixed inset-0 bg-black/30 z-[190] backdrop-blur-sm transition-opacity"></div>
-            
             <div id="more-menu-content" class="hidden fixed bottom-28 left-1/2 -translate-x-1/2 w-[85%] max-w-sm liquid-glass p-6 z-[195] rounded-3xl animate-pop-up origin-bottom">
                 <h3 class="text-xs font-black uppercase text-slate-500 dark:text-slate-300 tracking-widest mb-4 text-center">Mais Opções</h3>
                 <div class="grid grid-cols-3 gap-4">
-                    <button onclick="switchTab('analysis'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
-                        <div class="w-12 h-12 rounded-2xl bg-orange-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-heart-pulse text-lg"></i></div>
-                        <span class="text-[10px] font-bold text-slate-700 dark:text-white">Resgate</span>
-                    </button>
-                    <button onclick="switchTab('reports'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
-                        <div class="w-12 h-12 rounded-2xl bg-blue-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-file-invoice text-lg"></i></div>
-                        <span class="text-[10px] font-bold text-slate-700 dark:text-white">Relatórios</span>
-                    </button>
-                    <button onclick="switchTab('add'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-users text-lg"></i></div>
-                        <span class="text-[10px] font-bold text-slate-700 dark:text-white">Membros</span>
-                    </button>
-                    <button onclick="switchTab('admin-users'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
-                        <div class="w-12 h-12 rounded-2xl bg-slate-800 text-white flex items-center justify-center shadow-lg"><i class="fas fa-users-cog text-lg"></i></div>
-                        <span class="text-[10px] font-bold text-slate-700 dark:text-white">Admin</span>
-                    </button>
-                    <button onclick="toggleTheme(); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
-                        <div class="w-12 h-12 rounded-2xl bg-yellow-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-adjust text-lg"></i></div>
-                        <span class="text-[10px] font-bold text-slate-700 dark:text-white">Tema</span>
-                    </button>
-                    <button onclick="logout()" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all">
-                        <div class="w-12 h-12 rounded-2xl bg-red-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-power-off text-lg"></i></div>
-                        <span class="text-[10px] font-bold text-slate-700 dark:text-white">Sair</span>
-                    </button>
+                    <button onclick="switchTab('analysis'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all"><div class="w-12 h-12 rounded-2xl bg-orange-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-heart-pulse text-lg"></i></div><span class="text-[10px] font-bold text-slate-700 dark:text-white">Resgate</span></button>
+                    <button onclick="switchTab('reports'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all"><div class="w-12 h-12 rounded-2xl bg-blue-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-file-invoice text-lg"></i></div><span class="text-[10px] font-bold text-slate-700 dark:text-white">Relatórios</span></button>
+                    <button onclick="switchTab('add'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all"><div class="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-users text-lg"></i></div><span class="text-[10px] font-bold text-slate-700 dark:text-white">Membros</span></button>
+                    <button onclick="switchTab('admin-users'); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all"><div class="w-12 h-12 rounded-2xl bg-slate-800 text-white flex items-center justify-center shadow-lg"><i class="fas fa-users-cog text-lg"></i></div><span class="text-[10px] font-bold text-slate-700 dark:text-white">Admin</span></button>
+                    <button onclick="toggleTheme(); toggleMoreMenu();" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all"><div class="w-12 h-12 rounded-2xl bg-yellow-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-adjust text-lg"></i></div><span class="text-[10px] font-bold text-slate-700 dark:text-white">Tema</span></button>
+                    <button onclick="logout()" class="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-white/50 dark:hover:bg-white/10 active:scale-95 transition-all"><div class="w-12 h-12 rounded-2xl bg-red-500 text-white flex items-center justify-center shadow-lg"><i class="fas fa-power-off text-lg"></i></div><span class="text-[10px] font-bold text-slate-700 dark:text-white">Sair</span></button>
                 </div>
             </div>
         </main>
 
         <nav class="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[70%] max-w-xs h-16 liquid-glass rounded-full flex justify-around items-center px-4 z-[200] transition-all duration-300">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 dark:text-slate-400 transition-all hover:scale-110 active:scale-95 nav-icon">
-                <i class="fas fa-home text-xl"></i>
-            </button>
-            <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 dark:text-slate-400 transition-all hover:scale-110 active:scale-95 nav-icon">
-                <i class="fas fa-clipboard-check text-xl"></i>
-            </button>
-            <button onclick="toggleMoreMenu()" id="nav-more" class="flex flex-col items-center justify-center w-12 h-12 text-slate-400 dark:text-slate-400 transition-all hover:scale-110 active:scale-95 nav-icon">
-                <i class="fas fa-bars text-xl"></i>
-            </button>
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center w-12 h-12 nav-btn"><i class="fas fa-home text-xl nav-icon"></i></button>
+            <button onclick="switchTab('attendance')" id="nav-attendance" class="flex flex-col items-center justify-center w-12 h-12 nav-btn"><i class="fas fa-clipboard-check text-xl nav-icon"></i></button>
+            <button onclick="toggleMoreMenu()" id="nav-more" class="flex flex-col items-center justify-center w-12 h-12 nav-btn"><i class="fas fa-bars text-xl nav-icon"></i></button>
         </nav>
     </div>
 
     <div id="toast-container" class="fixed top-8 left-1/2 -translate-x-1/2 z-[1000] flex flex-col gap-3 pointer-events-none w-full max-w-xs px-4"></div>
+    
+    <script>
+        setTimeout(() => {
+            const ls = document.getElementById('loading-screen');
+            if(ls && !ls.classList.contains('hidden')) {
+                console.warn('Carregamento forçado pelo sistema de segurança.');
+                ls.classList.add('hidden');
+            }
+        }, 4000);
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, query, orderBy, setDoc, deleteDoc, getDocs, where, arrayUnion, arrayRemove, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-          apiKey: "AIzaSyAaEKx9n4N847WW97FhfZxLZYtsa5cTsE0",
-          authDomain: "frequencia-da-ala.firebaseapp.com",
-          projectId: "frequencia-da-ala",
-          storageBucket: "frequencia-da-ala.firebasestorage.app",
-          messagingSenderId: "823110082594",
-          appId: "1:823110082594:web:525d38b65a5ab74ec9ea7b"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyAaEKx9n4N847WW97FhfZxLZYtsa5cTsE0", authDomain: "frequencia-da-ala.firebaseapp.com", projectId: "frequencia-da-ala", storageBucket: "frequencia-da-ala.firebasestorage.app", messagingSenderId: "823110082594", appId: "1:823110082594:web:525d38b65a5ab74ec9ea7b" };
+        const app = initializeApp(firebaseConfig); const db = getFirestore(app);
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // HELPER PARA DATA LOCAL (SEM UTC)
-        const getLocalISOString = (date) => {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        };
+        // HELPER DATE
+        const getLocalISOString = (date) => { const y=date.getFullYear(); const m=String(date.getMonth()+1).padStart(2,'0'); const d=String(date.getDate()).padStart(2,'0'); return `${y}-${m}-${d}`; };
 
         // GLOBALS
-        let members = []; 
-        let attendanceHistory = {}; 
-        let allUsersList = [];
-        let domingosISO = [];
-        let currentUser = JSON.parse(localStorage.getItem('user_data')) || null;
-        let selectedDate = new Date().toISOString().split('T')[0];
-        let currentFilter = 'TODOS';
-        let hChart = null; let aChart = null;
-        let memberIdEditing = null; let userIdEditing = null; let memberIdJustifying = null;
-        let orderByFrequency = false;
-        let searchTimeout;
-        let showMissingOnly = false;
+        let members = []; let attendanceHistory = {}; let allUsersList = []; let domingosISO = []; let currentUser = JSON.parse(localStorage.getItem('user_data')) || null;
+        let selectedDate = new Date().toISOString().split('T')[0]; let currentFilter = 'TODOS'; let hChart = null; let aChart = null;
+        let memberIdEditing = null; let userIdEditing = null; let memberIdJustifying = null; let orderByFrequency = false; let searchTimeout; let showMissingOnly = false;
 
-        // DATE INIT CORRIGIDO
+        // DATE INIT
         const dSelectGlobal = document.getElementById('dateSelectGlobal');
-        let dataAux = new Date();
-        while (dataAux.getDay() !== 0) dataAux.setDate(dataAux.getDate() - 1);
-        domingosISO = [];
-        if(dSelectGlobal) dSelectGlobal.innerHTML = '';
-        for(let i=0; i<12; i++) {
-            let iso = getLocalISOString(dataAux); 
-            domingosISO.push(iso); 
-            if(dSelectGlobal) dSelectGlobal.innerHTML += `<option value="${iso}" class="text-black">${dataAux.toLocaleDateString('pt-BR')}</option>`;
-            dataAux.setDate(dataAux.getDate() - 7);
-        }
-        if(domingosISO.length > 0) {
-            selectedDate = domingosISO[0];
-            if(dSelectGlobal) {
-                dSelectGlobal.value = selectedDate;
-                dSelectGlobal.addEventListener('change', (e) => { selectedDate = e.target.value; renderAll(); });
-            }
-        }
+        let dataAux = new Date(); while(dataAux.getDay()!==0) dataAux.setDate(dataAux.getDate()-1);
+        domingosISO = []; if(dSelectGlobal) dSelectGlobal.innerHTML = '';
+        for(let i=0; i<12; i++) { let iso = getLocalISOString(dataAux); domingosISO.push(iso); if(dSelectGlobal) dSelectGlobal.innerHTML += `<option value="${iso}" class="text-black">${dataAux.toLocaleDateString('pt-BR')}</option>`; dataAux.setDate(dataAux.getDate()-7); }
+        if(domingosISO.length > 0) { selectedDate = domingosISO[0]; if(dSelectGlobal) { dSelectGlobal.value = selectedDate; dSelectGlobal.addEventListener('change', (e) => { selectedDate = e.target.value; renderAll(); }); } }
 
-        // THEME
-        window.toggleTheme = () => {
-            const html = document.documentElement;
-            if(html.classList.contains('dark')) {
-                html.classList.remove('dark'); localStorage.setItem('theme', 'light');
-            } else {
-                html.classList.add('dark'); localStorage.setItem('theme', 'dark');
-            }
-            if(members.length > 0) window.updateCharts();
-        };
-        if(localStorage.getItem('theme') === 'dark') {
-            document.documentElement.classList.add('dark');
-        }
+        // LOGIC
+        window.toggleTheme = () => { const html = document.documentElement; if(html.classList.contains('dark')) { html.classList.remove('dark'); localStorage.setItem('theme', 'light'); } else { html.classList.add('dark'); localStorage.setItem('theme', 'dark'); } if(members.length > 0) window.updateCharts(); };
+        if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
 
-        // UTILS
-        window.showToast = (msg, type = 'success') => {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            const colors = { success: 'bg-emerald-500 shadow-emerald-900/20', error: 'bg-rose-500 shadow-rose-900/20', info: 'bg-[#002e5d] dark:bg-blue-600 shadow-blue-900/20' };
-            const icons = { success: 'fa-check-circle', error: 'fa-triangle-exclamation', info: 'fa-circle-info' };
-            toast.className = `${colors[type]} text-white px-8 py-5 rounded-[24px] shadow-2xl flex items-center gap-4 transition-all duration-300 transform toast-active pointer-events-auto w-full scale-100 opacity-100 border border-white/20`;
-            toast.innerHTML = `<i class="fas ${icons[type]} text-lg"></i> <span class="text-xs font-black uppercase tracking-widest">${msg}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(-20px) scale(0.9)'; setTimeout(() => toast.remove(), 400); }, 3000);
-        };
+        window.showToast = (msg, type='success') => { const c = document.getElementById('toast-container'); const t = document.createElement('div'); const cl = {success:'bg-emerald-500', error:'bg-rose-500', info:'bg-[#002e5d]'}; t.className = `${cl[type] || cl.success} text-white px-6 py-4 rounded-2xl shadow-xl flex items-center gap-3 animate-pop-up`; t.innerHTML = `<span class="font-bold text-xs uppercase">${msg}</span>`; c.appendChild(t); setTimeout(() => t.remove(), 3000); };
+        
+        window.renderAll = () => { try { renderAttendance(); renderRescue(); updateCharts(); } catch(e) { console.error(e); } };
 
-        window.renderAll = () => { renderAttendance(); renderRescue(); updateCharts(); };
-
-        // NAVIGATION
         window.switchTab = (tab) => {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-            if (tab === 'login' || tab === 'first-login') {
-                document.getElementById('app-layout').classList.add('hidden');
-                document.getElementById('access-container').classList.remove('hidden');
-                document.body.className = "antialiased status-login bg-slate-50 dark:bg-slate-900";
-            } else {
-                document.getElementById('app-layout').classList.remove('hidden');
-                document.getElementById('access-container').classList.add('hidden');
-                document.body.className = "antialiased status-app bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 overflow-x-hidden";
-            }
-            const targetView = document.getElementById(`view-${tab}`);
-            if(targetView) targetView.classList.remove('hidden');
+            if(tab==='login' || tab==='first-login') { document.getElementById('app-layout').classList.add('hidden'); document.getElementById('access-container').classList.remove('hidden'); }
+            else { document.getElementById('app-layout').classList.remove('hidden'); document.getElementById('access-container').classList.add('hidden'); }
+            const target = document.getElementById(`view-${tab}`); if(target) target.classList.remove('hidden');
             
-            // AUTO CLOSE MENU
-            const menu = document.getElementById('more-menu-content');
-            const overlay = document.getElementById('more-menu-overlay');
-            if(!menu.classList.contains('hidden')) {
-                menu.classList.add('hidden');
-                overlay.classList.add('hidden');
-                document.getElementById('nav-more').classList.remove('nav-btn-active'); 
-            }
-
+            const menu = document.getElementById('more-menu-content'); const over = document.getElementById('more-menu-overlay');
+            if(!menu.classList.contains('hidden')) { menu.classList.add('hidden'); over.classList.add('hidden'); document.getElementById('nav-more').classList.remove('nav-btn-active'); }
+            
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-btn-active'));
+            const titles = {'dashboard':'Página Inicial','attendance':'Registrar Frequência','analysis':'Resgate','reports':'Relatórios','add':'Membros','members-list':'Gestão','admin-users':'Admin'};
+            document.getElementById('dynamic-page-title').innerText = titles[tab] || 'Ala';
             
-            const titles = {
-                'dashboard': 'Página Inicial',
-                'attendance': 'Registrar Frequência',
-                'analysis': 'Resgate',
-                'reports': 'Relatórios',
-                'add': 'Membros',
-                'members-list': 'Gestão',
-                'admin-users': 'Admin'
-            };
+            const dateEl = document.getElementById('date-controls-wrapper'); const searchEl = document.getElementById('sticky-search-wrapper');
+            if(['dashboard','attendance','reports'].includes(tab)) { dateEl.classList.remove('hidden'); } else { dateEl.classList.add('hidden'); }
+            if(tab==='attendance') searchEl.classList.remove('hidden'); else searchEl.classList.add('hidden');
             
-            const titleEl = document.getElementById('dynamic-page-title');
-            const dateEl = document.getElementById('date-controls-wrapper');
-            const searchEl = document.getElementById('sticky-search-wrapper');
-            
-            titleEl.innerText = titles[tab] || 'Ala';
-            
-            const allowDate = ['dashboard', 'attendance', 'reports'];
-            if(allowDate.includes(tab)) {
-                dateEl.classList.remove('hidden');
-                titleEl.classList.remove('w-full');
-            } else {
-                dateEl.classList.add('hidden');
-                titleEl.classList.add('w-full');
-            }
+            if(tab==='dashboard') document.getElementById('nav-dashboard').classList.add('nav-btn-active');
+            if(tab==='attendance') document.getElementById('nav-attendance').classList.add('nav-btn-active');
 
-            // Exibir/Esconder Search Bar (Apenas em attendance)
-            if(tab === 'attendance') {
-                searchEl.classList.remove('hidden');
-            } else {
-                searchEl.classList.add('hidden');
-            }
-
-            if(tab === 'dashboard') document.getElementById('nav-dashboard').classList.add('nav-btn-active');
-            if(tab === 'attendance') document.getElementById('nav-attendance').classList.add('nav-btn-active');
-
-            if(tab === 'members-list') renderMembersList();
-            if(tab === 'reports' || tab === 'dashboard') renderAll();
+            if(tab==='members-list') renderMembersList();
+            if(tab==='reports' || tab==='dashboard') renderAll();
             window.scrollTo(0,0);
         };
+        window.toggleMobileMenu = () => {};
+        window.toggleMoreMenu = () => { const o = document.getElementById('more-menu-overlay'); const m = document.getElementById('more-menu-content'); const b = document.getElementById('nav-more'); if(m.classList.contains('hidden')) { m.classList.remove('hidden'); o.classList.remove('hidden'); b.classList.add('nav-btn-active'); } else { m.classList.add('hidden'); o.classList.add('hidden'); b.classList.remove('nav-btn-active'); } };
 
-        window.toggleMobileMenu = () => { }; 
+        window.checkLogin = async () => { const u = document.getElementById('login-user').value.toLowerCase().trim(); const p = document.getElementById('login-pass').value.trim(); const snap = await getDocs(query(collection(db, "usuarios"), where("username", "==", u), where("password", "==", p))); if(!snap.empty) { localStorage.setItem('user_data', JSON.stringify({id:snap.docs[0].id, ...snap.docs[0].data()})); location.reload(); } else showToast("Erro login", "error"); };
+        window.processFirstLogin = async () => { /* ... */ }; window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
 
-        window.toggleMoreMenu = () => {
-            const overlay = document.getElementById('more-menu-overlay');
-            const menu = document.getElementById('more-menu-content');
-            const btn = document.getElementById('nav-more');
-            
-            if(menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                overlay.classList.remove('hidden');
-                btn.classList.remove('nav-btn-active'); // Remove active
-            } else {
-                menu.classList.add('hidden');
-                overlay.classList.add('hidden');
-                btn.classList.add('nav-btn-active'); // Add active
-            }
-        };
-
-        // AUTH
-        window.checkLogin = async () => {
-            const u = document.getElementById('login-user').value.toLowerCase().trim();
-            const p = document.getElementById('login-pass').value.trim();
-            const snap = await getDocs(query(collection(db, "usuarios"), where("username", "==", u), where("password", "==", p)));
-            if (!snap.empty) { localStorage.setItem('user_data', JSON.stringify({id: snap.docs[0].id, ...snap.docs[0].data()})); location.reload(); } 
-            else showToast("Usuário ou senha incorretos", "error");
-        };
-        window.processFirstLogin = async () => {
-            const u = document.getElementById('first-user').value.toLowerCase().trim();
-            const p1 = document.getElementById('first-pass').value.trim();
-            const p2 = document.getElementById('first-pass-confirm').value.trim();
-            if(!u || p1 !== p2) return showToast("Senhas não coincidem", "error");
-            const snap = await getDocs(query(collection(db, "usuarios"), where("username", "==", u)));
-            if(snap.empty) return showToast("Acesso não autorizado", "error");
-            await updateDoc(doc(db, "usuarios", snap.docs[0].id), { password: p1 });
-            showToast("Conta ativada com sucesso!", "success"); switchTab('login');
-        };
-        window.logout = () => { localStorage.removeItem('user_data'); location.reload(); };
-
-        // SYNC
         function listenData() {
-            onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => {
-                members = snap.docs.map(d => ({id: d.id, ...d.data()})); 
-                renderAll(); 
-            });
-            onSnapshot(collection(db, "historico"), (snap) => {
-                attendanceHistory = {}; snap.docs.forEach(d => { attendanceHistory[d.id] = d.data(); }); 
-                renderAll(); 
-            });
-            onSnapshot(collection(db, "usuarios"), (snap) => {
-                allUsersList = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                if(currentUser && currentUser.role === 'admin') renderAdminUsers();
-            });
+            onSnapshot(query(collection(db, "membros"), orderBy("name")), (snap) => { members = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAll(); });
+            onSnapshot(collection(db, "historico"), (snap) => { attendanceHistory = {}; snap.docs.forEach(d => { attendanceHistory[d.id] = d.data(); }); renderAll(); });
+            onSnapshot(collection(db, "usuarios"), (snap) => { allUsersList = snap.docs.map(d => ({id: d.id, ...d.data()})); if(currentUser && currentUser.role === 'admin') renderAdminUsers(); });
             document.getElementById('loading-screen').classList.add('hidden');
         }
 
-        // LOGIC
-        window.togglePresence = async (memberId, memberName) => {
-            if (currentUser.role !== 'admin' || !selectedDate) return;
-            const batch = writeBatch(db);
-            const hRef = doc(db, "historico", selectedDate);
-            const mRef = doc(db, "membros", memberId);
-            const data = attendanceHistory[selectedDate] || {};
-            const presents = data.presents || [];
-            const online = data.online_ids || [];
-            try {
-                if (!presents.includes(memberId)) {
-                    batch.set(hRef, { presents: arrayUnion(memberId) }, { merge: true });
-                    batch.update(mRef, { attendanceLog: arrayUnion(selectedDate), lastAttended: selectedDate });
-                } else if (!online.includes(memberId)) {
-                    batch.set(hRef, { online_ids: arrayUnion(memberId) }, { merge: true });
-                } else {
-                    if(!confirm(`Remover presença de ${memberName}?`)) return;
-                    batch.set(hRef, { presents: arrayRemove(memberId), online_ids: arrayRemove(memberId) }, { merge: true });
-                    batch.update(mRef, { attendanceLog: arrayRemove(selectedDate) });
-                }
-                await batch.commit();
-                if ("vibrate" in navigator) navigator.vibrate(50);
-            } catch (error) { console.error(error); showToast("Erro ao sincronizar dados", "error"); }
+        window.togglePresence = async (id, name) => { if(currentUser.role!=='admin') return; const batch = writeBatch(db); const hRef = doc(db,"historico",selectedDate); const mRef = doc(db,"membros",id); const data = attendanceHistory[selectedDate]||{}; const ps = data.presents||[]; const on = data.online_ids||[]; 
+            if(!ps.includes(id)) { batch.set(hRef,{presents:arrayUnion(id)},{merge:true}); batch.update(mRef,{attendanceLog:arrayUnion(selectedDate),lastAttended:selectedDate}); }
+            else if(!on.includes(id)) { batch.set(hRef,{online_ids:arrayUnion(id)},{merge:true}); }
+            else { if(!confirm(`Remover ${name}?`)) return; batch.set(hRef,{presents:arrayRemove(id),online_ids:arrayRemove(id)},{merge:true}); batch.update(mRef,{attendanceLog:arrayRemove(selectedDate)}); }
+            await batch.commit(); if(navigator.vibrate) navigator.vibrate(50);
         };
-
-        window.getRealCategory = (m) => m.categoria || 'Membro';
-
-        // NEW RENDER LOGIC
-        window.markFamilyPresent = async (familyName) => {
-            if(!confirm(`Marcar PRESENÇA para toda a Família ${familyName}?`)) return;
-            if (currentUser.role !== 'admin' || !selectedDate) return;
-            const familyMembers = members.filter(m => m.familia === familyName);
-            const idsToMark = familyMembers.map(m => m.id);
-            if(idsToMark.length === 0) return;
-            const batch = writeBatch(db);
-            const hRef = doc(db, "historico", selectedDate);
-            batch.set(hRef, { presents: arrayUnion(...idsToMark) }, { merge: true });
-            idsToMark.forEach(id => {
-                const mRef = doc(db, "membros", id);
-                batch.update(mRef, { attendanceLog: arrayUnion(selectedDate), lastAttended: selectedDate });
-            });
-            try { await batch.commit(); if ("vibrate" in navigator) navigator.vibrate([50, 50, 50]); showToast(`${familyName}: Presença registrada!`, "success"); } 
-            catch (error) { console.error(error); showToast("Erro ao marcar família", "error"); }
-        };
-
-        window.toggleMissingOnly = () => {
-            showMissingOnly = !showMissingOnly;
-            const btn = document.getElementById('btnToggleMissing');
-            if(showMissingOnly) {
-                btn.classList.add('bg-orange-100', 'text-orange-600', 'border-orange-200', 'dark:bg-orange-900/40', 'dark:text-orange-400', 'dark:border-orange-700');
-                btn.classList.remove('bg-white', 'text-slate-400', 'dark:bg-slate-800');
-                showToast("Mostrando apenas ausentes", "info");
-            } else {
-                btn.classList.remove('bg-orange-100', 'text-orange-600', 'border-orange-200', 'dark:bg-orange-900/40', 'dark:text-orange-400', 'dark:border-orange-700');
-                btn.classList.add('bg-white', 'text-slate-400', 'dark:bg-slate-800');
-                showToast("Mostrando todos", "info");
-            }
-            renderAttendance();
-        };
-
-        window.toggleFrequencyOrder = () => {
-            orderByFrequency = !orderByFrequency;
-            if (orderByFrequency) showToast("Mais frequentes primeiro", "info"); else showToast("Ordem alfabética", "info");
-            renderAttendance();
-        };
+        window.markFamilyPresent = async (fam) => { if(!confirm(`Marcar Família ${fam}?`)) return; const fMem = members.filter(m=>m.familia===fam).map(m=>m.id); const batch = writeBatch(db); const hRef = doc(db,"historico",selectedDate); batch.set(hRef,{presents:arrayUnion(...fMem)},{merge:true}); fMem.forEach(id => batch.update(doc(db,"membros",id),{attendanceLog:arrayUnion(selectedDate),lastAttended:selectedDate})); await batch.commit(); showToast("Família marcada!"); };
 
         window.renderAttendance = () => {
             const list = document.getElementById('memberList'); if(!list) return;
             const search = document.getElementById('searchMember').value.toLowerCase();
-            const btnClr = document.getElementById('btnClearSearch'); if(btnClr) search.length > 0 ? btnClr.classList.remove('hidden') : btnClr.classList.add('hidden');
-
-            // DADOS ATUAIS
-            const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
-            const curP = data.presents || []; const curO = data.online_ids || [];
-            const justifications = data.justifications || {};
-
-            // --- LÓGICA DE CRESCIMENTO (COMPARAR COM DOMINGO ANTERIOR) ---
-            let growthHtml = '';
-            // Encontra o índice da data atual na lista de domingos gerados
-            const currentIndex = domingosISO.indexOf(selectedDate);
-            // O domingo anterior é o próximo índice (pois a lista é gerada do mais novo pro mais velho no meu loop, 
-            // mas no seu código original era do hoje para trás. Se index + 1 existir, é a semana passada).
-            if (currentIndex !== -1 && currentIndex + 1 < domingosISO.length) {
-                const prevDate = domingosISO[currentIndex + 1];
-                const prevData = attendanceHistory[prevDate] || { presents: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
-                
-                // Calcula totais
-                let curTotalCalc = 0; members.forEach(m => { if(curP.includes(m.id)) curTotalCalc++; });
-                curTotalCalc += (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
-
-                let prevTotalCalc = 0; members.forEach(m => { if((prevData.presents||[]).includes(m.id)) prevTotalCalc++; });
-                prevTotalCalc += (prevData.lideresCount||0) + (prevData.visitantesCount||0) + (prevData.missionariosCount||0);
-
-                if (prevTotalCalc > 0) {
-                    const diff = curTotalCalc - prevTotalCalc;
-                    const percent = Math.round((diff / prevTotalCalc) * 100);
-                    const isPositive = diff >= 0;
-                    const colorClass = isPositive ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600';
-                    const iconClass = isPositive ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down';
-                    const signal = isPositive ? '+' : '';
-                    growthHtml = `<span class="${colorClass} text-xs font-black px-2.5 py-1 rounded-full flex items-center gap-1"><i class="fas ${iconClass}"></i> ${signal}${percent}%</span>`;
-                } else {
-                    growthHtml = `<span class="bg-slate-100 text-slate-400 text-xs font-black px-2.5 py-1 rounded-full">--</span>`;
-                }
-            }
-
-            // ATUALIZA CONTADORES MANUAIS NA TELA DE REGISTRO
-            if(document.getElementById('display-lideres')) {
-                document.getElementById('display-lideres').innerText = data.lideresCount || 0;
-                document.getElementById('display-visitantes').innerText = data.visitantesCount || 0;
-                document.getElementById('display-missionarios').innerText = data.missionariosCount || 0;
-            }
+            const btnClr = document.getElementById('btnClearSearch'); if(btnClr) search.length>0 ? btnClr.classList.remove('hidden') : btnClr.classList.add('hidden');
             
-            // CÁLCULO DE TOTAIS PARA EXIBIÇÃO
-            let mFis = 0; let mOnl = 0; let vFis = 0; let vOnl = 0; let totM = 0;
+            const data = attendanceHistory[selectedDate] || { presents: [], online_ids: [], lideresCount: 0, visitantesCount: 0, missionariosCount: 0 };
+            const curP = data.presents || []; const curO = data.online_ids || []; const justs = data.justifications || {};
+
+            if(document.getElementById('display-lideres')) { document.getElementById('display-lideres').innerText = data.lideresCount||0; document.getElementById('display-visitantes').innerText = data.visitantesCount||0; document.getElementById('display-missionarios').innerText = data.missionariosCount||0; }
+
+            let mFis = 0, mOnl = 0, vLoc = 0;
             members.forEach(m => {
                 const isP = curP.includes(m.id); const isOn = curO.includes(m.id);
-                const rCat = getRealCategory(m); if(rCat !== 'Visitante') { totM++; if(isP) isOn ? mOnl++ : mFis++; } else { if(isP) isOn ? vOnl++ : vFis++; }
+                if(isP) { if(m.categoria === 'Visitante') vLoc++; else isOn ? mOnl++ : mFis++; }
             });
-            
-            const totalPresentes = mFis + mOnl + vFis + vOnl + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
-            
-            // ATUALIZA O CARD PRINCIPAL DO DASHBOARD (COM BARRA DE META)
-            const dashboardCard = document.getElementById('dashboard-main-card');
-            if(dashboardCard) {
-                const meta = 100;
-                const progresso = Math.min(100, Math.round((totalPresentes / meta) * 100));
-                
-                dashboardCard.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <p class="text-sm font-bold text-slate-500 dark:text-slate-400">Frequência Sacramental</p>
-                            <div class="flex items-center gap-3 mt-1">
-                                <h1 class="text-5xl font-black text-slate-800 dark:text-white tracking-tight">${totalPresentes}</h1>
-                                ${growthHtml}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="relative w-full h-3 bg-slate-100 dark:bg-slate-700 rounded-full mt-2 mb-1 overflow-hidden">
-                        <div class="absolute top-0 left-0 h-full bg-[#002e5d] dark:bg-blue-500 rounded-full transition-all duration-1000 ease-out" style="width: ${progresso}%"></div>
-                    </div>
-                    <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 text-right uppercase tracking-widest mb-6">Meta: ${meta}</p>
+            const totGeral = mFis + mOnl + vLoc + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
 
-                    <div class="pt-4 border-t border-dashed border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-500 dark:text-slate-400 space-y-3">
-                        <div class="flex justify-between items-center"><span class="text-green-600 dark:text-green-400 flex items-center gap-2"><i class="fas fa-users text-xs"></i> Membros Ala</span> <span class="text-base font-black text-slate-800 dark:text-white">${mFis + mOnl}</span></div>
-                        ${(mOnl) > 0 ? `<div class="flex justify-between items-center pl-6 text-xs"><span class="text-blue-400 uppercase tracking-widest">Online</span><span class="font-black text-blue-600 dark:text-blue-400">${mOnl}</span></div>` : ''}
-                        ${(mFis) > 0 ? `<div class="flex justify-between items-center pl-6 text-xs border-b border-slate-50 dark:border-slate-800 pb-2"><span class="text-emerald-500 uppercase tracking-widest">Presencial</span><span class="font-black text-emerald-600 dark:text-emerald-400">${mFis}</span></div>` : ''}
-                        
-                        ${(vFis+vOnl) > 0 ? `<div class="flex justify-between items-center"><span class="text-teal-600 dark:text-teal-400 flex items-center gap-2"><i class="fas fa-user-tag text-xs"></i> Visitantes Locais</span> <span class="text-base font-black text-teal-700 dark:text-teal-300">${vFis+vOnl}</span></div>` : ''}
-                        ${data.lideresCount > 0 ? `<div class="flex justify-between items-center"><span class="text-amber-600 dark:text-amber-400 flex items-center gap-2"><i class="fas fa-user-tie text-xs"></i> Líderes Estaca</span> <span class="text-base font-black text-amber-700 dark:text-amber-300">${data.lideresCount}</span></div>` : ''}
-                        ${data.visitantesCount > 0 ? `<div class="flex justify-between items-center"><span class="text-cyan-600 dark:text-cyan-400 flex items-center gap-2"><i class="fas fa-bus text-xs"></i> Visitantes de Fora</span> <span class="text-base font-black text-cyan-700 dark:text-cyan-300">${data.visitantesCount}</span></div>` : ''}
-                        ${data.missionariosCount > 0 ? `<div class="flex justify-between items-center"><span class="text-indigo-600 dark:text-indigo-400 flex items-center gap-2"><i class="fas fa-id-badge text-xs"></i> Missionários</span> <span class="text-base font-black text-indigo-700 dark:text-indigo-300">${data.missionariosCount}</span></div>` : ''}
-                    </div>
-                `;
-            }
-            
-            // ATUALIZA O NÚMERO TOTAL NOS OUTROS LUGARES
-            document.getElementById('stats-total').innerText = totM;
-
-            // RENDERIZAÇÃO DA LISTA DE CHAMADA (MANTIDA)
-            list.innerHTML = ''; let lastFam = ""; let visibleCount = 0;
-            const lastDom = Object.keys(attendanceHistory).sort().reverse().slice(0, 4);
-            const sorted = [...members].sort((a, b) => {
-                if (orderByFrequency) {
-                    let sA = 0; let sB = 0;
-                    lastDom.forEach(d => { if (attendanceHistory[d]?.presents?.includes(a.id)) sA++; if (attendanceHistory[d]?.presents?.includes(b.id)) sB++; });
-                    if(sB !== sA) return sB - sA;
+            const card = document.getElementById('dashboard-main-card');
+            if(card) {
+                let growthHtml = '<span class="bg-slate-100 text-slate-400 text-xs font-black px-2.5 py-1 rounded-full">--</span>';
+                const idx = domingosISO.indexOf(selectedDate);
+                if(idx !== -1 && idx + 1 < domingosISO.length) {
+                    const prevD = attendanceHistory[domingosISO[idx+1]];
+                    if(prevD) {
+                        const prevTot = (prevD.presents||[]).length + (prevD.lideresCount||0) + (prevD.visitantesCount||0) + (prevD.missionariosCount||0);
+                        if(prevTot > 0) {
+                            const diff = totGeral - prevTot; const perc = Math.round((diff/prevTot)*100); const isPos = diff >= 0;
+                            growthHtml = `<span class="${isPos?'bg-emerald-100 text-emerald-600':'bg-red-100 text-red-600'} text-xs font-black px-2.5 py-1 rounded-full flex items-center gap-1"><i class="fas ${isPos?'fa-arrow-trend-up':'fa-arrow-trend-down'}"></i> ${isPos?'+':''}${perc}%</span>`;
+                        }
+                    }
                 }
-                const fA = (a.familia || "Z-SEM").toUpperCase(); const fB = (b.familia || "Z-SEM").toUpperCase();
-                return fA === fB ? a.name.localeCompare(b.name) : fA.localeCompare(fB);
-            });
+                const meta = 180; const prog = Math.min(100, Math.round((totGeral/meta)*100));
 
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2"><div><p class="text-sm font-bold text-slate-500 dark:text-slate-400">Frequência Sacramental</p><div class="flex items-center gap-3 mt-1"><h1 class="text-5xl font-black text-slate-800 dark:text-white tracking-tight">${totGeral}</h1>${growthHtml}</div></div><div class="w-10 h-10 rounded-full bg-[#002e5d]/10 dark:bg-blue-500/20 flex items-center justify-center text-[#002e5d] dark:text-blue-400"><i class="fas fa-church text-xl"></i></div></div>
+                    <div class="relative w-full h-3 bg-slate-100 dark:bg-slate-700 rounded-full mt-2 mb-1 overflow-hidden"><div class="absolute top-0 left-0 h-full bg-[#002e5d] dark:bg-blue-500 rounded-full transition-all duration-1000 ease-out" style="width: ${prog}%"></div></div><p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 text-right uppercase tracking-widest mb-6">Meta: ${meta}</p>
+                    <div class="pt-4 border-t border-dashed border-slate-200 dark:border-slate-700 text-left text-sm font-bold text-slate-500 dark:text-slate-400 space-y-3">
+                        <div class="flex justify-between items-center py-1 border-b border-slate-50 dark:border-slate-800"><span class="text-[11px] font-bold uppercase tracking-widest text-slate-400">Membros da Ala</span> <span class="text-base font-black text-slate-800 dark:text-white">${mFis+mOnl}</span></div>
+                        ${(mFis)>0 ? `<div class="flex justify-between items-center pl-4 text-xs"><span class="text-emerald-500 uppercase tracking-widest">Presencial</span><span class="font-black text-emerald-600">${mFis}</span></div>` : ''}
+                        ${(mOnl)>0 ? `<div class="flex justify-between items-center pl-4 text-xs border-b border-slate-50 pb-1"><span class="text-blue-400 uppercase tracking-widest">Online</span><span class="font-black text-blue-500">${mOnl}</span></div>` : ''}
+                        ${(vLoc)>0 ? `<div class="flex justify-between items-center py-1 border-b border-slate-50 dark:border-slate-800"><span class="text-[11px] font-bold uppercase tracking-widest text-teal-500">Visitantes Locais</span> <span class="text-base font-black text-teal-600">${vLoc}</span></div>` : ''}
+                        ${(data.lideresCount||0)>0 ? `<div class="flex justify-between items-center py-1 border-b border-slate-50 dark:border-slate-800"><span class="text-[11px] font-bold uppercase tracking-widest text-amber-500">Líderes Estaca</span> <span class="text-base font-black text-amber-600">${data.lideresCount}</span></div>` : ''}
+                        ${(data.visitantesCount||0)>0 ? `<div class="flex justify-between items-center py-1 border-b border-slate-50 dark:border-slate-800"><span class="text-[11px] font-bold uppercase tracking-widest text-cyan-500">Visitantes de Fora</span> <span class="text-base font-black text-cyan-600">${data.visitantesCount}</span></div>` : ''}
+                        ${(data.missionariosCount||0)>0 ? `<div class="flex justify-between items-center py-1 border-b border-slate-50 dark:border-slate-800"><span class="text-[11px] font-bold uppercase tracking-widest text-indigo-500">Missionários</span> <span class="text-base font-black text-indigo-600">${data.missionariosCount}</span></div>` : ''}
+                    </div>`;
+            }
+            if(document.getElementById('stats-total')) document.getElementById('stats-total').innerText = totGeral;
+
+            list.innerHTML = ''; let lastFam = ""; let visibleCount = 0;
+            const sorted = [...members].sort((a,b) => { if(orderByFrequency) return 0; const fA = (a.familia||"Z").toUpperCase(), fB = (b.familia||"Z").toUpperCase(); return fA===fB ? a.name.localeCompare(b.name) : fA.localeCompare(fB); });
             let buffer = '';
             sorted.forEach(m => {
                 const isP = curP.includes(m.id); const isOn = curO.includes(m.id);
-                if (showMissingOnly && isP) return;
-
+                if(showMissingOnly && isP) return;
                 if((m.name.toLowerCase().includes(search) || (m.familia && m.familia.toLowerCase().includes(search))) && (currentFilter === 'TODOS' || m.org === currentFilter)) {
                     visibleCount++;
-                    if (!orderByFrequency && m.familia !== lastFam && !search) { 
-                        buffer += `<div onclick="markFamilyPresent('${m.familia}')" class="family-divider mt-6 mb-3 p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex justify-between items-center cursor-pointer hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all group select-none relative overflow-hidden"><div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#002e5d] dark:bg-blue-500"></div><span class="flex items-center gap-3 font-black text-slate-700 dark:text-slate-200 text-xs uppercase tracking-widest pl-3"><i class="fas fa-users text-[#002e5d] dark:text-blue-400 opacity-80"></i> ${m.familia}</span><span class="text-[9px] font-bold bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg text-slate-400 group-hover:text-[#002e5d] dark:group-hover:text-blue-400 shadow-sm transition-colors border border-slate-200 dark:border-slate-600">Marcar Todos <i class="fas fa-check-double ml-1"></i></span></div>`; 
-                        lastFam = m.familia; 
-                    }
-                    let star = 0; if(orderByFrequency) lastDom.forEach(d => { if (attendanceHistory[d]?.presents?.includes(m.id)) star++; });
+                    if(!orderByFrequency && m.familia !== lastFam && !search) { buffer += `<div onclick="markFamilyPresent('${m.familia}')" class="family-divider mt-6 mb-3 p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex justify-between items-center cursor-pointer hover:bg-white dark:hover:bg-slate-700 shadow-sm transition-all group select-none relative overflow-hidden"><div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#002e5d] dark:bg-blue-500"></div><span class="flex items-center gap-3 font-black text-slate-700 dark:text-slate-200 text-xs uppercase tracking-widest pl-3"><i class="fas fa-users text-[#002e5d] dark:text-blue-400 opacity-80"></i> ${m.familia}</span><span class="text-[9px] font-bold bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg text-slate-400 group-hover:text-[#002e5d] dark:group-hover:text-blue-400 shadow-sm transition-colors border border-slate-200 dark:border-slate-600">Marcar Todos <i class="fas fa-check-double ml-1"></i></span></div>`; lastFam = m.familia; }
                     
                     let bgClass, borderClass, avatarStyle, avatarContent, textClass;
-                    if (isP) {
-                        if (isOn) {
-                            bgClass = "bg-blue-50 dark:bg-blue-900/40"; 
-                            borderClass = "border-blue-400 dark:border-blue-500";
-                            avatarStyle = "bg-blue-500 text-white shadow-blue-300 dark:shadow-none";
-                            avatarContent = `<i class="fas fa-wifi text-lg"></i>`;
-                            textClass = "text-slate-900 dark:text-blue-100";
-                        } else {
-                            bgClass = "bg-emerald-50 dark:bg-emerald-900/40"; 
-                            borderClass = "border-emerald-400 dark:border-emerald-500";
-                            avatarStyle = "bg-emerald-500 text-white shadow-emerald-300 dark:shadow-none";
-                            avatarContent = `<i class="fas fa-check text-lg"></i>`;
-                            textClass = "text-slate-900 dark:text-emerald-100";
-                        }
-                    } else {
-                        bgClass = "bg-white dark:bg-slate-800";
-                        borderClass = "border-transparent";
-                        avatarStyle = "bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-500";
-                        avatarContent = `<span class="text-sm font-bold">${m.name.charAt(0).toUpperCase()}</span>`;
-                        textClass = "text-slate-700 dark:text-slate-300";
-                    }
-                    const rCat = getRealCategory(m);
-                    const hasNote = justifications[m.id]; 
-                    const noteIconClass = hasNote ? "text-amber-500 dark:text-amber-400" : "text-slate-300 dark:text-slate-600";
-                    const noteIconType = hasNote ? "fas fa-sticky-note" : "far fa-sticky-note";
+                    if (isP) { if (isOn) { bgClass = "bg-blue-50 dark:bg-blue-900/40"; borderClass = "border-blue-400 dark:border-blue-500"; avatarStyle = "bg-blue-500 text-white shadow-blue-300 dark:shadow-none"; avatarContent = `<i class="fas fa-wifi text-lg"></i>`; textClass = "text-slate-900 dark:text-blue-100"; } else { bgClass = "bg-emerald-50 dark:bg-emerald-900/40"; borderClass = "border-emerald-400 dark:border-emerald-500"; avatarStyle = "bg-emerald-500 text-white shadow-emerald-300 dark:shadow-none"; avatarContent = `<i class="fas fa-check text-lg"></i>`; textClass = "text-slate-900 dark:text-emerald-100"; } } else { bgClass = "bg-white dark:bg-slate-800"; borderClass = "border-transparent"; avatarStyle = "bg-slate-100 text-slate-400 dark:bg-slate-700 dark:text-slate-500"; avatarContent = `<span class="text-sm font-bold">${m.name.charAt(0).toUpperCase()}</span>`; textClass = "text-slate-700 dark:text-slate-300"; }
+                    
+                    const hasNote = justs[m.id];
+                    const noteClass = hasNote ? "text-amber-500 dark:text-amber-400" : "text-slate-300 dark:text-slate-600";
+                    const noteIcon = hasNote ? "fas fa-sticky-note" : "far fa-sticky-note";
 
-                    buffer += `<div class="glass-card mb-2 p-3 flex items-center gap-3 border-l-[6px] transition-all duration-200 ${bgClass} ${borderClass} shadow-sm"><div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name.replace(/'/g, "\\'")}')"` : ''} class="flex-1 flex items-center gap-3 cursor-pointer select-none"><div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${avatarStyle}">${avatarContent}</div><div class="flex-1 min-w-0"><h4 class="font-bold text-sm ${textClass} break-words whitespace-normal leading-tight">${m.name} ${star > 0 ? `<span class="text-amber-500 text-[10px] ml-1"><i class="fas fa-star"></i>${star}</span>`:''}</h4><p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mt-0.5 tracking-wide">${m.org} • ${rCat}</p></div></div>${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="${noteIconClass} hover:text-[#002e5d] dark:hover:text-blue-400 p-3 transition-colors"><i class="${noteIconType} text-lg"></i></button>` : ''}</div>`;
+                    buffer += `<div class="glass-card mb-2 p-3 flex items-center gap-3 border-l-[6px] transition-all duration-200 ${bgClass} ${borderClass} shadow-sm"><div ${currentUser.role === 'admin' ? `onclick="togglePresence('${m.id}', '${m.name.replace(/'/g, "\\'")}')"` : ''} class="flex-1 flex items-center gap-3 cursor-pointer select-none"><div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${avatarStyle}">${avatarContent}</div><div class="flex-1 min-w-0"><h4 class="font-bold text-sm ${textClass} break-words whitespace-normal leading-tight">${m.name}</h4><p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mt-0.5 tracking-wide">${m.org} • ${getRealCategory(m)}</p></div></div>${!isP && currentUser.role === 'admin' ? `<button onclick="openJustify('${m.id}', '${m.name.replace(/'/g, "\\'")}')" class="${noteClass} hover:text-[#002e5d] dark:hover:text-blue-400 p-3 transition-colors"><i class="${noteIcon} text-lg"></i></button>` : ''}</div>`;
                 }
             });
             list.innerHTML = visibleCount === 0 ? `<div class="flex flex-col items-center justify-center py-10 opacity-60"><div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4"><i class="fas ${showMissingOnly ? 'fa-check-circle text-green-500' : 'fa-search text-slate-400'} text-3xl"></i></div><p class="font-bold text-slate-500 dark:text-slate-400 text-sm">${showMissingOnly ? 'Todos os listados estão presentes!' : 'Nenhum membro encontrado.'}</p></div>` : buffer;
         };
 
-        window.renderAdminUsers = () => {
-            const l = document.getElementById('users-list'); if(!l) return; l.innerHTML = '';
-            allUsersList.forEach(u => { l.innerHTML += `<div class="bg-white dark:bg-slate-700 p-5 rounded-3xl flex justify-between items-center text-xs border dark:border-slate-600"><div><p class="font-black uppercase text-[#002e5d] dark:text-white">${u.name}</p><p class="opacity-40 uppercase text-[9px] font-bold dark:text-slate-300">${u.username}</p></div><button onclick="openEditUser({id:'${u.id}', name:'${u.name}', role:'${u.role}'})" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-600 flex items-center justify-center"><i class="fas fa-cog text-slate-400 dark:text-slate-200"></i></button></div>`; });
-        };
-        window.renderMembersList = () => {
-            const container = document.getElementById('manageMembersContainer'); if(!container) return; container.innerHTML = '';
-            members.forEach(m => {
-                container.innerHTML += `<div class="glass-card p-6 flex justify-between items-center border-l-8 border-slate-100 dark:border-slate-600 shadow-sm"><div class="text-left"><h4 class="font-black text-sm uppercase text-slate-800 dark:text-white">${m.name}</h4><p class="text-[9px] font-black uppercase text-slate-400">${m.org} • ${getRealCategory(m)}</p></div>${currentUser.role === 'admin' ? `<button onclick="openMemberEdit('${m.id}')" class="w-10 h-10 bg-slate-50 dark:bg-slate-700 text-slate-300 dark:text-slate-400 rounded-xl flex items-center justify-center hover:bg-[#002e5d] dark:hover:bg-blue-600 hover:text-white transition-all"><i class="fas fa-pen-to-square"></i></button>` : ''}</div>`;
-            });
-        };
+        window.updateCharts = () => { if(!members.length) return; const orgs = ['Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária']; const container = document.getElementById('org-stats-container'); if(container) { let htmlBuffer = ''; orgs.forEach(org => { const orgMembers = members.filter(m => m.org === org); const total = orgMembers.length; if(total === 0) return; const presentsList = attendanceHistory[selectedDate]?.presents || []; const presentCount = orgMembers.filter(m => presentsList.includes(m.id)).length; const percent = Math.round((presentCount / total) * 100); const isHigh = percent > 90; const barColor = isHigh ? 'bg-emerald-500' : 'bg-[#002e5d] dark:bg-blue-600'; htmlBuffer += `<div class="space-y-1"><div class="flex justify-between items-end"><span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">${org}</span><span class="text-xs font-black text-slate-700 dark:text-white">${presentCount}/${total}</span></div><div class="flex items-center gap-3"><div class="flex-1 h-2.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden"><div class="h-full ${barColor} rounded-full animate-grow-width" style="width: ${percent}%"></div></div><span class="text-xs font-black text-slate-600 dark:text-slate-300 w-8 text-right">${percent}%</span></div></div>`; }); container.innerHTML = htmlBuffer; } const ctx2 = document.getElementById('attendanceChart'); if(!ctx2) return; const isDark = document.documentElement.classList.contains('dark'); const color = isDark ? '#60a5fa' : '#002e5d'; const cts = domingosISO.slice(0, 5).reverse().map(d => { const data = attendanceHistory[d] || {}; let total = (data.presents || []).length + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0); return total; }); if(aChart) aChart.destroy(); aChart = new Chart(ctx2.getContext('2d'), { type: 'line', data: { labels: domingosISO.slice(0, 5).reverse().map(d=>d.split('-')[2]+'/'+d.split('-')[1]), datasets: [{ data: cts, borderColor: color, fill: true, tension: 0.4, borderWidth: 3 }] }, options: { plugins: { legend: false }, scales: { x: { ticks: { color: isDark?'#94a3b8':'#666' }, grid: {display: false} }, y: { ticks: { color: isDark?'#94a3b8':'#666' }, grid: {color: isDark?'#334155':'#e2e8f0'} } } } }); };
 
-        window.clearSearch = () => { document.getElementById('searchMember').value = ''; renderAttendance(); };
-        window.debounceSearch = () => {
-            const btnClr = document.getElementById('btnClearSearch');
-            if(btnClr) document.getElementById('searchMember').value.length > 0 ? btnClr.classList.remove('hidden') : btnClr.classList.add('hidden');
-            clearTimeout(searchTimeout); searchTimeout = setTimeout(() => { renderAttendance(); }, 300);
-        };
-        window.formatNameInput = (el) => { el.value = el.value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' '); };
-        window.formatPhone = (el) => { let v = el.value.replace(/\D/g,''); v = v.replace(/^(\d{2})(\d)/g,"($1) $2"); v = v.replace(/(\d)(\d{4})$/,"$1-$2"); el.value = v; };
-        window.handleFamilySearch = (q) => { 
-            const sug = document.getElementById('familySuggestions'); const box = document.getElementById('headOfFamilyContainer'); if(q.length<2) { sug.classList.add('hidden'); box.classList.remove('hidden'); return; }
-            sug.classList.remove('hidden'); const heads = members.filter(m => m.isHead && m.familia.toLowerCase().includes(q.toLowerCase()));
-            let h = `<div onclick="selectFamily('${q.trim().toUpperCase()}', true)" class="p-4 bg-blue-50 dark:bg-slate-700 cursor-pointer font-bold text-xs uppercase dark:text-white">+ Nova Família ${q}</div>`;
-            if(heads.length > 0) h += heads.map(m => `<div onclick="selectFamily('${m.familia}', false)" class="p-4 border-t dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer font-bold text-xs uppercase dark:text-white">${m.familia}</div>`).join('');
-            sug.innerHTML = h;
-        };
-        window.selectFamily = (f, isNew) => { document.getElementById('familySearch').value = f; document.getElementById('familySuggestions').classList.add('hidden'); document.getElementById('headOfFamilyContainer').classList.toggle('hidden', !isNew); document.getElementById('isHeadOfFamily').checked = isNew; };
-        window.saveNewMember = async () => { 
-            const n = document.getElementById('newName').value; const f = document.getElementById('familySearch').value.toUpperCase(); if(!n || !f) return showToast("Preencha Nome e Família", "error");
-            await addDoc(collection(db, "membros"), { name: n, familia: f, org: document.getElementById('newOrg').value, categoria: document.getElementById('newCat').value, telefone: document.getElementById('newPhone').value || '', isHead: document.getElementById('isHeadOfFamily').checked, lastAttended: "2024-01-01", dataBatismo: document.getElementById('newBaptismDate').value });
-            showToast("Membro cadastrado!", "success"); document.getElementById('newName').value = ''; document.getElementById('familySearch').value = ''; document.getElementById('newPhone').value = ''; document.getElementById('isHeadOfFamily').checked = false;
-        };
-        window.toggleOptions = () => document.getElementById('attendance-options').classList.toggle('hidden');
-        window.toggleBaptismDate = (val, containerId) => { const container = document.getElementById(containerId); if(val === 'Recém-Converso') container.classList.remove('hidden'); else container.classList.add('hidden'); };
-        window.openMemberEdit = (id) => { const m = members.find(x => x.id === id); memberIdEditing = id; document.getElementById('edit-member-name').value = m.name; document.getElementById('edit-member-family').value = m.familia; document.getElementById('edit-member-org').value = m.org; document.getElementById('edit-member-cat').value = m.categoria || 'Membro'; document.getElementById('edit-member-phone').value = m.telefone || ''; document.getElementById('edit-member-isHead').checked = m.isHead || false; document.getElementById('edit-member-baptismDate').value = m.dataBatismo || ''; window.toggleBaptismDate(m.categoria, 'editBaptismDateContainer'); document.getElementById('memberEditModal').classList.remove('hidden'); };
-        window.closeMemberEdit = () => document.getElementById('memberEditModal').classList.add('hidden');
-        window.saveMemberAction = async () => { await updateDoc(doc(db, "membros", memberIdEditing), { name: document.getElementById('edit-member-name').value, familia: document.getElementById('edit-member-family').value.toUpperCase(), org: document.getElementById('edit-member-org').value, categoria: document.getElementById('edit-member-cat').value, telefone: document.getElementById('edit-member-phone').value, isHead: document.getElementById('edit-member-isHead').checked, dataBatismo: document.getElementById('edit-member-baptismDate').value }); showToast("Alterado!", "success"); closeMemberEdit(); };
-        window.deleteMemberAction = async () => { if(confirm("Excluir?")) { await deleteDoc(doc(db, "membros", memberIdEditing)); showToast("Excluído!", "success"); closeMemberEdit(); } };
-        window.adminCreateUser = async () => { const n = document.getElementById('admin-new-name').value; const u = document.getElementById('admin-new-user').value.toLowerCase().trim(); const r = document.getElementById('admin-new-role').value; if(!n || !u) return showToast("Preencha!", "error"); await addDoc(collection(db, "usuarios"), { name: n, username: u, password: "", role: r }); showToast("Login autorizado!", "success"); document.getElementById('admin-new-name').value = ''; document.getElementById('admin-new-user').value = ''; };
-        window.openEditUser = (u) => { userIdEditing = u.id; document.getElementById('edit-user-name').value = u.name; document.getElementById('edit-user-role').value = u.role; document.getElementById('edit-user-pass').value = ''; document.getElementById('userEditModal').classList.remove('hidden'); };
-        window.saveUserUpdate = async () => { const n = document.getElementById('edit-user-name').value; const r = document.getElementById('edit-user-role').value; const p = document.getElementById('edit-user-pass').value; const u = { name: n, role: r }; if(p) u.password = p; await updateDoc(doc(db, "usuarios", userIdEditing), u); showToast("Atualizado!", "success"); document.getElementById('userEditModal').classList.add('hidden'); };
-        window.deleteUserAction = async () => { if(confirm("Remover login?")) { await deleteDoc(doc(db, "usuarios", userIdEditing)); showToast("Removido!", "info"); document.getElementById('userEditModal').classList.add('hidden'); } };
-        
-        window.openJustify = (id, name) => { 
-            memberIdJustifying = id; 
-            document.getElementById('justify-member-name').innerText = "Justificar: " + name; 
-            const note = attendanceHistory[selectedDate]?.justifications?.[id] || '';
-            document.getElementById('justify-text').value = note; 
-            document.getElementById('justificationModal').classList.remove('hidden'); 
-            const btnDelete = document.getElementById('btn-delete-note');
-            if(note) btnDelete.classList.remove('hidden'); else btnDelete.classList.add('hidden');
-        };
+        window.openJustify = (id, name) => { memberIdJustifying = id; document.getElementById('justify-member-name').innerText = "Justificar: " + name; const note = attendanceHistory[selectedDate]?.justifications?.[id] || ''; document.getElementById('justify-text').value = note; document.getElementById('justificationModal').classList.remove('hidden'); const btnDelete = document.getElementById('btn-delete-note'); if(note) btnDelete.classList.remove('hidden'); else btnDelete.classList.add('hidden'); };
         window.closeJustify = () => document.getElementById('justificationModal').classList.add('hidden');
-        window.saveJustification = async () => { 
-            const txt = document.getElementById('justify-text').value.trim(); 
-            const currentData = attendanceHistory[selectedDate] || {};
-            let jst = { ...(currentData.justifications || {}) }; 
-            
-            if(txt === "") delete jst[memberIdJustifying]; 
-            else jst[memberIdJustifying] = txt; 
-            
-            await updateDoc(doc(db, "historico", selectedDate), { justifications: jst }); 
-            showToast("Salvo!", "success"); 
-            closeJustify(); 
-        };
+        window.saveJustification = async () => { const txt = document.getElementById('justify-text').value.trim(); const currentData = attendanceHistory[selectedDate] || {}; let jst = { ...(currentData.justifications || {}) }; if(txt === "") delete jst[memberIdJustifying]; else jst[memberIdJustifying] = txt; await updateDoc(doc(db, "historico", selectedDate), { justifications: jst }); showToast("Salvo!", "success"); closeJustify(); };
+        window.deleteJustification = async () => { if(!confirm("Excluir esta nota?")) return; const currentData = attendanceHistory[selectedDate] || {}; let jst = { ...(currentData.justifications || {}) }; delete jst[memberIdJustifying]; await updateDoc(doc(db, "historico", selectedDate), { justifications: jst }); showToast("Nota excluída", "info"); closeJustify(); };
         
-        window.deleteJustification = async () => {
-            if(!confirm("Excluir esta nota?")) return;
-            const currentData = attendanceHistory[selectedDate] || {};
-            let jst = { ...(currentData.justifications || {}) }; 
-            delete jst[memberIdJustifying]; 
-            
-            await updateDoc(doc(db, "historico", selectedDate), { justifications: jst }); 
-            
-            showToast("Nota excluída", "info"); 
-            closeJustify();
-        };
-
         window.updateCount = async (field, val) => { const ref = doc(db, "historico", selectedDate); const data = attendanceHistory[selectedDate] || {}; const current = data[field] || 0; const newValue = Math.max(0, current + val); await setDoc(ref, { [field]: newValue }, { merge: true }); };
-        window.renderRescue = () => { const list = document.getElementById('missingList'); if(!list) return; list.innerHTML = ''; members.forEach(m => { if(getRealCategory(m)!=='Visitante') { const diff = Math.floor((new Date()-new Date(m.lastAttended))/(1000*60*60*24)); if(diff>=21) list.innerHTML += `<div class="glass-card p-6 border-t-8 border-orange-500"><div><p class="text-[9px] font-black text-orange-500 uppercase">${Math.floor(diff/7)} SEMANAS</p><h4 class="font-black text-slate-800 dark:text-white text-xs">${m.name}</h4></div><a href="https://wa.me/${m.telefone || ''}?text=Olá!" target="_blank" class="block mt-4 bg-teal-600 text-white p-3 rounded-xl text-center text-[10px] uppercase font-bold">WhatsApp</a></div>`; } }); if(document.getElementById('stats-rescue')) document.getElementById('stats-rescue').innerText = list.children.length; }
+        window.renderRescue = () => { const list = document.getElementById('missingList'); if(!list) return; list.innerHTML = ''; members.forEach(m => { if(getRealCategory(m)!=='Visitante') { const diff = Math.floor((new Date()-new Date(m.lastAttended))/(1000*60*60*24)); if(diff>=21) list.innerHTML += `<div class="glass-card p-6 border-t-8 border-orange-500"><div><p class="text-[9px] font-black text-orange-500 uppercase">${Math.floor(diff/7)} SEMANAS</p><h4 class="font-black text-slate-800 dark:text-white text-xs">${m.name}</h4></div><a href="https://wa.me/${m.telefone || ''}?text=Olá!" target="_blank" class="block mt-4 bg-teal-600 text-white p-3 rounded-xl text-center text-[10px] uppercase font-bold">WhatsApp</a></div>`; } }); if(document.getElementById('stats-rescue')) document.getElementById('stats-rescue').innerText = list.children.length; };
+        // ADMIN AND SEARCH
+        window.toggleOptions = () => document.getElementById('attendance-options').classList.toggle('hidden'); window.toggleBaptismDate = (val, containerId) => { const container = document.getElementById(containerId); if(val === 'Recém-Converso') container.classList.remove('hidden'); else container.classList.add('hidden'); }; window.openMemberEdit = (id) => { const m = members.find(x => x.id === id); memberIdEditing = id; document.getElementById('edit-member-name').value = m.name; document.getElementById('edit-member-family').value = m.familia; document.getElementById('edit-member-org').value = m.org; document.getElementById('edit-member-cat').value = m.categoria || 'Membro'; document.getElementById('edit-member-phone').value = m.telefone || ''; document.getElementById('edit-member-isHead').checked = m.isHead || false; document.getElementById('edit-member-baptismDate').value = m.dataBatismo || ''; window.toggleBaptismDate(m.categoria, 'editBaptismDateContainer'); document.getElementById('memberEditModal').classList.remove('hidden'); }; window.closeMemberEdit = () => document.getElementById('memberEditModal').classList.add('hidden'); window.saveMemberAction = async () => { await updateDoc(doc(db, "membros", memberIdEditing), { name: document.getElementById('edit-member-name').value, familia: document.getElementById('edit-member-family').value.toUpperCase(), org: document.getElementById('edit-member-org').value, categoria: document.getElementById('edit-member-cat').value, telefone: document.getElementById('edit-member-phone').value, isHead: document.getElementById('edit-member-isHead').checked, dataBatismo: document.getElementById('edit-member-baptismDate').value }); showToast("Alterado!", "success"); closeMemberEdit(); }; window.deleteMemberAction = async () => { if(confirm("Excluir?")) { await deleteDoc(doc(db, "membros", memberIdEditing)); showToast("Excluído!", "success"); closeMemberEdit(); } }; window.adminCreateUser = async () => { const n = document.getElementById('admin-new-name').value; const u = document.getElementById('admin-new-user').value.toLowerCase().trim(); const r = document.getElementById('admin-new-role').value; if(!n || !u) return showToast("Preencha!", "error"); await addDoc(collection(db, "usuarios"), { name: n, username: u, password: "", role: r }); showToast("Login autorizado!", "success"); document.getElementById('admin-new-name').value = ''; document.getElementById('admin-new-user').value = ''; }; window.openEditUser = (u) => { userIdEditing = u.id; document.getElementById('edit-user-name').value = u.name; document.getElementById('edit-user-role').value = u.role; document.getElementById('edit-user-pass').value = ''; document.getElementById('userEditModal').classList.remove('hidden'); }; window.saveUserUpdate = async () => { const n = document.getElementById('edit-user-name').value; const r = document.getElementById('edit-user-role').value; const p = document.getElementById('edit-user-pass').value; const u = { name: n, role: r }; if(p) u.password = p; await updateDoc(doc(db, "usuarios", userIdEditing), u); showToast("Atualizado!", "success"); document.getElementById('userEditModal').classList.add('hidden'); }; window.deleteUserAction = async () => { if(confirm("Remover login?")) { await deleteDoc(doc(db, "usuarios", userIdEditing)); showToast("Removido!", "info"); document.getElementById('userEditModal').classList.add('hidden'); } }; window.clearSearch = () => { document.getElementById('searchMember').value = ''; renderAttendance(); }; window.debounceSearch = () => { const btnClr = document.getElementById('btnClearSearch'); if(btnClr) document.getElementById('searchMember').value.length > 0 ? btnClr.classList.remove('hidden') : btnClr.classList.add('hidden'); clearTimeout(searchTimeout); searchTimeout = setTimeout(() => { renderAttendance(); }, 300); }; window.formatNameInput = (el) => { el.value = el.value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' '); }; window.formatPhone = (el) => { let v = el.value.replace(/\D/g,''); v = v.replace(/^(\d{2})(\d)/g,"($1) $2"); v = v.replace(/(\d)(\d{4})$/,"$1-$2"); el.value = v; }; window.handleFamilySearch = (q) => { const sug = document.getElementById('familySuggestions'); const box = document.getElementById('headOfFamilyContainer'); if(q.length<2) { sug.classList.add('hidden'); box.classList.remove('hidden'); return; } sug.classList.remove('hidden'); const heads = members.filter(m => m.isHead && m.familia.toLowerCase().includes(q.toLowerCase())); let h = `<div onclick="selectFamily('${q.trim().toUpperCase()}', true)" class="p-4 bg-blue-50 dark:bg-slate-700 cursor-pointer font-bold text-xs uppercase dark:text-white">+ Nova Família ${q}</div>`; if(heads.length > 0) h += heads.map(m => `<div onclick="selectFamily('${m.familia}', false)" class="p-4 border-t dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer font-bold text-xs uppercase dark:text-white">${m.familia}</div>`).join(''); sug.innerHTML = h; }; window.selectFamily = (f, isNew) => { document.getElementById('familySearch').value = f; document.getElementById('familySuggestions').classList.add('hidden'); document.getElementById('headOfFamilyContainer').classList.toggle('hidden', !isNew); document.getElementById('isHeadOfFamily').checked = isNew; }; window.saveNewMember = async () => { const n = document.getElementById('newName').value; const f = document.getElementById('familySearch').value.toUpperCase(); if(!n || !f) return showToast("Preencha Nome e Família", "error"); await addDoc(collection(db, "membros"), { name: n, familia: f, org: document.getElementById('newOrg').value, categoria: document.getElementById('newCat').value, telefone: document.getElementById('newPhone').value || '', isHead: document.getElementById('isHeadOfFamily').checked, lastAttended: "2024-01-01", dataBatismo: document.getElementById('newBaptismDate').value }); showToast("Membro cadastrado!", "success"); document.getElementById('newName').value = ''; document.getElementById('familySearch').value = ''; document.getElementById('newPhone').value = ''; document.getElementById('isHeadOfFamily').checked = false; }; window.toggleMissingOnly = () => { showMissingOnly = !showMissingOnly; const btn = document.getElementById('btnToggleMissing'); if(showMissingOnly) { btn.classList.add('bg-orange-100', 'text-orange-600', 'border-orange-200', 'dark:bg-orange-900/40', 'dark:text-orange-400', 'dark:border-orange-700'); btn.classList.remove('bg-white', 'text-slate-400', 'dark:bg-slate-800'); showToast("Mostrando apenas ausentes", "info"); } else { btn.classList.remove('bg-orange-100', 'text-orange-600', 'border-orange-200', 'dark:bg-orange-900/40', 'dark:text-orange-400', 'dark:border-orange-700'); btn.classList.add('bg-white', 'text-slate-400', 'dark:bg-slate-800'); showToast("Mostrando todos", "info"); } renderAttendance(); }; window.toggleFrequencyOrder = () => { orderByFrequency = !orderByFrequency; if (orderByFrequency) showToast("Mais frequentes primeiro", "info"); else showToast("Ordem alfabética", "info"); renderAttendance(); }; window.navigateDate = (d) => { const s = document.getElementById('dateSelectGlobal'); const i = s.selectedIndex + d; if(i>=0 && i<s.options.length) { s.selectedIndex = i; selectedDate = s.value; if(navigator.vibrate) navigator.vibrate(10); renderAll(); } else showToast("Fim das datas", "info"); };
         
-        window.updateCharts = () => {
-            if(!members.length) return;
-
-            // --- 1. LÓGICA DAS BARRAS DE PROGRESSO (NOVO) ---
-            const orgs = ['Quórum de Élderes', 'Sociedade de Socorro', 'Moças', 'Rapazes', 'Primária'];
-            const container = document.getElementById('org-stats-container');
-            
-            if(container) {
-                let htmlBuffer = '';
-                
-                orgs.forEach(org => {
-                    // Filtra membros da organização
-                    const orgMembers = members.filter(m => m.org === org);
-                    const total = orgMembers.length;
-                    
-                    if(total === 0) return; // Se não tiver ninguém na org, pula
-                    
-                    // Conta quantos estão presentes na data selecionada
-                    const presentsList = attendanceHistory[selectedDate]?.presents || [];
-                    const presentCount = orgMembers.filter(m => presentsList.includes(m.id)).length;
-                    
-                    // Calcula porcentagem
-                    const percent = Math.round((presentCount / total) * 100);
-                    
-                    // Lógica de Cor: Se > 90% fica Verde, senão fica Azul padrão
-                    const isHigh = percent > 90;
-                    const barColor = isHigh ? 'bg-emerald-500' : 'bg-[#002e5d] dark:bg-blue-600';
-                    
-                    // Monta o HTML da Barra
-                    htmlBuffer += `
-                        <div class="space-y-1">
-                            <div class="flex justify-between items-end">
-                                <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                                    ${org}
-                                </span>
-                                <span class="text-xs font-black text-slate-700 dark:text-white">
-                                    ${presentCount}/${total}
-                                </span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <div class="flex-1 h-2.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                                    <div class="h-full ${barColor} rounded-full animate-grow-width" style="width: ${percent}%"></div>
-                                </div>
-                                <span class="text-xs font-black text-slate-600 dark:text-slate-300 w-8 text-right">
-                                    ${percent}%
-                                </span>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                container.innerHTML = htmlBuffer;
-            }
-
-            // --- 2. GRÁFICO DE LINHA (MANTIDO IGUAL) ---
-            const ctx2 = document.getElementById('attendanceChart'); if(!ctx2) return;
-            const isDark = document.documentElement.classList.contains('dark');
-            const color = isDark ? '#60a5fa' : '#002e5d';
-            
-            const cts = domingosISO.slice(0, 5).reverse().map(d => {
-               const data = attendanceHistory[d] || {};
-               let total = (data.presents || []).length + (data.lideresCount||0) + (data.visitantesCount||0) + (data.missionariosCount||0);
-               return total;
-            });
-            
-            if(aChart) aChart.destroy(); 
-            aChart = new Chart(ctx2.getContext('2d'), { 
-                type: 'line', 
-                data: { 
-                    labels: domingosISO.slice(0, 5).reverse().map(d=>d.split('-')[2]+'/'+d.split('-')[1]), 
-                    datasets: [{ data: cts, borderColor: color, fill: true, tension: 0.4, borderWidth: 3 }] 
-                }, 
-                options: { 
-                    plugins: { legend: false }, 
-                    scales: { 
-                        x: { ticks: { color: isDark?'#94a3b8':'#666' }, grid: {display: false} }, 
-                        y: { ticks: { color: isDark?'#94a3b8':'#666' }, grid: {color: isDark?'#334155':'#e2e8f0'} } 
-                    } 
-                } 
-            });
-        }
-        
-        window.navigateDate = (direction) => {
-            const dSelect = document.getElementById('dateSelectGlobal');
-            const currentIndex = dSelect.selectedIndex;
-            const newIndex = currentIndex + direction;
-            if (newIndex >= 0 && newIndex < dSelect.options.length) {
-                dSelect.selectedIndex = newIndex; selectedDate = dSelect.value;
-                if ("vibrate" in navigator) navigator.vibrate(10);
-                renderAll(); 
-            } else showToast("Fim das datas geradas", "info");
-        };
-        
+        if(currentUser) {
+            document.getElementById('user-name-side').innerText = currentUser.name;
+            if(currentUser.role === 'admin') { document.getElementById('admin-btn').classList.remove('hidden'); if(document.getElementById('admin-mobile-btn')) document.getElementById('admin-mobile-btn').classList.remove('hidden'); }
+            listenData(); switchTab('dashboard');
+        } else { switchTab('login'); document.getElementById('loading-screen').classList.add('hidden'); }
     </script>
 </body>
 </html>
